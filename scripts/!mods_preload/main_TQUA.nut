@@ -3,7 +3,8 @@
 	Name = "Troop Quarter",
 	Version = "0.1.0",
 	Const = {
-		MinPlayerRoster = 1 // The game tries to spawn this many Vaults per new map.
+		MinPlayerRoster = 1, 		// The game tries to spawn this many Vaults per new map.
+		PlayerRosterLimit = 27
 	},
 	Config = {
 		VaultSpaceLimit = 60,	// Maximum amount of slots you can unlock in each Vault

@@ -11,12 +11,17 @@ this.troop_quarter_dialog_module <- this.inherit("scripts/ui/screens/ui_module",
 		QuarterID = "quarter",
 		TroopQuarter = null,
 
+
 		// Const
+		QuarterMin = 0,
+		QuarterMax = 4,
+		QuarterLimit = 44,
+
 		UpperRosterLimit = 165,
 		RowLength = 11,
 
 		MinPlayerRoster = ::modTQUA.Const.MinPlayerRoster,
-		MaxPlayerRoster = ::modTQUA.Const.MinPlayerRoster
+		PlayerRosterLimit = ::modTQUA.Const.PlayerRosterLimit,
 	},
 	function create()
 	{
@@ -84,10 +89,15 @@ this.troop_quarter_dialog_module <- this.inherit("scripts/ui/screens/ui_module",
 		_result.Stronghold <- roster;
 		_result.BrothersMaxInStronghold <- num;
 
+		_result.QuarterCurrent <- brothers.len();
+		_result.QuarterMin <- this.m.QuarterMin;
+		_result.QuarterMax <- this.m.QuarterMax;
+		_result.QuarterLimit <- this.m.QuarterLimit;
+
 		if ("Assets" in _result)
 		{
-			_result.Assets.StrongholdBrothers <- brothers.len();
-			_result.Assets.StrongholdBrothersMax <- num;
+			_result.Assets.QuarterCurrent <- brothers.len();
+			_result.Assets.QuarterMax <- roster.len();
 		}
 	}
 
@@ -104,23 +114,32 @@ this.troop_quarter_dialog_module <- this.inherit("scripts/ui/screens/ui_module",
 		}
 
 		_result.Player <- roster;
-		_result.BrothersMaxInCombat <- this.World.Assets.getBrothersMaxInCombat();
-		_result.BrothersMax <- this.World.Assets.getBrothersMax();
+		_result.BrothersMaxInCombat <- ::World.Assets.getBrothersMaxInCombat();
+
+		_result.PlayerCurrent <- ::World.getPlayerRoster().getSize();
+		_result.PlayerMin <- this.m.MinPlayerRoster;
+		_result.PlayerMax <- ::World.Assets.getBrothersMax();
+		_result.PlayerLimit <- this.m.PlayerRosterLimit;
 
 		if ("Assets" in _result)
 		{
-			_result.Assets.Brothers <- this.World.getPlayerRoster().getSize();
-			_result.Assets.BrothersMax <- _result.BrothersMax;
+			_result.Assets.PlayerCurrent <- _result.PlayerCurrent;
+			_result.Assets.PlayerMax <- _result.PlayerMax;
 		}
 	}
 
 	// only ask for the data i need
 	function queryAssetsInformation( _assets )
 	{
-		_assets.Brothers <- this.World.getPlayerRoster().getSize();
-		_assets.BrothersMax <- this.World.Assets.getBrothersMax();
-		_assets.StrongholdBrothers <- this.getQuarterRoster().getSize();
-		_assets.StrongholdBrothersMax <- this.m.UpperRosterLimit;
+		_assets.PlayerCurrent <- ::World.getPlayerRoster().getSize();
+		_assets.PlayerMax <- ::World.Assets.getBrothersMax();
+		_assets.QuarterCurrent <- this.getQuarterRoster().getSize();
+		_assets.QuarterMax <- this.m.QuarterMax;
+	}
+
+	function transferBrother()
+	{
+
 	}
 
 	// Changes the place in formation of a single brother only within their roster

@@ -10,7 +10,7 @@ var BrotherContainer = function( _containerID )
         this.mSlots = [];            // Array of DIVs that a brother can fit in
         this.mBrotherList = [];      // Array of BrotherObject objects
 
-        this.mBrotherCount = 0;     // Current amount of brothers in this container
+        this.mBrotherCurrent = 0;     // Current amount of brothers in this container
         this.mBrotherMin = 0;       // minimum allowed brothers in a contaner (player roster can never have less than 1)
         this.mBrotherMax = 27;      // Maximum allows brothers in this list
         this.mSlotLimit = 27;       // Maximum slots on this list

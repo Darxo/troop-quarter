@@ -41,22 +41,22 @@ var TroopQuarterDialogModule = function(_parent)
     this.mPlayerBrotherButton          = null;
 
     this.mTroopQuarter = new BrotherContainer(Owner.Quarter);
+    this.mTroopQuarter.mBrotherCurrent = 0;
     this.mTroopQuarter.mBrotherMin = 0;
     this.mTroopQuarter.mBrotherMax = 2;
     this.mTroopQuarter.mSlotLimit = 44;
     this.mTroopQuarter.BrotherList = null;
     this.mTroopQuarter.ListContainer = null;
     this.mTroopQuarter.ListScrollContainer = null;
-    this.mTroopQuarter.NumActive = 0;
 
     this.mPlayerRoster = new BrotherContainer(Owner.Player);
+    this.mPlayerRoster.mBrotherCurrent = 0;
     this.mPlayerRoster.mBrotherMin = 1;
     this.mPlayerRoster.mBrotherMax = 5;
     this.mPlayerRoster.mSlotLimit = 27;
     this.mPlayerRoster.BrotherList = null;
     this.mPlayerRoster.ListContainer = null;
     this.mPlayerRoster.ListScrollContainer = null;
-    this.mPlayerRoster.NumActive = 0;
 
     // buttons
     this.mLeaveButton     = null;
@@ -356,32 +356,21 @@ TroopQuarterDialogModule.prototype.isVisible = function ()
 // Load the Data
 TroopQuarterDialogModule.prototype.loadFromData = function (_data)
 {
-    if(_data === undefined || _data === null)
-    {
-        return;
-    }
+    if(_data === undefined || _data === null)       return;
 
-    if('Title' in _data && _data.Title !== null)
-    {
-        this.mDialogContainer.findDialogTitle().html(_data.Title);
-    }
+    if('Title' in _data && _data.Title !== null)                this.mDialogContainer.findDialogTitle().html(_data.Title);
+    if('SubTitle' in _data && _data.SubTitle !== null)          this.mDialogContainer.findDialogSubTitle().html(_data.SubTitle);
 
-    if('SubTitle' in _data && _data.SubTitle !== null)
-    {
-        this.mDialogContainer.findDialogSubTitle().html(_data.SubTitle);
-    }
+    if ('PlayerMin' in _data && _data.PlayerMin !== null)               this.mPlayerRoster.mBrotherMin = _data.PlayerMin;
+    if ('PlayerMax' in _data && _data.PlayerMax !== null)               this.mPlayerRoster.mBrotherMax = _data.PlayerMax;
+    if ('PlayerSlotLimit' in _data && _data.PlayerSlotLimit !== null)   this.mPlayerRoster.mSlotLimit = _data.PlayerSlotLimit;
 
-    if ('BrothersMax' in _data && _data.BrothersMax !== null)
+    if ('QuarterMin' in _data && _data.QuarterMin !== null)             this.mTroopQuarter.mBrotherMin = _data.QuarterMin;
+    if ('QuarterMax' in _data && _data.QuarterMax !== null)             this.mTroopQuarter.mBrotherMax = _data.QuarterMax;
+    if ('QuarterSlotLimit' in _data && _data.QuarterSlotLimit !== null)
     {
-        this.mPlayerRoster.mSlotLimit = _data.BrothersMax;
-    }
+        this.mTroopQuarter.mSlotLimit = _data.QuarterSlotLimit;
 
-    if ('BrothersMaxInStronghold' in _data && _data.BrothersMaxInStronghold !== null && _data.BrothersMaxInStronghold != this.mTroopQuarter.mBrotherMax)
-    {
-        this.mTroopQuarter.mSlotLimit = _data.BrothersMaxInStronghold;
-        // this.mTroopQuarter.mBrotherMax = this.mTroopQuarter.mSlotLimit;
-
-        // compare then resize the roster slots
         if (this.mTroopQuarter.Slots.length < this.mTroopQuarter.mSlotLimit)
         {
             this.mTroopQuarter.ListScrollContainer.empty();
@@ -566,7 +555,7 @@ TroopQuarterDialogModule.prototype.quickMoveBrother = function (_source)
     var _brother = _source.data('brother');
 
     // check if both roster is full
-    if (this.mTroopQuarter.NumActive === this.mTroopQuarter.mBrotherMax && this.mPlayerRoster.NumActive === this.mPlayerRoster.mBrotherMax)
+    if (this.mTroopQuarter.mBrotherCurrent === this.mTroopQuarter.mBrotherMax && this.mPlayerRoster.mBrotherCurrent === this.mPlayerRoster.mBrotherMax)
     {
         return false;
     }
@@ -586,11 +575,11 @@ TroopQuarterDialogModule.prototype.quickMoveBrother = function (_source)
             return false;
 
         // deny when player roster only has 1 bro
-        if (this.mPlayerRoster.NumActive === this.mPlayerRoster.mBrotherMin)
+        if (this.mPlayerRoster.mBrotherCurrent === this.mPlayerRoster.mBrotherMin)
             return false;
 
         // deny when stronghold roster is full
-        if (this.mTroopQuarter.NumActive === this.mTroopQuarter.mBrotherMax)
+        if (this.mTroopQuarter.mBrotherCurrent === this.mTroopQuarter.mBrotherMax)
             return false;
 
         // transfer brother from player roster to stronghold roster
@@ -601,11 +590,11 @@ TroopQuarterDialogModule.prototype.quickMoveBrother = function (_source)
     else
     {
         // deny when player roster has reached brothers max
-        if (this.mPlayerRoster.NumActive >= this.mPlayerRoster.mBrotherLimit)
+        if (this.mPlayerRoster.mBrotherCurrent >= this.mPlayerRoster.mBrotherLimit)
             return false;
 
         // deny when player roster is full
-        if (this.mPlayerRoster.NumActive === this.mPlayerRoster.mBrotherMax)
+        if (this.mPlayerRoster.mBrotherCurrent === this.mPlayerRoster.mBrotherMax)
             return false;
 
         // transfer brother from stronghold roster to player roster
@@ -652,8 +641,8 @@ TroopQuarterDialogModule.prototype.swapSlots = function (_a, _tagA, _b, _tagB)
 
         if (isDifferenceRoster)
         {
-            --sourceOwner.NumActive;
-            ++targetOwner.NumActive;
+            --sourceOwner.mBrotherCurrent;
+            ++targetOwner.mBrotherCurrent;
             this.notifyBackendMoveAtoB(A.data('ID'), _tagA, _b, _tagB);
         }
         else
@@ -759,18 +748,18 @@ TroopQuarterDialogModule.prototype.createBrotherSlots = function ( _tag )
                 return false;
 
             // deny when the player roster has reached brothers max
-            if (drag.data('tag') === Owner.Quarter && self.mPlayer.NumActive >= self.mPlayerRoster.mBrotherMax)
+            if (drag.data('tag') === Owner.Quarter && self.mPlayerRoster.mBrotherCurrent >= self.mPlayerRoster.mBrotherMax)
                 return false;
         }
 
         // number in formation is limited
-        if (parent.NumActive >= parent.mBrotherMax && drag.data('idx') > parent.mBrotherMax && drop.data('idx') <= parent.mBrotherMax && parent.Slots[drop.data('idx')].data('child') == null)
+        if (parent.mBrotherCurrent >= parent.mBrotherMax && drag.data('idx') > parent.mBrotherMax && drop.data('idx') <= parent.mBrotherMax && parent.Slots[drop.data('idx')].data('child') == null)
         {
             return false;
         }
 
         // always keep at least 1 in formation
-        if (parent.NumActive == parent.mBrotherMin && drag.data('idx') <= parent.mBrotherMax && drop.data('idx') > parent.mBrotherMax && parent.Slots[drop.data('idx')].data('child') == null)
+        if (parent.mBrotherCurrent == parent.mBrotherMin && drag.data('idx') <= parent.mBrotherMax && drop.data('idx') > parent.mBrotherMax && parent.Slots[drop.data('idx')].data('child') == null)
         {
             return false;
         }
@@ -812,7 +801,7 @@ TroopQuarterDialogModule.prototype.addBrotherSlotDIV = function(_parent, _data, 
     result.unbindTooltip();
     result.bindTooltip({ contentType: 'ui-element', entityId: id, elementId: 'pokebro.roster' });
     parentDiv.data('child', result);
-    ++_parent.NumActive;
+    ++_parent.mBrotherCurrent;
 
     // some event listener for brother slot to drag and drop
     result.drag("start", function (ev, dd)
@@ -913,7 +902,7 @@ TroopQuarterDialogModule.prototype.onBrothersListLoaded = function (_tag)
         parent.Slots[i].data('child', null);
     }
 
-    parent.NumActive = 0;
+    parent.mBrotherCurrent = 0;
 
     if (parent.BrotherList === null || !jQuery.isArray(parent.BrotherList) || parent.BrotherList.length === 0)
     {
@@ -944,21 +933,21 @@ TroopQuarterDialogModule.prototype.updateAssets = function (_data)
     var currentAssetInformation = _data;
     var previousAssetInformation = this.mRoster;
 
-    if ('Brothers' in _data && 'BrothersMax' in _data)
+    if ('PlayerCurrent' in _data && 'PlayerMax' in _data)
     {
-        value = currentAssetInformation['Brothers'];
-        maxValue = currentAssetInformation['BrothersMax'];
-        previousValue = previousAssetInformation['Brothers'];
+        value = currentAssetInformation['PlayerCurrent'];
+        maxValue = currentAssetInformation['PlayerMax'];
+        previousValue = previousAssetInformation['PlayerCurrent'];
         valueDifference = value - previousValue;
 
         this.updateAssetValue(this.mPlayerBrotherButton, value, maxValue, valueDifference);
     }
 
-    if ('StrongholdBrothers' in _data && 'StrongholdBrothersMax' in _data)
+    if ('QuarterCurrent' in _data && 'QuarterMax' in _data)
     {
-        value = currentAssetInformation['StrongholdBrothers'];
-        maxValue = currentAssetInformation['StrongholdBrothersMax'] > this.mTroopQuarter.mBrotherMax ? this.mTroopQuarter.mBrotherMax : currentAssetInformation['StrongholdBrothersMax'];
-        previousValue = previousAssetInformation['StrongholdBrothers'];
+        value = currentAssetInformation['QuarterCurrent'];
+        maxValue = currentAssetInformation['QuarterMax'] > this.mTroopQuarter.mBrotherMax ? this.mTroopQuarter.mBrotherMax : currentAssetInformation['QuarterMax'];
+        previousValue = previousAssetInformation['QuarterCurrent'];
         valueDifference = value - previousValue;
 
         this.updateAssetValue(this.mAssets.mBrothersAsset, value, maxValue, valueDifference);
