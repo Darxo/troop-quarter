@@ -1,6 +1,6 @@
 var BrotherContainer = function( _containerID )
 {
-    this.mSQHandle = null;
+    // this.mSQHandle = null;
     this.mEventListener = null;
 
     this.mContainerID = _containerID;
@@ -136,6 +136,7 @@ BrotherContainer.prototype.getBrotherByID = function (_brotherId)
 // Create a new DIV object out of a brother object to assign to a slot
 BrotherContainer.prototype.addBrotherSlotDIV = function(_brotherData, _index)
 {
+    console.error(this.mSlots.length + " " + _index);
     var parentDiv = this.mSlots[_index];
     var character = _brotherData[CharacterScreenIdentifier.Entity.Character.Key];
     var brotherID = _brotherData[CharacterScreenIdentifier.Entity.Id];
@@ -311,7 +312,6 @@ BrotherContainer.prototype.createBrotherSlots = function ()
 // Insert Slot and Brother data that are coming from another slot into a new slot
 BrotherContainer.prototype.importBrother = function ( _slotIdx, _data )
 {
-    console.error("importBrother");
     if (this.isEmpty(_slotIdx) === false) return false;
     if (_data === null) return false;
 
@@ -334,7 +334,6 @@ BrotherContainer.prototype.importBrother = function ( _slotIdx, _data )
 // Returns an object with the removed slotData, playerData and a bool indicating whether this slot was highlighted
 BrotherContainer.prototype.removeBrother = function ( _slotIdx )
 {
-    console.error("removeBrother");
     if (this.isEmpty(_slotIdx)) return null;
 
     var slot = this.mSlots[_slotIdx];
@@ -392,12 +391,20 @@ BrotherContainer.prototype.swapBrothers = function ( _firstIdx, _secondIdx )
     targetData.appendTo(sourceSlot);
     sourceSlot.data('child', targetData);
 
+    if (this.mSelectedBrother === _firstIdx)
+    {
+        this.mSelectedBrother = _secondIdx;
+    }
+    else if (this.mSelectedBrother === _secondIdx)
+    {
+        this.mSelectedBrother = _firstIdx;
+    }
+
+    // a class is getting added thats not possible to be removed
 
     var tmp = this.mBrotherList[_firstIdx];
     this.mBrotherList[_firstIdx] = this.mBrotherList[_secondIdx];
     this.mBrotherList[_secondIdx] = tmp;
-
-    if (this.mSelectedBrother === _firstIdx) this.selectSlot(_secondIdx);
     return true;
 }
 
@@ -424,58 +431,3 @@ BrotherContainer.prototype.relocateBrother = function ( _sourceIdx, _targetIdx )
     // this.notifyBackendUpdateRosterPosition(sourceData.data('ID'), _targetIdx);
     return true;
 }
-
-// Backend Notifications
-BrotherContainer.prototype.notifyBackendUpdateRosterPosition = function (_brotherID, _newPosition)
-{
-    // Todo implement callback to allow squirrelto intervene here
-    SQ.call(this.mSQHandle, 'onUpdateRosterPosition', [ _brotherID, _newPosition ]);
-};
-
-
-
-// Generic Stuff
-
-    BrotherContainer.prototype.onDisconnection = function ()
-    {
-        this.mSQHandle = null;
-
-        // notify listener
-        if (this.mEventListener !== null && ('onModuleOnDisconnectionCalled' in this.mEventListener))
-        {
-            this.mEventListener.onModuleOnDisconnectionCalled(this);
-        }
-    };
-
-    // Stuff for notifying squirrel backend
-    BrotherContainer.prototype.registerEventListener = function(_listener)
-    {
-        this.mEventListener = _listener;
-    };
-
-    BrotherContainer.prototype.isConnected = function ()
-    {
-        return this.mSQHandle !== null;
-    };
-
-    BrotherContainer.prototype.onConnection = function (_handle)
-    {
-        this.mSQHandle = _handle;
-
-        // notify listener
-        if (this.mEventListener !== null && ('onModuleOnConnectionCalled' in this.mEventListener))
-        {
-            this.mEventListener.onModuleOnConnectionCalled(this);
-        }
-    };
-
-    BrotherContainer.prototype.onDisconnection = function ()
-    {
-        this.mSQHandle = null;
-
-        // notify listener
-        if (this.mEventListener !== null && ('onModuleOnDisconnectionCalled' in this.mEventListener))
-        {
-            this.mEventListener.onModuleOnDisconnectionCalled(this);
-        }
-    };

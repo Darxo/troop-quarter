@@ -30,6 +30,7 @@
 
 
     ::mods_registerJS("mod_TQUA/brother_container.js");
+    ::mods_registerJS("mod_TQUA/brother_manager.js");
 
     ::mods_registerJS("mod_TQUA/troop_quarter_dialog_module.js");
     ::mods_registerCSS("mod_TQUA/troop_quarter_dialog_module.css");

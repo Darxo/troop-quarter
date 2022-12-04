@@ -6,11 +6,10 @@ this.troop_quarter_dialog_module <- this.inherit("scripts/ui/screens/ui_module",
 		// a row can hold 11 slots so with this you have a maximum of 9 rows in the screen
 		// change to 9999 so you can feel like the roster size is endless lol
 
-		PlayerID = "player",
+		PlayerID = "Player",
+		QuarterID = "Quarter",
 
-		QuarterID = "quarter",
 		TroopQuarter = null,
-
 
 		// Const
 		QuarterMin = 0,
