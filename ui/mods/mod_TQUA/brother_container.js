@@ -261,25 +261,35 @@ BrotherContainer.prototype.createBrotherSlots = function ()
     return this.mSlots;
 };
 
+// This is bring called from outside. The contents of two slots are being swapped
+BrotherContainer.prototype.swapSlots = function ( _firstIdx, _secondIdx )
+{
+    if (_firstIdx === null || _secondIdx === null) return false;
+    if (this.isEmpty(_firstIdx) && this.isEmpty(_secondIdx)) return true;   // We just swapped two empty slots, gg
+
+    if (this.isEmpty(_firstIdx))    return this.relocateBrother(_secondIdx, _firstIdx);
+    if (this.isEmpty(_secondIdx))   return this.relocateBrother(_firstIdx, _secondIdx);
+
+    return this.swapBrothers(_firstIdx, _secondIdx);
+}
+
 // Switch the positions of two brothers in this container
 // _sourceIdx is an unsigned integer
 // _targetIdx is an unsigned integer
-BrotherContainer.prototype.swapBrothers = function ( _sourceIdx, _targetIdx )
+BrotherContainer.prototype.swapBrothers = function ( _firstIdx, _secondIdx )
 {
-    if (_sourceIdx === null || _targetIdx === null) return false;
-    if (this.isEmpty(_sourceIdx) || this.isEmpty(_targetIdx)) return false;
-
-    var sourceSlot = this.mSlots[_sourceIdx];
-    var targetSlot = this.mSlots[_targetIdx];
+    console.error("swapBrothers");
+    var sourceSlot = this.mSlots[_firstIdx];
+    var targetSlot = this.mSlots[_secondIdx];
 
     var sourceData = sourceSlot.data('child');
     var targetData = targetSlot.data('child');
 
-    this.notifyBackendUpdateRosterPosition(sourceData.data('ID'), _targetIdx);
-    this.notifyBackendUpdateRosterPosition(targetData.data('ID'), _sourceIdx);
+    // this.notifyBackendUpdateRosterPosition(sourceData.data('ID'), _secondIdx);
+    // this.notifyBackendUpdateRosterPosition(targetData.data('ID'), _firstIdx);
 
-    sourceData.data('idx', _targetIdx);
-    targetData.data('idx', _sourceIdx);
+    sourceData.data('idx', _secondIdx);
+    targetData.data('idx', _firstIdx);
 
     targetData.detach();
 
@@ -290,23 +300,20 @@ BrotherContainer.prototype.swapBrothers = function ( _sourceIdx, _targetIdx )
     sourceSlot.data('child', targetData);
 
 
-    var tmp = this.mBrotherList[_sourceIdx];
-    this.mBrotherList[_sourceIdx] = this.mBrotherList[_targetIdx];
-    this.mBrotherList[_targetIdx] = tmp;
+    var tmp = this.mBrotherList[_firstIdx];
+    this.mBrotherList[_firstIdx] = this.mBrotherList[_secondIdx];
+    this.mBrotherList[_secondIdx] = tmp;
 
-    if (this.mSelectedBrother === _sourceIdx) this.selectSlot(_targetIdx);
+    if (this.mSelectedBrother === _firstIdx) this.selectSlot(_secondIdx);
+    return true;
 }
 
 // Removes a brother from one slot and move them to another slot within this container
-// _sourceIdx is an unsigned integer that's not null
-// _targetIdx is either an unsigned integer or null
-// _sourceOwner, _targetOwner are BrotherContainer and not null
-BrotherContainer.prototype.relocateBrother = function ( _sourceIdx, _sourceOwner, _targetIdx, _targetOwner )
+// _sourceIdx is an unsigned integer
+// _targetIdx is an unsigned integer
+BrotherContainer.prototype.relocateBrother = function ( _sourceIdx, _targetIdx )
 {
-    if (_sourceIdx === null || _targetIdx === null) return false;
-    if (this.isEmpty(_sourceIdx)) return false;
-    if (this.isEmpty(_targetIdx) === false) return false;
-
+    console.error("relocateBrother");
     var sourceSlot = this.mSlots[_sourceIdx];
     var targetSlot = this.mSlots[_targetIdx];
 
@@ -317,7 +324,12 @@ BrotherContainer.prototype.relocateBrother = function ( _sourceIdx, _sourceOwner
 
     sourceSlot.data('child', null);
 
-    this.notifyBackendUpdateRosterPosition(sourceData.data('ID'), _targetIdx);
+    var tmp = this.mBrotherList[_sourceIdx];
+    this.mBrotherList[_sourceIdx] = this.mBrotherList[_targetIdx];
+    this.mBrotherList[_targetIdx] = tmp;
+
+    // this.notifyBackendUpdateRosterPosition(sourceData.data('ID'), _targetIdx);
+    return true;
 }
 
 // Backend Notifications

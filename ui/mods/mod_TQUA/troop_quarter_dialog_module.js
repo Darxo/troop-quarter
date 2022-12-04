@@ -437,11 +437,31 @@ TroopQuarterDialogModule.prototype.swapBrothers = function (_sourceIdx, _sourceO
 
 TroopQuarterDialogModule.prototype.swapSlots = function (_a, _tagA, _b, _tagB)
 {
-    var isDifferenceRoster = _tagA != _tagB;
+    var isDifferenceRoster = _tagA !== _tagB;
     var sourceOwner = this.getRoster(_tagA);
     var targetOwner = this.getRoster(_tagB);
     var slotA = sourceOwner.mSlots[_a];
     var slotB = targetOwner.mSlots[_b];
+
+    if (isDifferenceRoster === false)
+    {
+        if(slotB.data('child') === null)
+        {
+            var A = slotA.data('child');
+            this.getRoster(_tagA).swapSlots(_a, _b);
+            this.notifyBackendRelocateBrother(A.data('ID'), _b);
+        }
+        else
+        {
+            var A = slotA.data('child');
+            var B = slotB.data('child');
+            this.getRoster(_tagA).swapSlots(_a, _b);
+            this.notifyBackendRelocateBrother(A.data('ID'), _b);
+            this.notifyBackendRelocateBrother(B.data('ID'), _a);
+        }
+
+        return;
+    }
 
     // dragging or transfering into empty slot
     if(slotB.data('child') == null)
