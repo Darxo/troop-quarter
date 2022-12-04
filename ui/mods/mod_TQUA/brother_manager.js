@@ -20,6 +20,29 @@ BrotherManager.prototype.get = function( _containerID )
     return null;
 }
 
+// Returns the next container in line that comes after this one. Useful for quickMove features
+// Returns null is this ID doesn't exists or this is the only container in the manager
+BrotherManager.prototype.getNext = function( _containerID )
+{
+    if (this.mBrotherContainer.length === 1) return null;
+    for(var i = 0; i < this.mBrotherContainer.length; i++)
+    {
+        if (this.mBrotherContainer[i].mContainerID === _containerID)
+        {
+            if (i < (this.mBrotherContainer.length - 1))  // We are not the last element
+            {
+                return this.mBrotherContainer[i + 1];
+            }
+            else
+            {
+                return this.mBrotherContainer[0];
+            }
+        }
+    }
+
+    return null;
+}
+
 // When we don't know in which roster he is
 BrotherManager.prototype.getBrotherByID = function (_brotherID)
 {
@@ -302,16 +325,10 @@ BrotherManager.prototype.quickMoveBrother = function (_clickedSlot)
 
     var data = this.getBrotherByID(_brother[CharacterScreenIdentifier.Entity.Id]);
 
-    if (data.Index === null || data.Tag === null)
-    {
-        return false;
-    }
+    if (data.Index === null || data.Tag === null) return false;
 
-    // selected brother is in player roster
-    var targetOwnerID = Owner.Player;
-    if (data.Tag === Owner.Player) targetOwnerID = Owner.Quarter;
     var sourceOwner = this.get(data.Tag);
-    var targetOwner = this.get(targetOwnerID);
+    var targetOwner = this.getNext(data.Tag);
 
     // Source roster is at minimum
     if (sourceOwner.mBrotherCurrent <= sourceOwner.mBrotherMin) return false;
@@ -320,11 +337,13 @@ BrotherManager.prototype.quickMoveBrother = function (_clickedSlot)
     if (targetOwner.mBrotherCurrent >= targetOwner.mBrotherMax) return false;
 
     // transfer brother from source roster to target roster
-    var firstEmptySlot = this.get(targetOwnerID).getIndexOfFirstEmptySlot();
+    var firstEmptySlot = this.get(targetOwner.mContainerID).getIndexOfFirstEmptySlot();
     this.swapSlots(data.Index, data.Tag, firstEmptySlot, targetOwner.mContainerID);
 
     return true;
 };
+
+
 
 //- Call Squirrel backend function
 BrotherManager.prototype.notifyBackendRelocateBrother = function (_brotherID, _placeInFormation)
