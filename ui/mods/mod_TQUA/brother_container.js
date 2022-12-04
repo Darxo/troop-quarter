@@ -262,18 +262,19 @@ BrotherContainer.prototype.createBrotherSlots = function ()
 };
 
 // Insert Slot and Brother data that are coming from another slot into a new slot
-BrotherContainer.prototype.insertBrother = function ( _slotIdx, _data )
+BrotherContainer.prototype.importBrother = function ( _slotIdx, _data )
 {
-    console.error("insertBrother");
+    console.error("importBrother");
     if (this.isEmpty(_slotIdx) === false) return false;
     if (_data === null) return false;
 
     var newSlot = this.mSlots[_slotIdx];
 
-    _data.SlotData.data('idx', _slotIdx);                 // Adjust the internal index variable of the arrivign slotData
-    _data.SlotData.appendTo(newSlot);                       // Attach the Slot Data to the slot
+    _data.SlotData.data('idx', _slotIdx);                // Adjust the internal index variable of the arrivign slotData
+    _data.SlotData.data('tag', this.mContainerID);       // Adjust the internal containerID variable of the arrivign slotData
+    _data.SlotData.appendTo(newSlot);                    // Attach the Slot Data to the slot
 
-    newSlot.data('child', _data.SlotData);                  // Insert the Slot Data
+    newSlot.data('child', _data.SlotData);               // Insert the Slot Data
     this.mBrotherList[_slotIdx] = _data.BrotherData;     // Insert the Brother Data
 
     this.mBrotherCurrent++;

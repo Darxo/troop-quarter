@@ -427,7 +427,7 @@ TroopQuarterDialogModule.prototype.transferBrother = function ( _sourceIdx, _sou
     var brotherID = sourceOwner.mSlots[_sourceIdx].data('child').data('ID');
 
     var brotherData = sourceOwner.removeBrother(_sourceIdx);
-    targetOwner.insertBrother(_targetIdx, brotherData);
+    targetOwner.importBrother(_targetIdx, brotherData);
 
     this.notifyBackendMoveAtoB(brotherID, _sourceOwnerID, _targetIdx, _targetOwnerID);
 
