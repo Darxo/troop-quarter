@@ -200,9 +200,11 @@ this.troop_quarter_dialog_module <- this.inherit("scripts/ui/screens/ui_module",
 			}
 		}
 
-		local ret = {};
-		this.queryAssetsInformation(ret);
-		this.m.JSHandle.asyncCall("updateAssets", ret);
+		local ret = {
+			Assets = {}
+		};
+		this.queryAssetsInformation(ret.Assets);
+		this.m.JSHandle.asyncCall("loadFromData", ret);
 	}
 
 	function pushUIMenuStack()

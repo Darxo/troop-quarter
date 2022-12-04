@@ -173,6 +173,19 @@ BrotherContainer.prototype.addBrotherSlotDIV = function(_brotherData, _index)
     return result;
 }
 
+BrotherContainer.prototype.createBrotherSlots = function()
+{
+    this.mSlots = [];
+    for (var i = 0 ; i < this.mSlotLimit; i++)
+    {
+        this.mSlots.push(null);
+        this.mSlots[i] = $(this.mSlotClasses);
+        this.mSlots[i].data('idx', i);
+        this.mSlots[i].data('tag', this.mContainerID);
+        this.mSlots[i].data('child', null);
+    }
+}
+
 // Returns the first empty slot
 BrotherContainer.prototype.getIndexOfFirstEmptySlot = function()
 {
