@@ -89,15 +89,23 @@ this.troop_quarter_dialog_module <- this.inherit("scripts/ui/screens/ui_module",
 		_result.Stronghold <- roster;
 		_result.BrothersMaxInStronghold <- num;
 
+		_result.Quarter <- {
+			Roster = roster,
+			BrotherCount = brothers.len(),
+			BrotherMin = this.m.QuarterMin,
+			BrotherMax = this.m.QuarterMax,
+			SlotLimit = this.m.QuarterLimit
+		}
+/*
 		_result.QuarterCurrent <- brothers.len();
 		_result.QuarterMin <- this.m.QuarterMin;
 		_result.QuarterMax <- this.m.QuarterMax;
 		_result.QuarterLimit <- this.m.QuarterLimit;
-
+*/
 		if ("Assets" in _result)
 		{
 			_result.Assets.QuarterCurrent <- brothers.len();
-			_result.Assets.QuarterMax <- roster.len();
+			_result.Assets.QuarterMax <- this.m.QuarterMax;
 		}
 	}
 
@@ -113,18 +121,28 @@ this.troop_quarter_dialog_module <- this.inherit("scripts/ui/screens/ui_module",
 			}
 		}
 
-		_result.Player <- roster;
+		_result.Player <- {
+			Roster = roster,
+			BrotherCount = ::World.getPlayerRoster().getSize(),
+			BrotherMin = this.m.MinPlayerRoster,
+			BrotherMax = ::World.Assets.getBrothersMax(),
+			SlotLimit = this.m.PlayerRosterLimit
+		}
+
 		_result.BrothersMaxInCombat <- ::World.Assets.getBrothersMaxInCombat();
+/*
+		_result.Player <- roster;
+		_result.
 
 		_result.PlayerCurrent <- ::World.getPlayerRoster().getSize();
 		_result.PlayerMin <- this.m.MinPlayerRoster;
 		_result.PlayerMax <- ::World.Assets.getBrothersMax();
 		_result.PlayerLimit <- this.m.PlayerRosterLimit;
-
+*/
 		if ("Assets" in _result)
 		{
-			_result.Assets.PlayerCurrent <- _result.PlayerCurrent;
-			_result.Assets.PlayerMax <- _result.PlayerMax;
+			_result.Assets.PlayerCurrent <- _result.Player.BrotherCount;
+			_result.Assets.PlayerMax <- _result.Player.BrotherMax;
 		}
 	}
 
@@ -176,11 +194,6 @@ this.troop_quarter_dialog_module <- this.inherit("scripts/ui/screens/ui_module",
 			{
 				rosterB.add(bro);
 				rosterA.remove(bro);
-
-				if (isMovingToPlayerRoster /*&& this.World.State.getBrothersInFrontline() > this.World.Assets.getBrothersMaxInCombat()*/)
-				{
-					bro.setInReserves(true);
-				}
 
 				bro.setPlaceInFormation(_data[2]);
 				break;

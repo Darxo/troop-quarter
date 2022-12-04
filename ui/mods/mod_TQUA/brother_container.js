@@ -33,25 +33,35 @@ BrotherContainer.prototype.getBrothers = function()
     return this.mBrotherList;
 }
 
+BrotherContainer.prototype.loadFromData = function( _data )
+{
+    if ('Roster' in _data && _data.Roster !== null) this.mBrotherList = _data.Roster;
+    if ('BrotherMin' in _data && _data.BrotherMin !== null) this.mBrotherMin = _data.BrotherMin;
+    if ('BrotherMax' in _data && _data.BrotherMax !== null) this.mBrotherMax = _data.BrotherMax;
+    if ('SlotLimit' in _data && _data.SlotLimit !== null)   this.mSlotLimit = _data.SlotLimit
+}
+
 BrotherContainer.prototype.deselectCurrent = function()
 {
     if (this.mSelectedBrother < 0) return;
-    var slot = this.mSlots[_slotIndex];
-    slot.removeClass('is-selected');
+    var slot = this.mSlots[this.mSelectedBrother];
+    slot.find('#slot-index:first').removeClass('is-selected');
+    // console.error("Deselected slot: " + this.mSelectedBrother);
     this.mSelectedBrother = -1;
 }
 
-BrotherContainer.prototype.selectBrother = function (_brotherId)
+BrotherContainer.prototype.selectBrother = function (_brotherID)
 {
     for (var i = 0; i < this.mBrotherList.length; ++i)
     {
         var brother = this.mBrotherList[i];
         if (brother === null) continue;
         if (CharacterScreenIdentifier.Entity.Id in brother === false) continue;
-        if (brother[CharacterScreenIdentifier.Entity.Id] !== _brotherId) continue;
+        if (brother[CharacterScreenIdentifier.Entity.Id] !== _brotherID) continue;
         this.selectSlot(i);
-        break;
+        return true;
     }
+    return false;
 };
 
 BrotherContainer.prototype.hasSelected = function()     // Maybe make this function a bit smarter to detect/correct errors?
@@ -63,12 +73,15 @@ BrotherContainer.prototype.hasSelected = function()     // Maybe make this funct
 BrotherContainer.prototype.selectSlot = function(_slotIndex)    // todo add default value -1
 {
     this.deselectCurrent();
+    if (_slotIndex === null) return console.error("_slotIndex is null");
     if (_slotIndex < 0) return true;    // this function was called without parameter in which case we only deselect and do nothing else
     var slot = this.mSlots[_slotIndex];
     if (slot === null) return false;    // Can't select null slots.
     if (this.mBrotherList[_slotIndex] === null && this.mCanSelectEmptySlots === false) return false;    // Can't select empty slots
     this.mSelectedBrother = _slotIndex;
-    slot.addClass('is-selected');
+
+    slot.find('#slot-index:first').addClass('is-selected');
+    // console.error("Selected slot: " + _slotIndex);
     return true;
 };
 
@@ -95,7 +108,9 @@ BrotherContainer.prototype.getBrotherByID = function (_brotherId)
     var data =
     {
         Index   : null,
+        Tag     : null,
         Brother : null,
+        IsNull  : true
     };
 
     if (this.mBrotherList !== null && jQuery.isArray(this.mBrotherList))
@@ -107,48 +122,48 @@ BrotherContainer.prototype.getBrotherByID = function (_brotherId)
             if (brother != null && CharacterScreenIdentifier.Entity.Id in brother && brother[CharacterScreenIdentifier.Entity.Id] === _brotherId)
             {
                 data.Index = i;
+                data.Tag = this.mContainerID;
                 data.Brother = brother;
-                return data;
+                data.IsNull = false;
+                break;
             }
         }
     }
 
-    return null;
+    return data;
 };
 
-// Returns the first empty slot
-BrotherContainer.prototype.findEmptySlot = function()
+BrotherContainer.prototype.addBrotherSlotDIV = function(_data, _index, _tag)
 {
-    for(var i = 0; i < this.mBrotherList.length; ++i)
-    {
-        if (this.mBrotherList[i] === null) return this.mSlots[i];
-    }
-
-    return null;
+    var _parent = this;
+    var _tag = this.mContainerID;
 }
 
-BrotherContainer.prototype.loadFromData = function (_data)
+// Returns the first empty slot
+BrotherContainer.prototype.getIndexOfFirstEmptySlot = function()
 {
-    if(_data === undefined || _data === null)
+    for (var i = 0; i < this.mSlots.length; i++)
     {
-        return;
+        if (this.mSlots[i].data('child') === null)
+        {
+            return i;
+        }
     }
+    return null
+}
 
-    if ('BrotherMin' in _data && _data.brothersMin !== null)
+// Returns the first empty slot
+BrotherContainer.prototype.getFirstEmptySlot = function()
+{
+    for (var i = 0; i < this.mSlots.length; i++)
     {
-        this.mBrotherMin = _data.mBrotherMin;
+        if (this.mSlots[i].data('child') === null)
+        {
+            return this.mSlots[i];
+        }
     }
-
-    if ('BrothersMax' in _data && _data.BrothersMax !== null)
-    {
-        this.mBrotherMax = _data.BrothersMax;
-    }
-
-    if ('BrotherList' in _data && _data.BrotherList !== null)
-    {
-        this.loadBrotherList(_data.BrotherList);
-    }
-};
+    return null
+}
 
 BrotherContainer.prototype.updateBrothers = function (_data)
 {
@@ -211,7 +226,6 @@ BrotherContainer.prototype.addBrotherToSlotDIV = function(_brother, _index)
         }
     });
 }
-
 
 BrotherContainer.prototype.updateBrotherList = function(_newBrotherList)
 {
