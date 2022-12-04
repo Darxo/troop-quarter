@@ -261,6 +261,50 @@ BrotherContainer.prototype.createBrotherSlots = function ()
     return this.mSlots;
 };
 
+// Insert Slot and Brother data that are coming from another slot into a new slot
+BrotherContainer.prototype.insertBrother = function ( _slotIdx, _data )
+{
+    console.error("insertBrother");
+    if (this.isEmpty(_slotIdx) === false) return false;
+    if (_data === null) return false;
+
+    var slot = this.mSlots[_slotIdx];
+
+    _data.SlotData.data('idx', _slotIdx);                 // Adjust the internal index variable of the arrivign slotData
+    slot.data('child', _data.SlotData);                  // Insert the Slot Data
+    _data.SlotData.appendTo(slot);                       // Attach the Slot Data to the slot
+    this.mBrotherList[_slotIdx] = _data.BrotherData;     // Insert the Brother Data
+
+    this.mBrotherCurrent++;
+    if (_data.IsSelected === true) this.selectSlot(_slotIdx);
+
+    return true;
+}
+
+// Removes the brother related div data from a slot and the brother data from the brother array
+// Returns an object with the removed slotData, playerData and a bool indicating whether this slot was highlighted
+BrotherContainer.prototype.removeBrother = function ( _slotIdx )
+{
+    console.error("removeBrother");
+    if (this.isEmpty(_slotIdx)) return null;
+
+    var slot = this.mSlots[_slotIdx];
+
+    var data = {
+        IsSelected : (_slotIdx === this.mSelectedBrother),
+        SlotData : slot.data('child'),
+        BrotherData : this.mBrotherList[_slotIdx]
+    }
+
+    slot.data('child', null);                   // Make the slot child null
+    this.mBrotherList[_slotIdx] = null;         // Make the list entry null
+
+    this.mBrotherCurrent--;
+    this.deselectCurrent();
+
+    return data;
+}
+
 // This is bring called from outside. The contents of two slots are being swapped
 BrotherContainer.prototype.swapSlots = function ( _firstIdx, _secondIdx )
 {
@@ -320,8 +364,8 @@ BrotherContainer.prototype.relocateBrother = function ( _sourceIdx, _targetIdx )
     var sourceData = sourceSlot.data('child');
     sourceData.data('idx', _targetIdx);
     sourceData.appendTo(targetSlot);
-    targetSlot.data('child', sourceData);
 
+    targetSlot.data('child', sourceData);
     sourceSlot.data('child', null);
 
     var tmp = this.mBrotherList[_sourceIdx];

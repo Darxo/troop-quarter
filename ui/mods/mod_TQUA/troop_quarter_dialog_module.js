@@ -385,15 +385,9 @@ TroopQuarterDialogModule.prototype.setBrotherSelectedByID = function (_brotherID
 };
 
 // move brother to the other roster on right-click
-TroopQuarterDialogModule.prototype.quickMoveBrother = function (_source)
+TroopQuarterDialogModule.prototype.quickMoveBrother = function (_clickedSlot)
 {
-    var _brother = _source.data('brother');
-
-    // check if both roster is full
-    if (this.mTroopQuarter.mBrotherCurrent === this.mTroopQuarter.mBrotherMax && this.mPlayerRoster.mBrotherCurrent === this.mPlayerRoster.mBrotherMax)
-    {
-        return false;
-    }
+    var _brother = _clickedSlot.data('brother');
 
     var data = this.getBrotherByID(_brother[CharacterScreenIdentifier.Entity.Id]);
 
@@ -411,7 +405,7 @@ TroopQuarterDialogModule.prototype.quickMoveBrother = function (_source)
     if (data.Tag === Owner.Player)
     {
         // deny when the selected brother is a player character
-        if (_source.data('player') === true) return false;
+        if (_clickedSlot.data('player') === true) return false;
     }
 
     // Source roster is at minimum
@@ -435,117 +429,98 @@ TroopQuarterDialogModule.prototype.swapBrothers = function (_sourceIdx, _sourceO
     _targetOwner.mBrotherList[_targetIdx] = tmp;
 }
 
-TroopQuarterDialogModule.prototype.swapSlots = function (_a, _tagA, _b, _tagB)
+// Removes a brother from one brotherContainer and puts them into a different brotherContainer
+// _sourceIdx is an unsigned integer
+// _targetIdx is an unsigned integer
+// _sourceOwner, _targetOwner are BrotherContainer and not null
+TroopQuarterDialogModule.prototype.transferBrother = function ( _sourceIdx, _sourceOwnerID, _targetIdx, _targetOwnerID )
 {
-    var isDifferenceRoster = _tagA !== _tagB;
+    var sourceOwner = this.getRoster(_sourceOwnerID);
+    var targetOwner = this.getRoster(_targetOwnerID);
+
+    // Source roster is at minimum
+    if (sourceOwner.mBrotherCurrent <= sourceOwner.mBrotherMin) return false;
+
+    // Targeted Roster is at maximum
+    if (targetOwner.mBrotherCurrent >= targetOwner.mBrotherMax) return false;
+
+    var brotherID = sourceOwner.mSlots[_sourceIdx].data('child').data('ID');
+
+    var brotherData = sourceOwner.removeBrother(_sourceIdx);
+    targetOwner.insertBrother(_targetIdx, brotherData);
+
+    this.notifyBackendMoveAtoB(brotherID, _sourceOwnerID, _targetIdx, _targetOwnerID);
+
+    return true;
+}
+
+// Swap the contents of two slots no matter where they are or what their state is
+TroopQuarterDialogModule.prototype.swapSlots = function (_firstIdx, _tagA, _secondIdx, _tagB)
+{
+    if (_firstIdx === null || _secondIdx === null) return false;
     var sourceOwner = this.getRoster(_tagA);
     var targetOwner = this.getRoster(_tagB);
-    var slotA = sourceOwner.mSlots[_a];
-    var slotB = targetOwner.mSlots[_b];
+    if (sourceOwner.isEmpty(_firstIdx) && targetOwner.isEmpty(_secondIdx)) return false;
 
-    if (isDifferenceRoster === false)
+    var slotA = sourceOwner.mSlots[_firstIdx];
+    var slotB = targetOwner.mSlots[_secondIdx];
+
+    if (_tagA === _tagB)
     {
         if(slotB.data('child') === null)
         {
-            var A = slotA.data('child');
-            this.getRoster(_tagA).swapSlots(_a, _b);
-            this.notifyBackendRelocateBrother(A.data('ID'), _b);
+            var sourceBrotherID = slotA.data('child').data('ID');
+            if (this.getRoster(_tagA).swapSlots(_firstIdx, _secondIdx) === false) return false
+            this.notifyBackendRelocateBrother(sourceBrotherID, _secondIdx);
         }
         else
         {
-            var A = slotA.data('child');
-            var B = slotB.data('child');
-            this.getRoster(_tagA).swapSlots(_a, _b);
-            this.notifyBackendRelocateBrother(A.data('ID'), _b);
-            this.notifyBackendRelocateBrother(B.data('ID'), _a);
+            var sourceBrotherID = slotA.data('child').data('ID');
+            var targetBrotherID = slotB.data('child').data('ID');
+            if (this.getRoster(_tagA).swapSlots(_firstIdx, _secondIdx) === false) return false;
+            this.notifyBackendRelocateBrother(sourceBrotherID, _secondIdx);
+            this.notifyBackendRelocateBrother(targetBrotherID, _firstIdx);
         }
-
-        return;
+        return true;
     }
 
-    // dragging or transfering into empty slot
-    if(slotB.data('child') == null)
-    {
-        var A = slotA.data('child');
-
-        A.data('idx', _b);
-        A.appendTo(slotB);
-
-        if (isDifferenceRoster)
-        {
-            A.data('tag', _tagB);
-        }
-
-        slotB.data('child', A);
-        slotA.data('child', null);
-
-        if (isDifferenceRoster)
-        {
-            --sourceOwner.mBrotherCurrent;
-            ++targetOwner.mBrotherCurrent;
-            this.notifyBackendMoveAtoB(A.data('ID'), _tagA, _b, _tagB);
-        }
-        else
-        {
-            this.notifyBackendRelocateBrother(A.data('ID'), _b);
-        }
-
-        this.swapBrothers(_a, sourceOwner, _b, targetOwner);
-
-        var selection = this.getSelected();
-        if(selection !== null)
-        {
-            if (selection.Index === _a && selection.OwnerID === _tagA)
-            {
-                this.setBrotherSelected(_b, _tagB, true);
-            }
-        }
-    }
+    // A brother is moved from one container into another:
+    if (sourceOwner.isEmpty(_firstIdx))    return this.transferBrother(_secondIdx, _tagB, _firstIdx, _tagA);
+    if (targetOwner.isEmpty(_secondIdx))   return this.transferBrother(_firstIdx, _tagA, _secondIdx, _tagB);
 
     // swapping two full slots
-    else
+    var A = slotA.data('child');
+    var B = slotB.data('child');
+
+    A.data('idx', _secondIdx);
+    B.data('idx', _firstIdx);
+
+    if (isDifferenceRoster)
     {
-        var A = slotA.data('child');
-        var B = slotB.data('child');
+        A.data('tag', _tagB);
+        B.data('tag', _tagA);
+    }
 
-        A.data('idx', _b);
-        B.data('idx', _a);
+    B.detach();
 
-        if (isDifferenceRoster)
-        {
-            A.data('tag', _tagB);
-            B.data('tag', _tagA);
-        }
+    A.appendTo(slotB);
+    slotB.data('child', A);
 
-        B.detach();
+    B.appendTo(slotA);
+    slotA.data('child', B);
 
-        A.appendTo(slotB);
-        slotB.data('child', A);
+    this.notifyBackendMoveAtoB(A.data('ID'), _tagA, _secondIdx, _tagB);
+    this.notifyBackendMoveAtoB(B.data('ID'), _tagB, _firstIdx, _tagA);
 
-        B.appendTo(slotA);
-        slotA.data('child', B);
+    this.swapBrothers(_firstIdx, sourceOwner, _secondIdx, targetOwner);
 
-        if (isDifferenceRoster)
-        {
-            this.notifyBackendMoveAtoB(A.data('ID'), _tagA, _b, _tagB);
-            this.notifyBackendMoveAtoB(B.data('ID'), _tagB, _a, _tagA);
-        }
-        else
-        {
-            this.notifyBackendRelocateBrother(A.data('ID'), _b);
-            this.notifyBackendRelocateBrother(B.data('ID'), _a);
-        }
-
-        this.swapBrothers(_a, sourceOwner, _b, targetOwner);
-
-        if(this.getSelected().Index == _a && this.getSelected().OwnerID == _tagA)
-        {
-            this.setBrotherSelected(_b, _tagB, true);
-        }
-        else if(this.getSelected().Index == _b && this.getSelected().OwnerID == _tagB)
-        {
-            this.setBrotherSelected(_a, _tagA, true);
-        }
+    if(this.getSelected().Index == _firstIdx && this.getSelected().OwnerID == _tagA)
+    {
+        this.setBrotherSelected(_secondIdx, _tagB, true);
+    }
+    else if(this.getSelected().Index == _secondIdx && this.getSelected().OwnerID == _tagB)
+    {
+        this.setBrotherSelected(_firstIdx, _tagA, true);
     }
 
     //this.updateRosterLabel();
