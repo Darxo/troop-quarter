@@ -22,6 +22,9 @@ var TroopQuarterDialogModule = function(_parent)
         StrongholdBrothersMax : 0,
     }
 
+    this.mTroopQuarter = new BrotherContainer(Owner.Quarter);
+    this.mPlayerRoster = new BrotherContainer(Owner.Player);
+
     // event listener
     this.mEventListener   = null;
 
@@ -34,20 +37,10 @@ var TroopQuarterDialogModule = function(_parent)
     this.mPlayerBrotherButton          = null;
 
     this.mTroopQuarter = new BrotherContainer(Owner.Quarter);
-    this.mTroopQuarter.mBrotherCurrent = 0;
-    this.mTroopQuarter.mBrotherMin = 0;
-    this.mTroopQuarter.mBrotherMax = 2;
-    this.mTroopQuarter.mSlotLimit = 44;
-    this.mTroopQuarter.mBrotherList = null;
     this.mTroopQuarter.ListContainer = null;
     this.mTroopQuarter.ListScrollContainer = null;
 
     this.mPlayerRoster = new BrotherContainer(Owner.Player);
-    this.mPlayerRoster.mBrotherCurrent = 0;
-    this.mPlayerRoster.mBrotherMin = 1;
-    this.mPlayerRoster.mBrotherMax = 5;
-    this.mPlayerRoster.mSlotLimit = 27;
-    this.mPlayerRoster.mBrotherList = null;
     this.mPlayerRoster.ListContainer = null;
     this.mPlayerRoster.ListScrollContainer = null;
 
@@ -200,26 +193,6 @@ TroopQuarterDialogModule.prototype.destroyDIV = function ()
     this.mContainer = null;
 };
 
-
-TroopQuarterDialogModule.prototype.bindTooltips = function ()
-{
-    this.mAssets.bindTooltips();
-    this.mAssets.mBrothersAsset.unbindTooltip();
-
-    // replace with a new tooltip to tell player it's for displaying stronghold roster size
-    this.mAssets.mBrothersAsset.bindTooltip({ contentType: 'ui-element', elementId: 'assets.BrothersInStronghold' });
-
-
-    this.mLeaveButton.bindTooltip({ contentType: 'ui-element', elementId: TooltipIdentifier.WorldTownScreen.HireDialogModule.LeaveButton });
-};
-
-
-TroopQuarterDialogModule.prototype.unbindTooltips = function ()
-{
-    this.mAssets.unbindTooltips();
-
-    this.mLeaveButton.unbindTooltip();
-};
 TroopQuarterDialogModule.prototype.show = function (_withSlideAnimation)
 {
     var self = this;
@@ -401,14 +374,6 @@ TroopQuarterDialogModule.prototype.quickMoveBrother = function (_clickedSlot)
     return true;
 };
 
-// swap the brother data so i don't have to update the whole roster
-TroopQuarterDialogModule.prototype.swapBrothers = function (_sourceIdx, _sourceOwner, _targetIdx, _targetOwner)
-{
-    var tmp = _sourceOwner.mBrotherList[_sourceIdx];
-    _sourceOwner.mBrotherList[_sourceIdx] = _targetOwner.mBrotherList[_targetIdx];
-    _targetOwner.mBrotherList[_targetIdx] = tmp;
-}
-
 // Removes a brother from one brotherContainer and puts them into a different brotherContainer
 // _sourceIdx is an unsigned integer
 // _targetIdx is an unsigned integer
@@ -468,28 +433,17 @@ TroopQuarterDialogModule.prototype.swapSlots = function (_firstIdx, _tagA, _seco
     if (sourceOwner.isEmpty(_firstIdx))    return this.transferBrother(_secondIdx, _tagB, _firstIdx, _tagA);
     if (targetOwner.isEmpty(_secondIdx))   return this.transferBrother(_firstIdx, _tagA, _secondIdx, _tagB);
 
-    // swapping two full slots
-    var A = slotA.data('child');
-    var B = slotB.data('child');
+    var firstBrotherID = sourceOwner.mSlots[_firstIdx].data('child').data('ID');
+    var secondBrotherID = targetOwner.mSlots[_secondIdx].data('child').data('ID');
 
-    A.data('idx', _secondIdx);
-    B.data('idx', _firstIdx);
+    var firstData = sourceOwner.removeBrother(_firstIdx);
+    var secondData = targetOwner.removeBrother(_secondIdx);
 
-    A.data('tag', _tagB);
-    B.data('tag', _tagA);
+    sourceOwner.importBrother(_firstIdx, secondData);
+    targetOwner.importBrother(_secondIdx, firstData);
 
-    B.detach();
-
-    A.appendTo(slotB);
-    slotB.data('child', A);
-
-    B.appendTo(slotA);
-    slotA.data('child', B);
-
-    this.notifyBackendMoveAtoB(A.data('ID'), _tagA, _secondIdx, _tagB);
-    this.notifyBackendMoveAtoB(B.data('ID'), _tagB, _firstIdx, _tagA);
-
-    this.swapBrothers(_firstIdx, sourceOwner, _secondIdx, targetOwner);
+    this.notifyBackendMoveAtoB(firstBrotherID, _tagA, _secondIdx, _tagB);
+    this.notifyBackendMoveAtoB(secondBrotherID, _tagB, _firstIdx, _tagA);
 }
 
 
@@ -572,21 +526,8 @@ TroopQuarterDialogModule.prototype.createBrotherSlots = function ( _tag )
 TroopQuarterDialogModule.prototype.addBrotherSlotDIV = function(_parent, _data, _index, _tag)
 {
     var self = this;
-    var parentDiv = _parent.mSlots[_index];
-    var character = _data[CharacterScreenIdentifier.Entity.Character.Key];
-    var id = _data[CharacterScreenIdentifier.Entity.Id];
 
-    // create: slot & background layer
-    var result = parentDiv.createListBrother(id);
-    result.attr('id', 'slot-index');
-    result.data('ID', id);
-    result.data('player', (CharacterScreenIdentifier.Entity.Character.IsPlayerCharacter in character ? character[CharacterScreenIdentifier.Entity.Character.IsPlayerCharacter] : false));
-    result.data('idx', _index);
-    result.data('tag', _tag);
-    result.unbindTooltip();
-    result.bindTooltip({ contentType: 'ui-element', entityId: id, elementId: 'pokebro.roster' });
-    parentDiv.data('child', result);
-    ++_parent.mBrotherCurrent;
+    var result = this.getRoster(_tag).addBrotherSlotDIV(_data, _index);
 
     // some event listener for brother slot to drag and drop
     result.drag("start", function (ev, dd)
@@ -607,20 +548,17 @@ TroopQuarterDialogModule.prototype.addBrotherSlotDIV = function(_parent, _data, 
 
         return proxy;
     }, { distance: 3 });
-    result.drag(function (ev, dd)
-    {
-        $(dd.proxy).css({ top: dd.offsetY, left: dd.offsetX });
-    }, { relative: false, distance: 3 });
+
+    result.drag(function (ev, dd) { $(dd.proxy).css({ top: dd.offsetY, left: dd.offsetX }); }, { relative: false, distance: 3 });
+
     result.drag("end", function (ev, dd)
     {
         var drag = $(dd.drag);
         var drop = $(dd.drop);
         var proxy = $(dd.proxy);
 
-        var allowDragEnd = true; // TODO: check what we're dropping onto
-
         // not dropped into anything?
-        if (drop.length === 0 || allowDragEnd === false)
+        if (drop.length === 0)
         {
             proxy.velocity("finish", true).velocity({ top: dd.originalY, left: dd.originalX },
             {
@@ -637,25 +575,6 @@ TroopQuarterDialogModule.prototype.addBrotherSlotDIV = function(_parent, _data, 
             proxy.remove();
         }
     }, { drop: '.is-brother-slot' });
-
-    // update image & name
-    var imageOffsetX = (CharacterScreenIdentifier.Entity.Character.ImageOffsetX in character ? character[CharacterScreenIdentifier.Entity.Character.ImageOffsetX] : 0);
-    var imageOffsetY = (CharacterScreenIdentifier.Entity.Character.ImageOffsetY in character ? character[CharacterScreenIdentifier.Entity.Character.ImageOffsetY] : 0);
-
-    result.assignListBrotherImage(Path.PROCEDURAL + character[CharacterScreenIdentifier.Entity.Character.ImagePath], imageOffsetX, imageOffsetY, 0.66);
-
-    // the mood icon is messed up in the screen, i hate it so i hide it, problem solve with minimum effort
-    //result.showListBrotherMoodImage(this.IsMoodVisible, character['moodIcon']);
-
-    for(var i = 0; i != _data['injuries'].length && i < 3; ++i)
-    {
-        result.assignListBrotherStatusEffect(_data['injuries'][i].imagePath, _data[CharacterScreenIdentifier.Entity.Id], _data['injuries'][i].id)
-    }
-
-    if(_data['injuries'].length <= 2 && _data['stats'].hitpoints < _data['stats'].hitpointsMax)
-    {
-        result.assignListBrotherDaysWounded();
-    }
 
     // event listener when left-click the brother
     result.assignListBrotherClickHandler(function (_brother, _event)
@@ -957,4 +876,24 @@ TroopQuarterDialogModule.prototype.hide = function ()
 TroopQuarterDialogModule.prototype.isVisible = function ()
 {
     return this.mIsVisible;
+};
+
+TroopQuarterDialogModule.prototype.bindTooltips = function ()
+{
+    this.mAssets.bindTooltips();
+    this.mAssets.mBrothersAsset.unbindTooltip();
+
+    // replace with a new tooltip to tell player it's for displaying stronghold roster size
+    this.mAssets.mBrothersAsset.bindTooltip({ contentType: 'ui-element', elementId: 'assets.BrothersInStronghold' });
+
+
+    this.mLeaveButton.bindTooltip({ contentType: 'ui-element', elementId: TooltipIdentifier.WorldTownScreen.HireDialogModule.LeaveButton });
+};
+
+
+TroopQuarterDialogModule.prototype.unbindTooltips = function ()
+{
+    this.mAssets.unbindTooltips();
+
+    this.mLeaveButton.unbindTooltip();
 };

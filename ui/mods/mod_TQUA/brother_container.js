@@ -133,10 +133,44 @@ BrotherContainer.prototype.getBrotherByID = function (_brotherId)
     return data;
 };
 
-BrotherContainer.prototype.addBrotherSlotDIV = function(_data, _index, _tag)
+// Create a new DIV object out of a brother object to assign to a slot
+BrotherContainer.prototype.addBrotherSlotDIV = function(_brotherData, _index)
 {
-    var _parent = this;
-    var _tag = this.mContainerID;
+    var parentDiv = this.mSlots[_index];
+    var character = _brotherData[CharacterScreenIdentifier.Entity.Character.Key];
+    var brotherID = _brotherData[CharacterScreenIdentifier.Entity.Id];
+
+    var result = parentDiv.createListBrother(brotherID);
+    result.attr('id', 'slot-index');
+    result.data('ID', brotherID);
+    result.data('avatar', (CharacterScreenIdentifier.Entity.Character.IsPlayerCharacter in character ? character[CharacterScreenIdentifier.Entity.Character.IsPlayerCharacter] : false));
+    result.data('idx', _index);
+    result.data('tag', this.mContainerID);
+    result.unbindTooltip();
+    result.bindTooltip({ contentType: 'ui-element', entityId: brotherID, elementId: 'pokebro.roster' });
+    parentDiv.data('child', result);
+    this.mBrotherCurrent++;
+
+    // update image & name
+    var imageOffsetX = (CharacterScreenIdentifier.Entity.Character.ImageOffsetX in character ? character[CharacterScreenIdentifier.Entity.Character.ImageOffsetX] : 0);
+    var imageOffsetY = (CharacterScreenIdentifier.Entity.Character.ImageOffsetY in character ? character[CharacterScreenIdentifier.Entity.Character.ImageOffsetY] : 0);
+
+    result.assignListBrotherImage(Path.PROCEDURAL + character[CharacterScreenIdentifier.Entity.Character.ImagePath], imageOffsetX, imageOffsetY, 0.66);
+
+    // the mood icon is messed up in the screen, i hate it so i hide it, problem solve with minimum effort
+    //result.showListBrotherMoodImage(this.IsMoodVisible, character['moodIcon']);
+
+    for(var i = 0; i != _brotherData['injuries'].length && i < 3; ++i)
+    {
+        result.assignListBrotherStatusEffect(_brotherData['injuries'][i].imagePath, _brotherData[CharacterScreenIdentifier.Entity.Id], _brotherData['injuries'][i].id)
+    }
+
+    if(_brotherData['injuries'].length <= 2 && _brotherData['stats'].hitpoints < _brotherData['stats'].hitpointsMax)
+    {
+        result.assignListBrotherDaysWounded();
+    }
+
+    return result;
 }
 
 // Returns the first empty slot
@@ -388,6 +422,17 @@ BrotherContainer.prototype.notifyBackendUpdateRosterPosition = function (_brothe
 
 
 // Generic Stuff
+
+    BrotherContainer.prototype.onDisconnection = function ()
+    {
+        this.mSQHandle = null;
+
+        // notify listener
+        if (this.mEventListener !== null && ('onModuleOnDisconnectionCalled' in this.mEventListener))
+        {
+            this.mEventListener.onModuleOnDisconnectionCalled(this);
+        }
+    };
 
     // Stuff for notifying squirrel backend
     BrotherContainer.prototype.registerEventListener = function(_listener)
