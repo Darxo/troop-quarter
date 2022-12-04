@@ -345,26 +345,6 @@ TroopQuarterDialogModule.prototype.getSelected = function()
     return null;
 }
 
-TroopQuarterDialogModule.prototype.setBrotherSelected = function (_rosterPosition, _rosterTag, _withoutNotify)
-{
-    this.getRoster(Owner.Player).deselectCurrent();
-    this.getRoster(Owner.Quarter).deselectCurrent();
-
-    this.getRoster(_rosterTag).selectSlot(_rosterPosition);
-/*
-    var brother = this.getRoster(_rosterTag).getBrotherByIndex(_rosterPosition)
-    if (brother === null || brother === undefined) return;
-
-    if (this.getSelected() !== null) this.getOwner(this.getSelected().OwnerID).deselectCurrent();
-    this.setBrotherSelectedByID(brother[CharacterScreenIdentifier.Entity.Id]);
-*/
-    // notify update
-    if (_withoutNotify === undefined || _withoutNotify !== true)
-    {
-        this.onBrothersListLoaded(_rosterTag);
-    }
-};
-
 // When we don't know in which roster he is
 TroopQuarterDialogModule.prototype.getBrotherByID = function (_brotherID)
 {
@@ -495,11 +475,8 @@ TroopQuarterDialogModule.prototype.swapSlots = function (_firstIdx, _tagA, _seco
     A.data('idx', _secondIdx);
     B.data('idx', _firstIdx);
 
-    if (isDifferenceRoster)
-    {
-        A.data('tag', _tagB);
-        B.data('tag', _tagA);
-    }
+    A.data('tag', _tagB);
+    B.data('tag', _tagA);
 
     B.detach();
 
@@ -513,17 +490,6 @@ TroopQuarterDialogModule.prototype.swapSlots = function (_firstIdx, _tagA, _seco
     this.notifyBackendMoveAtoB(B.data('ID'), _tagB, _firstIdx, _tagA);
 
     this.swapBrothers(_firstIdx, sourceOwner, _secondIdx, targetOwner);
-
-    if(this.getSelected().Index == _firstIdx && this.getSelected().OwnerID == _tagA)
-    {
-        this.setBrotherSelected(_secondIdx, _tagB, true);
-    }
-    else if(this.getSelected().Index == _secondIdx && this.getSelected().OwnerID == _tagB)
-    {
-        this.setBrotherSelected(_firstIdx, _tagA, true);
-    }
-
-    //this.updateRosterLabel();
 }
 
 
@@ -570,7 +536,7 @@ TroopQuarterDialogModule.prototype.createBrotherSlots = function ( _tag )
             if (drag.data('tag') === Owner.Quarter && self.mPlayerRoster.mBrotherCurrent >= self.mPlayerRoster.mBrotherMax)
                 return false;
         }
-
+/*
         // number in formation is limited
         if (parent.mBrotherCurrent >= parent.mBrotherMax && drag.data('idx') > parent.mBrotherMax && drop.data('idx') <= parent.mBrotherMax && parent.mSlots[drop.data('idx')].data('child') == null)
         {
@@ -581,7 +547,7 @@ TroopQuarterDialogModule.prototype.createBrotherSlots = function ( _tag )
         if (parent.mBrotherCurrent == parent.mBrotherMin && drag.data('idx') <= parent.mBrotherMax && drop.data('idx') > parent.mBrotherMax && parent.mSlots[drop.data('idx')].data('child') == null)
         {
             return false;
-        }
+        }*/
 
         // do the swapping
         self.swapSlots(drag.data('idx'), drag.data('tag'), drop.data('idx'), drop.data('tag'));
@@ -694,6 +660,7 @@ TroopQuarterDialogModule.prototype.addBrotherSlotDIV = function(_parent, _data, 
     // event listener when left-click the brother
     result.assignListBrotherClickHandler(function (_brother, _event)
     {
+        if (_event.button !== 0) return;   // We are only interested in LMB clicks
         var brotherID = _brother.data('brother')[CharacterScreenIdentifier.Entity.Id];
 
         self.setBrotherSelectedByID(brotherID);

@@ -69,7 +69,7 @@ BrotherContainer.prototype.hasSelected = function()     // Maybe make this funct
     return (this.mSelectedBrother >= 0);
 }
 
-// Selects the slot on the index
+// SAFE - Selects the slot on the index
 BrotherContainer.prototype.selectSlot = function(_slotIndex)    // todo add default value -1
 {
     this.deselectCurrent();
@@ -78,8 +78,8 @@ BrotherContainer.prototype.selectSlot = function(_slotIndex)    // todo add defa
     var slot = this.mSlots[_slotIndex];
     if (slot === null) return false;    // Can't select null slots.
     if (this.mBrotherList[_slotIndex] === null && this.mCanSelectEmptySlots === false) return false;    // Can't select empty slots
-    this.mSelectedBrother = _slotIndex;
 
+    this.mSelectedBrother = _slotIndex;
     slot.find('#slot-index:first').addClass('is-selected');
     // console.error("Selected slot: " + _slotIndex);
     return true;
@@ -268,11 +268,12 @@ BrotherContainer.prototype.insertBrother = function ( _slotIdx, _data )
     if (this.isEmpty(_slotIdx) === false) return false;
     if (_data === null) return false;
 
-    var slot = this.mSlots[_slotIdx];
+    var newSlot = this.mSlots[_slotIdx];
 
     _data.SlotData.data('idx', _slotIdx);                 // Adjust the internal index variable of the arrivign slotData
-    slot.data('child', _data.SlotData);                  // Insert the Slot Data
-    _data.SlotData.appendTo(slot);                       // Attach the Slot Data to the slot
+    _data.SlotData.appendTo(newSlot);                       // Attach the Slot Data to the slot
+
+    newSlot.data('child', _data.SlotData);                  // Insert the Slot Data
     this.mBrotherList[_slotIdx] = _data.BrotherData;     // Insert the Brother Data
 
     this.mBrotherCurrent++;
@@ -300,7 +301,7 @@ BrotherContainer.prototype.removeBrother = function ( _slotIdx )
     this.mBrotherList[_slotIdx] = null;         // Make the list entry null
 
     this.mBrotherCurrent--;
-    this.deselectCurrent();
+    if (data.IsSelected) this.deselectCurrent();
 
     return data;
 }
