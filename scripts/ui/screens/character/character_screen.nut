@@ -533,33 +533,9 @@ this.character_screen <- {
 		}
 	}
 
-	function onDropInventoryItemIntoBag( _data )
-	{
-		if (this.Tactical.isActive())
-		{
-			if (this.m.InventoryMode == this.Const.CharacterScreen.InventoryMode.Ground)
-			{
-				return this.tactical_onDropGroundItemIntoBag(_data);
-			}
-			else
-			{
-				return this.general_onDropStashItemIntoBag(_data);
-			}
-		}
-		else
-		{
-			return this.general_onDropStashItemIntoBag(_data);
-		}
-	}
-
 	function onEquipBagItem( _data )
 	{
 		return this.general_onEquipBagItem(_data);
-	}
-
-	function onSwapBagItem( _data )
-	{
-		return this.general_onSwapBagItem(_data);
 	}
 
 	function onDropBagItemIntoInventory( _data )
@@ -598,11 +574,6 @@ this.character_screen <- {
 		{
 			return this.general_onDropItemIntoStash(_data);
 		}
-	}
-
-	function onDropPaperdollItemIntoBag( _data )
-	{
-		return this.general_onDropPaperdollItemIntoBag(_data);
 	}
 
 	function onUpdateNameAndTitle( _data )
@@ -734,95 +705,6 @@ this.character_screen <- {
 			targetItems.firstItem,
 			targetItems.secondItem,
 			data.sourceItem
-		]);
-
-		if (this.Tactical.isActive())
-		{
-			return this.UIDataHelper.convertStashAndEntityToUIData(data.entity, this.Tactical.TurnSequenceBar.getActiveEntity(), true, this.m.InventoryFilter);
-		}
-		else
-		{
-			return this.UIDataHelper.convertStashAndEntityToUIData(data.entity, null, true, this.m.InventoryFilter);
-		}
-	}
-
-	function tactical_onDropGroundItemIntoBag( _data )
-	{
-		local data = this.helper_queryGroundItemData(_data);
-
-		if ("error" in data)
-		{
-			return data;
-		}
-
-		local targetItem;
-
-		if (data.targetItemIdx != null)
-		{
-			targetItem = data.inventory.getItemAtBagSlot(data.targetItemIdx);
-		}
-
-		local allowed = this.helper_isActionAllowed(data.entity, [
-			data.sourceItem,
-			targetItem
-		], true);
-
-		if (allowed != null)
-		{
-			return allowed;
-		}
-
-		local targetItem;
-
-		if (data.targetItemIdx != null)
-		{
-			if (targetItem != null)
-			{
-				if (data.inventory.removeFromBagSlot(data.targetItemIdx) == false)
-				{
-					return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.FailedToPutGroundItemIntoBag);
-				}
-
-				data.sourceItem.pickup();
-
-				if (data.inventory.addToBag(data.sourceItem, data.targetItemIdx) == false)
-				{
-					data.sourceItem.drop(data.entity.getTile());
-					return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.FailedToPutGroundItemIntoBag);
-				}
-
-				targetItem.drop(data.entity.getTile());
-			}
-			else
-			{
-				data.sourceItem.pickup();
-
-				if (data.inventory.addToBag(data.sourceItem, data.targetItemIdx) == false)
-				{
-					data.sourceItem.drop(data.entity.getTile());
-					return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.FailedToPutGroundItemIntoBag);
-				}
-			}
-		}
-		else if (data.inventory.hasEmptySlot(this.Const.ItemSlot.Bag) == true)
-		{
-			data.sourceItem.pickup();
-
-			if (data.inventory.addToBag(data.sourceItem) == false)
-			{
-				data.sourceItem.drop(data.entity.getTile());
-				return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.FailedToPutGroundItemIntoBag);
-			}
-		}
-		else
-		{
-			return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.NotEnoughBagSpace);
-		}
-
-		data.sourceItem.playInventorySound(this.Const.Items.InventoryEventType.PlacedInBag);
-		this.helper_payForAction(data.entity, [
-			data.sourceItem,
-			targetItem
 		]);
 
 		if (this.Tactical.isActive())
@@ -1154,110 +1036,6 @@ this.character_screen <- {
 		}
 	}
 
-	function general_onDropStashItemIntoBag( _data )
-	{
-		local data = this.helper_queryStashItemData(_data);
-
-		if ("error" in data)
-		{
-			return data;
-		}
-
-		if (!this.Tactical.isActive() && data.sourceItem.isUsable() && data.targetItemIdx != null && data.inventory.getItemAtBagSlot(data.targetItemIdx) != null)
-		{
-			if (data.sourceItem.onUse(data.inventory.getActor(), data.inventory.getItemAtBagSlot(data.targetItemIdx)))
-			{
-				data.stash.removeByIndex(data.sourceIndex);
-				data.inventory.getActor().getSkills().update();
-				return this.UIDataHelper.convertStashAndEntityToUIData(data.entity, null, false, this.m.InventoryFilter);
-			}
-			else
-			{
-				return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.FailedToEquipStashItem);
-			}
-		}
-
-		local targetItem;
-
-		if (data.targetItemIdx != null)
-		{
-			targetItem = data.inventory.getItemAtBagSlot(data.targetItemIdx);
-		}
-
-		local allowed = this.helper_isActionAllowed(data.entity, [
-			data.sourceItem,
-			targetItem
-		], true);
-
-		if (allowed != null)
-		{
-			return allowed;
-		}
-
-		if (data.targetItemIdx != null)
-		{
-			if (data.stash.removeByIndex(data.sourceIndex) == null)
-			{
-				return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.FailedToRemoveItemFromSourceSlot);
-			}
-
-			if (targetItem != null)
-			{
-				if (data.inventory.removeFromBagSlot(data.targetItemIdx) == false)
-				{
-					data.stash.insert(data.sourceItem, data.sourceIndex);
-					return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.FailedToPutStashItemIntoBag);
-				}
-
-				if (data.inventory.addToBag(data.sourceItem, data.targetItemIdx) == false)
-				{
-					data.inventory.addToBag(targetItem, data.targetItemIdx);
-					data.stash.insert(data.sourceItem, data.sourceIndex);
-					return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.FailedToPutStashItemIntoBag);
-				}
-
-				data.stash.insert(targetItem, data.sourceIndex);
-			}
-			else if (data.inventory.addToBag(data.sourceItem, data.targetItemIdx) == false)
-			{
-				data.stash.insert(data.sourceItem, data.sourceIndex);
-				return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.FailedToPutStashItemIntoBag);
-			}
-		}
-		else if (data.inventory.hasEmptySlot(this.Const.ItemSlot.Bag) == true)
-		{
-			if (data.stash.removeByIndex(data.sourceIndex) == null)
-			{
-				return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.FailedToRemoveItemFromSourceSlot);
-			}
-
-			if (data.inventory.addToBag(data.sourceItem) == false)
-			{
-				data.stash.insert(data.sourceItem, data.sourceIndex);
-				return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.FailedToPutStashItemIntoBag);
-			}
-		}
-		else
-		{
-			return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.NotEnoughBagSpace);
-		}
-
-		data.sourceItem.playInventorySound(this.Const.Items.InventoryEventType.PlacedInBag);
-		this.helper_payForAction(data.entity, [
-			data.sourceItem,
-			targetItem
-		]);
-
-		if (this.Tactical.isActive())
-		{
-			return this.UIDataHelper.convertStashAndEntityToUIData(data.entity, this.Tactical.TurnSequenceBar.getActiveEntity(), false, this.m.InventoryFilter);
-		}
-		else
-		{
-			return this.UIDataHelper.convertStashAndEntityToUIData(data.entity, null, false, this.m.InventoryFilter);
-		}
-	}
-
 	function general_onEquipBagItem( _data )
 	{
 		local data = this.helper_queryEntityItemData(_data);
@@ -1466,48 +1244,6 @@ this.character_screen <- {
 		}
 	}
 
-	function general_onSwapBagItem( _data )
-	{
-		local data = this.helper_queryEntityBackpackItemData(_data);
-
-		if ("error" in data)
-		{
-			return data;
-		}
-
-		if (data.inventory.removeFromBagSlot(data.sourceItemIdx) == false)
-		{
-			return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.FailedToRemoveItemFromBag);
-		}
-
-		if (data.targetItem != null)
-		{
-			if (data.inventory.removeFromBagSlot(data.targetItemIdx) == false)
-			{
-				data.inventory.addToBag(data.sourceItem, data.sourceItemIdx);
-				return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.FailedToRemoveItemFromBag);
-			}
-
-			data.inventory.addToBag(data.sourceItem, data.targetItemIdx);
-			data.inventory.addToBag(data.targetItem, data.sourceItemIdx);
-		}
-		else
-		{
-			data.inventory.addToBag(data.sourceItem, data.targetItemIdx);
-		}
-
-		data.sourceItem.playInventorySound(this.Const.Items.InventoryEventType.Equipped);
-
-		if (this.Tactical.isActive())
-		{
-			return this.UIDataHelper.convertStashAndEntityToUIData(data.entity, this.Tactical.TurnSequenceBar.getActiveEntity(), true, this.m.InventoryFilter);
-		}
-		else
-		{
-			return this.UIDataHelper.convertStashAndEntityToUIData(data.entity, null, true, this.m.InventoryFilter);
-		}
-	}
-
 	function general_onDropBagItemIntoStash( _data )
 	{
 		local data = this.helper_queryBagItemDataToInventory(_data);
@@ -1582,103 +1318,6 @@ this.character_screen <- {
 		else
 		{
 			return this.UIDataHelper.convertStashAndEntityToUIData(data.entity, null, false, this.m.InventoryFilter);
-		}
-	}
-
-	function general_onDropPaperdollItemIntoBag( _data )
-	{
-		local data = this.helper_queryEntityItemData(_data, true);
-
-		if ("error" in data)
-		{
-			return data;
-		}
-
-		local targetItem;
-
-		if (data.targetItemIdx != null)
-		{
-			targetItem = data.inventory.getItemAtBagSlot(data.targetItemIdx);
-		}
-
-		local allowed = this.helper_isActionAllowed(data.entity, [
-			data.sourceItem,
-			targetItem
-		], true);
-
-		if (allowed != null)
-		{
-			return allowed;
-		}
-
-		if (data.sourceItem.isInBag() == true)
-		{
-			return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.ItemAlreadyWithinBag);
-		}
-
-		local fatigueDifference = data.entity.getFatigueMax() - data.entity.getFatigue();
-
-		if (data.targetItemIdx != null)
-		{
-			if (targetItem != null)
-			{
-				if (data.inventory.removeFromBagSlot(data.targetItemIdx) == false)
-				{
-					data.inventory.addToBag(targetItem, data.targetItemIdx);
-					return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.FailedToRemoveItemFromBag);
-				}
-
-				data.inventory.unequip(data.sourceItem);
-
-				if (data.inventory.equip(targetItem) == false)
-				{
-					data.inventory.unequip(targetItem);
-					data.inventory.equip(data.sourceItem);
-					data.inventory.addToBag(targetItem, data.targetItemIdx);
-					return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.FailedToEquipBagItem);
-				}
-
-				data.inventory.addToBag(data.sourceItem, data.targetItemIdx);
-			}
-			else
-			{
-				data.inventory.unequip(data.sourceItem);
-				data.inventory.addToBag(data.sourceItem, data.targetItemIdx);
-			}
-		}
-		else if (data.inventory.hasEmptySlot(this.Const.ItemSlot.Bag) == true)
-		{
-			local result = this.helper_dropItemIntoBag(data, false);
-
-			if (result != null)
-			{
-				return result.error;
-			}
-		}
-		else
-		{
-			return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.NotEnoughBagSpace);
-		}
-
-		data.sourceItem.playInventorySound(this.Const.Items.InventoryEventType.Equipped);
-
-		if (("State" in this.Tactical) && this.Tactical.State != null)
-		{
-			data.entity.setFatigue(data.entity.getFatigueMax() - fatigueDifference);
-		}
-
-		this.helper_payForAction(data.entity, [
-			data.sourceItem,
-			targetItem
-		]);
-
-		if (this.Tactical.isActive())
-		{
-			return this.UIDataHelper.convertStashAndEntityToUIData(data.entity, this.Tactical.TurnSequenceBar.getActiveEntity(), true, this.m.InventoryFilter);
-		}
-		else
-		{
-			return this.UIDataHelper.convertStashAndEntityToUIData(data.entity, null, true, this.m.InventoryFilter);
 		}
 	}
 
