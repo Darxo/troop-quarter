@@ -36,6 +36,7 @@
     ::mods_registerCSS("mod_TQUA/troop_quarter_dialog_module.css");
     ::mods_registerJS("mod_TQUA/world_town_screen.js");
 
+    ::mods_registerJS("mod_TQUA/roster_manager/roster_manager_datasource.js");
     ::mods_registerJS("mod_TQUA/roster_manager/roster_manager_screen.js");
 
 

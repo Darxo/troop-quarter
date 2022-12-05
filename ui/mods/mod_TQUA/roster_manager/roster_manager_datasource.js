@@ -1,13 +1,4 @@
-/*
- *  @Project:		Battle Brothers
- *	@Company:		Overhype Studios
- *
- *	@Copyright:		(c) Overhype Studios | 2013 - 2020
- * 
- *  @Author:		Overhype Studios
- *  @Date:			24.01.2017 / Reworked: 26.11.2017
- *  @Description:	Character Screen Datasource JS
- */
+
 "use strict";
 
 
@@ -51,7 +42,7 @@ var CharacterScreenDatasourceIdentifier =
 };
 
 
-var CharacterScreenDatasource = function(_isTacticalMode)
+var RosterManagerDatasource = function()
 {
 	this.mSQHandle = null;
 
@@ -69,7 +60,6 @@ var CharacterScreenDatasource = function(_isTacticalMode)
 
     // States
 	this.mInventoryMode = null;
-    this.mIsTacticalMode = _isTacticalMode;
 
 	// fucking bullshit
     this.mInventoryModule = null;
@@ -80,29 +70,29 @@ var CharacterScreenDatasource = function(_isTacticalMode)
 };
 
 
-CharacterScreenDatasource.prototype.setInventoryModule = function (_module)
+RosterManagerDatasource.prototype.setInventoryModule = function (_module)
 {
 	this.mInventoryModule = _module;
 }
 
-CharacterScreenDatasource.prototype.getInventoryModule = function ()
+RosterManagerDatasource.prototype.getInventoryModule = function ()
 {
 	return this.mInventoryModule;
 }
 
-CharacterScreenDatasource.prototype.onConnection = function (_handle)
+RosterManagerDatasource.prototype.onConnection = function (_handle)
 {
 	this.mSQHandle = _handle;
 };
 
-CharacterScreenDatasource.prototype.onDisconnection = function ()
+RosterManagerDatasource.prototype.onDisconnection = function ()
 {
 	this.mSQHandle = null;
 	this.reset();
 };
 
 
-CharacterScreenDatasource.prototype.addListener = function(_channel, _callback)
+RosterManagerDatasource.prototype.addListener = function(_channel, _callback)
 {
 	if (_channel in this.mEventListener)
 	{
@@ -113,7 +103,7 @@ CharacterScreenDatasource.prototype.addListener = function(_channel, _callback)
 	}
 };
 
-CharacterScreenDatasource.prototype.removeListener = function(_channel, _callback)
+RosterManagerDatasource.prototype.removeListener = function(_channel, _callback)
 {
 	if (_channel in this.mEventListener)
 	{
@@ -125,12 +115,12 @@ CharacterScreenDatasource.prototype.removeListener = function(_channel, _callbac
 	}
 };
 
-CharacterScreenDatasource.prototype.removeListeners = function()
+RosterManagerDatasource.prototype.removeListeners = function()
 {
 	this.createEventChannels();
 };
 
-CharacterScreenDatasource.prototype.notifyEventListener = function(_channel, _payload)
+RosterManagerDatasource.prototype.notifyEventListener = function(_channel, _payload)
 {
 	if (_channel in this.mEventListener)
 	{
@@ -142,7 +132,7 @@ CharacterScreenDatasource.prototype.notifyEventListener = function(_channel, _pa
 	}
 };
 
-CharacterScreenDatasource.prototype.createEventChannels = function()
+RosterManagerDatasource.prototype.createEventChannels = function()
 {
     this.mEventListener[ErrorCode.Key] = [ ];
 
@@ -159,12 +149,12 @@ CharacterScreenDatasource.prototype.createEventChannels = function()
 };
 
 
-CharacterScreenDatasource.prototype.init = function()
+RosterManagerDatasource.prototype.init = function()
 {
 	this.createEventChannels();
 };
 
-CharacterScreenDatasource.prototype.reset = function()
+RosterManagerDatasource.prototype.reset = function()
 {
 	// Caches
 	this.mBrothersList = null;
@@ -177,13 +167,13 @@ CharacterScreenDatasource.prototype.reset = function()
 };
 
 
-CharacterScreenDatasource.prototype.setInventoryMode = function(_mode)
+RosterManagerDatasource.prototype.setInventoryMode = function(_mode)
 {
 	if (_mode === undefined || _mode === null || typeof(_mode) !== 'string')
 	{
 		console.error('ERROR: Failed to set inventory mode. Reason: Invalid mode.');
 	}
-	
+
 	switch(_mode.toLowerCase())
 	{
 		case CharacterScreenDatasourceIdentifier.InventoryMode.Stash:
@@ -205,33 +195,33 @@ CharacterScreenDatasource.prototype.setInventoryMode = function(_mode)
 };
 
 
-CharacterScreenDatasource.prototype.getInventoryMode = function()
+RosterManagerDatasource.prototype.getInventoryMode = function()
 {
 	return this.mInventoryMode;
 };
 
-CharacterScreenDatasource.prototype.isInStashMode = function()
+RosterManagerDatasource.prototype.isInStashMode = function()
 {
 	return this.mInventoryMode === CharacterScreenDatasourceIdentifier.InventoryMode.Stash || this.mInventoryMode === CharacterScreenDatasourceIdentifier.InventoryMode.BattlePreparation;
 };
 
-CharacterScreenDatasource.prototype.isInGroundMode = function()
+RosterManagerDatasource.prototype.isInGroundMode = function()
 {
 	return this.mInventoryMode === CharacterScreenDatasourceIdentifier.InventoryMode.Ground;
 };
 
-CharacterScreenDatasource.prototype.isTacticalMode = function ()
+RosterManagerDatasource.prototype.isTacticalMode = function ()
 {
-    return this.mIsTacticalMode;
+    return false;
 };
 
-CharacterScreenDatasource.prototype.getBrothersList = function ()
+RosterManagerDatasource.prototype.getBrothersList = function ()
 {
     return this.mBrothersList;
 };
 
 
-CharacterScreenDatasource.prototype.getTooltipItemOwner = function()
+RosterManagerDatasource.prototype.getTooltipItemOwner = function()
 {
 	switch(this.mInventoryMode)
 	{
@@ -250,7 +240,7 @@ CharacterScreenDatasource.prototype.getTooltipItemOwner = function()
 };
 
 
-CharacterScreenDatasource.prototype.loadFromData = function(_data)
+RosterManagerDatasource.prototype.loadFromData = function(_data)
 {
     if (_data === undefined || _data == null || typeof(_data) !== 'object')
     {
@@ -281,7 +271,7 @@ CharacterScreenDatasource.prototype.loadFromData = function(_data)
 };
 
 
-CharacterScreenDatasource.prototype.swapBrothers = function (_a, _b)
+RosterManagerDatasource.prototype.swapBrothers = function (_a, _b)
 {
     var tmp = this.mBrothersList[_a];
     this.mBrothersList[_a] = this.mBrothersList[_b];
@@ -289,28 +279,15 @@ CharacterScreenDatasource.prototype.swapBrothers = function (_a, _b)
 }
 
 
-CharacterScreenDatasource.prototype.loadBrothersList = function(_data, _withoutNotify)
+RosterManagerDatasource.prototype.loadBrothersList = function(_data, _withoutNotify)
 {
     var data = _data;
-    /*if (_data !== undefined && _data !== null && typeof(_data) === 'object')
-    {
-        var data = _data;
-    }
-    else
-    {
-        data = this.notifyBackendQueryBrothersList();
-        if (data === null)
-        {
-            console.log('ERROR: Failed to query brothers list data. Reason: Invalid result.');
-            return;
-        }
-    }*/
 
 	if (this.mInventoryMode === null)
 	{
 		this.setInventoryMode(CharacterScreenDatasourceIdentifier.InventoryMode.Stash);
 	}
-	
+
 	this.mSelectedBrotherIndex = null;
 	this.mBrothersList = data;
 
@@ -354,7 +331,7 @@ CharacterScreenDatasource.prototype.loadBrothersList = function(_data, _withoutN
 };
 
 
-CharacterScreenDatasource.prototype.getBrothersList = function()
+RosterManagerDatasource.prototype.getBrothersList = function()
 {
 	if (this.mBrothersList === null)
 	{
@@ -364,7 +341,7 @@ CharacterScreenDatasource.prototype.getBrothersList = function()
 	return this.mBrothersList;
 };
 
-CharacterScreenDatasource.prototype.getNumBrothers = function ()
+RosterManagerDatasource.prototype.getNumBrothers = function ()
 {
 	var num = 0;
 
@@ -377,7 +354,7 @@ CharacterScreenDatasource.prototype.getNumBrothers = function ()
 	return num;
 };
 
-CharacterScreenDatasource.prototype.getSelectedBrother = function()
+RosterManagerDatasource.prototype.getSelectedBrother = function()
 {
 	if (this.mSelectedBrotherIndex !== null && this.mBrothersList !== null && this.mSelectedBrotherIndex < this.mBrothersList.length)
 	{
@@ -386,12 +363,12 @@ CharacterScreenDatasource.prototype.getSelectedBrother = function()
 	return null;
 };
 
-CharacterScreenDatasource.prototype.getSelectedBrotherIndex = function ()
+RosterManagerDatasource.prototype.getSelectedBrotherIndex = function ()
 {
     return this.mSelectedBrotherIndex;
 };
 
-CharacterScreenDatasource.prototype.setSelectedBrotherIndex = function (_rosterPosition, _withoutNotify)
+RosterManagerDatasource.prototype.setSelectedBrotherIndex = function (_rosterPosition, _withoutNotify)
 {
     this.mSelectedBrotherIndex = _rosterPosition;
 
@@ -404,7 +381,7 @@ CharacterScreenDatasource.prototype.setSelectedBrotherIndex = function (_rosterP
 };
 
 
-CharacterScreenDatasource.prototype.getBrotherPerkPoints = function(_brother)
+RosterManagerDatasource.prototype.getBrotherPerkPoints = function(_brother)
 {
     if (_brother === null || !(CharacterScreenIdentifier.Entity.Character.Key in _brother))
     {
@@ -430,7 +407,7 @@ CharacterScreenDatasource.prototype.getBrotherPerkPoints = function(_brother)
 };
 
 
-CharacterScreenDatasource.prototype.getBrotherPerkPointsSpent = function (_brother)
+RosterManagerDatasource.prototype.getBrotherPerkPointsSpent = function (_brother)
 {
 	if (_brother === null || !(CharacterScreenIdentifier.Entity.Character.Key in _brother))
 	{
@@ -456,7 +433,7 @@ CharacterScreenDatasource.prototype.getBrotherPerkPointsSpent = function (_broth
 };
 
 
-CharacterScreenDatasource.prototype.isSelectedBrother = function(_brother)
+RosterManagerDatasource.prototype.isSelectedBrother = function(_brother)
 {
 	var selectedBrother = this.getSelectedBrother();
 	return selectedBrother !== null && CharacterScreenIdentifier.Entity.Id in selectedBrother &&
@@ -464,7 +441,7 @@ CharacterScreenDatasource.prototype.isSelectedBrother = function(_brother)
 			selectedBrother[CharacterScreenIdentifier.Entity.Id] === _brother[CharacterScreenIdentifier.Entity.Id];
 };
 
-CharacterScreenDatasource.prototype.switchToPreviousBrother = function(_withoutNotify)
+RosterManagerDatasource.prototype.switchToPreviousBrother = function(_withoutNotify)
 {
     if (this.mBrothersList == null || this.mIsPopupOpen)
         return;
@@ -499,7 +476,7 @@ CharacterScreenDatasource.prototype.switchToPreviousBrother = function(_withoutN
     }
 };
 
-CharacterScreenDatasource.prototype.switchToNextBrother = function(_withoutNotify)
+RosterManagerDatasource.prototype.switchToNextBrother = function(_withoutNotify)
 {
     if (this.mBrothersList == null || this.mIsPopupOpen)
         return;
@@ -516,7 +493,7 @@ CharacterScreenDatasource.prototype.switchToNextBrother = function(_withoutNotif
     }
 
     if(this.mSelectedBrotherIndex == currentIndex)
-    {  
+    {
         for (var i = 0; i < this.mSelectedBrotherIndex; ++i)
         {
             if (this.mBrothersList[i] !== null)
@@ -534,7 +511,7 @@ CharacterScreenDatasource.prototype.switchToNextBrother = function(_withoutNotif
 	}
 };
 
-CharacterScreenDatasource.prototype.selectedBrotherById = function(_brotherId, _withoutNotify)
+RosterManagerDatasource.prototype.selectedBrotherById = function(_brotherId, _withoutNotify)
 {
 	if (this.mSelectedBrotherIndex !== null && this.mBrothersList !== null)
 	{
@@ -561,7 +538,7 @@ CharacterScreenDatasource.prototype.selectedBrotherById = function(_brotherId, _
 	}
 };
 
-CharacterScreenDatasource.prototype.setRosterLimit = function(_data, _withoutNotify)
+RosterManagerDatasource.prototype.setRosterLimit = function(_data, _withoutNotify)
 {
     // notify every listener
 	if (_withoutNotify === undefined || _withoutNotify !== true)
@@ -571,7 +548,7 @@ CharacterScreenDatasource.prototype.setRosterLimit = function(_data, _withoutNot
 };
 
 
-CharacterScreenDatasource.prototype.loadStashList = function(_data, _withoutNotify)
+RosterManagerDatasource.prototype.loadStashList = function(_data, _withoutNotify)
 {
     var data = _data;
 	this.mStashList = data;
@@ -585,7 +562,7 @@ CharacterScreenDatasource.prototype.loadStashList = function(_data, _withoutNoti
 	return this.mStashList;
 };
 
-CharacterScreenDatasource.prototype.getStashList = function()
+RosterManagerDatasource.prototype.getStashList = function()
 {
 	if (this.mStashList === null)
 	{
@@ -595,7 +572,7 @@ CharacterScreenDatasource.prototype.getStashList = function()
 	return this.mStashList;
 };
 
-CharacterScreenDatasource.prototype.isStashSpaceLeft = function (_howMuch)
+RosterManagerDatasource.prototype.isStashSpaceLeft = function (_howMuch)
 {
     if (_howMuch !== undefined && _howMuch !== null)
     {
@@ -627,7 +604,7 @@ CharacterScreenDatasource.prototype.isStashSpaceLeft = function (_howMuch)
     return false;
 };
 
-CharacterScreenDatasource.prototype.isBagSpaceLeft = function (_howMuch)
+RosterManagerDatasource.prototype.isBagSpaceLeft = function (_howMuch)
 {
     var selectedBrother = this.getSelectedBrother();
     if (selectedBrother === null || !(CharacterScreenIdentifier.Entity.Id in selectedBrother))
@@ -670,21 +647,12 @@ CharacterScreenDatasource.prototype.isBagSpaceLeft = function (_howMuch)
     return false;
 };
 
-CharacterScreenDatasource.prototype.getStashStatistics = function ()
+RosterManagerDatasource.prototype.getStashStatistics = function ()
 {
-    /*var usedSpace = 0;
-    for (var i = 0; i < this.mStashList.length; ++i)
-    {
-        if (this.mStashList[i] !== null)
-        {
-            ++usedSpace;
-        }
-    }*/
-
     return { size: this.mStashSpaceMax, used: this.mStashSpaceUsed };
 };
 
-CharacterScreenDatasource.prototype.getGroundStatistics = function ()
+RosterManagerDatasource.prototype.getGroundStatistics = function ()
 {
     var selectedBrother = this.getSelectedBrother();
     if (selectedBrother === null || !(CharacterScreenIdentifier.Entity.Id in selectedBrother))
@@ -710,7 +678,7 @@ CharacterScreenDatasource.prototype.getGroundStatistics = function ()
     return 0;
 };
 
-CharacterScreenDatasource.prototype.hasItemEquipped = function (_slotType)
+RosterManagerDatasource.prototype.hasItemEquipped = function (_slotType)
 {
     var selectedBrother = this.getSelectedBrother();
     if (selectedBrother === null || !(CharacterScreenIdentifier.Entity.Id in selectedBrother))
@@ -732,7 +700,7 @@ CharacterScreenDatasource.prototype.hasItemEquipped = function (_slotType)
     return false;
 };
 
-CharacterScreenDatasource.prototype.hasEnoughAPToEquip = function ()
+RosterManagerDatasource.prototype.hasEnoughAPToEquip = function ()
 {
     var selectedBrother = this.getSelectedBrother();
     if (selectedBrother === null || !(CharacterScreenIdentifier.Entity.Id in selectedBrother))
@@ -757,7 +725,7 @@ CharacterScreenDatasource.prototype.hasEnoughAPToEquip = function ()
 };
 
 
-CharacterScreenDatasource.prototype.swapInventoryItem = function (_sourceItemIdx, _targetItemIdx)
+RosterManagerDatasource.prototype.swapInventoryItem = function (_sourceItemIdx, _targetItemIdx)
 {
     var self = this;
     this.notifyBackendSwapInventoryItem(_sourceItemIdx, _targetItemIdx, function (data)
@@ -809,10 +777,10 @@ CharacterScreenDatasource.prototype.swapInventoryItem = function (_sourceItemIdx
                 }
             }
         }
-    });    
+    });
 };
 
-CharacterScreenDatasource.prototype.destroyInventoryItem = function(_brotherId, _itemId)
+RosterManagerDatasource.prototype.destroyInventoryItem = function(_brotherId, _itemId)
 {
     // if the _brotherId is null, this means we are trying to equip a stash item which is NOT brother bound
     // thus we have to use the current selected one
@@ -879,12 +847,12 @@ CharacterScreenDatasource.prototype.destroyInventoryItem = function(_brotherId, 
     }
 };
 
-CharacterScreenDatasource.prototype.repairInventoryItem = function(_itemId, _callback)
+RosterManagerDatasource.prototype.repairInventoryItem = function(_itemId, _callback)
 {
    this.notifyBackendRepairInventoryItem(_itemId, _callback);
 };
 
-CharacterScreenDatasource.prototype.equipInventoryItem = function(_brotherId, _sourceItemId, _sourceItemIdx)
+RosterManagerDatasource.prototype.equipInventoryItem = function(_brotherId, _sourceItemId, _sourceItemIdx)
 {
 	// if the _brotherId is null, this means we are trying to equip a stash item which is NOT brother bound
 	// thus we have to use the current selected one
@@ -954,7 +922,7 @@ CharacterScreenDatasource.prototype.equipInventoryItem = function(_brotherId, _s
 	});
 };
 
-CharacterScreenDatasource.prototype.dropInventoryItemIntoBag = function(_brotherId, _sourceItemId, _sourceItemIdx, _targetItemIdx)
+RosterManagerDatasource.prototype.dropInventoryItemIntoBag = function(_brotherId, _sourceItemId, _sourceItemIdx, _targetItemIdx)
 {
 	// if the _brotherId is null, this means we are trying to equip a stash item which is NOT brother bound
 	// thus we have to use the current selected one
@@ -1024,7 +992,7 @@ CharacterScreenDatasource.prototype.dropInventoryItemIntoBag = function(_brother
 	});
 };
 
-CharacterScreenDatasource.prototype.equipBagItem = function(_brotherId, _sourceItemId, _sourceItemIdx)
+RosterManagerDatasource.prototype.equipBagItem = function(_brotherId, _sourceItemId, _sourceItemIdx)
 {
     // if the _brotherId is null, this means we are trying to equip a stash item which is NOT brother bound
     // thus we have to use the current selected one
@@ -1086,7 +1054,7 @@ CharacterScreenDatasource.prototype.equipBagItem = function(_brotherId, _sourceI
     });
 };
 
-CharacterScreenDatasource.prototype.swapBagItem = function (_brotherId, _sourceItemIdx, _targetItemIdx)
+RosterManagerDatasource.prototype.swapBagItem = function (_brotherId, _sourceItemIdx, _targetItemIdx)
 {
     // if the _brotherId is null, this means we are trying to equip a stash item which is NOT brother bound
     // thus we have to use the current selected one
@@ -1148,7 +1116,7 @@ CharacterScreenDatasource.prototype.swapBagItem = function (_brotherId, _sourceI
     });
 };
 
-CharacterScreenDatasource.prototype.dropBagItemIntoInventory = function(_brotherId, _sourceItemId, _sourceItemIdx, _targetItemIdx)
+RosterManagerDatasource.prototype.dropBagItemIntoInventory = function(_brotherId, _sourceItemId, _sourceItemIdx, _targetItemIdx)
 {
     // if the _brotherId is null, this means we are trying to equip a stash item which is NOT brother bound
     // thus we have to use the current selected one
@@ -1218,7 +1186,7 @@ CharacterScreenDatasource.prototype.dropBagItemIntoInventory = function(_brother
     });
 };
 
-CharacterScreenDatasource.prototype.dropPaperdollItem = function(_brotherId, _sourceItemId, _targetItemIdx)
+RosterManagerDatasource.prototype.dropPaperdollItem = function(_brotherId, _sourceItemId, _targetItemIdx)
 {
     // if the _brotherId is null, this means we are trying to equip a stash item which is NOT brother bound
     // thus we have to use the current selected one
@@ -1288,7 +1256,7 @@ CharacterScreenDatasource.prototype.dropPaperdollItem = function(_brotherId, _so
     });
 };
 
-CharacterScreenDatasource.prototype.dropPaperdollItemIntoBag = function(_brotherId, _sourceItemId, _targetItemIdx)
+RosterManagerDatasource.prototype.dropPaperdollItemIntoBag = function(_brotherId, _sourceItemId, _targetItemIdx)
 {
     // if the _brotherId is null, this means we are trying to equip a stash item which is NOT brother bound
     // thus we have to use the current selected one
@@ -1346,23 +1314,12 @@ CharacterScreenDatasource.prototype.dropPaperdollItemIntoBag = function(_brother
                     console.error('ERROR: Failed to drop paperdoll item into bag. Invalid brother data result.');
                 }
             }
-            /*
-		    // find the brother and update him
-		    if (CharacterScreenIdentifier.Entity.Id in data)
-		    {
-			    this.updateBrother(data);
-		    }
-		    else
-		    {
-			    console.error('ERROR: Failed to drop paperdoll item into bag. Invalid data result.');
-		    }
-		    */
         }
     });
 };
 
 
-CharacterScreenDatasource.prototype.loadPerkTrees = function(_data, _withoutNotify)
+RosterManagerDatasource.prototype.loadPerkTrees = function(_data, _withoutNotify)
 {
     this.mPerkTrees = _data;
 
@@ -1375,7 +1332,7 @@ CharacterScreenDatasource.prototype.loadPerkTrees = function(_data, _withoutNoti
     return this.mPerkTrees;
 };
 
-CharacterScreenDatasource.prototype.loadPerkTreesOnce = function(_data, _withoutNotify)
+RosterManagerDatasource.prototype.loadPerkTreesOnce = function(_data, _withoutNotify)
 {
     if (this.mPerkTrees === null)
     {
@@ -1383,7 +1340,7 @@ CharacterScreenDatasource.prototype.loadPerkTreesOnce = function(_data, _without
     }
 };
 
-CharacterScreenDatasource.prototype.getPerkTrees = function()
+RosterManagerDatasource.prototype.getPerkTrees = function()
 {
     if (this.mPerkTrees === null)
     {
@@ -1393,7 +1350,7 @@ CharacterScreenDatasource.prototype.getPerkTrees = function()
     return this.mPerkTrees;
 };
 
-CharacterScreenDatasource.prototype.unlockPerk = function(_brotherId, _perkId)
+RosterManagerDatasource.prototype.unlockPerk = function(_brotherId, _perkId)
 {
     var brotherId = _brotherId;
     if (brotherId === null)
@@ -1437,13 +1394,13 @@ CharacterScreenDatasource.prototype.unlockPerk = function(_brotherId, _perkId)
     });
 };
 
-CharacterScreenDatasource.prototype.queryPerkInformation = function(_perkId, _callback)
+RosterManagerDatasource.prototype.queryPerkInformation = function(_perkId, _callback)
 {
     this.notifyBackendQueryPerkInformation(_perkId, _callback);
 };
 
 
-CharacterScreenDatasource.prototype.updateBrother = function (_data)
+RosterManagerDatasource.prototype.updateBrother = function (_data)
 {
 	if (_data === null || typeof(_data) !== 'object')
 	{
@@ -1463,7 +1420,7 @@ CharacterScreenDatasource.prototype.updateBrother = function (_data)
 };
 
 
-CharacterScreenDatasource.prototype.updateStash = function (_data)
+RosterManagerDatasource.prototype.updateStash = function (_data)
 {
 	if (_data === null || !jQuery.isArray(_data))
 	{
@@ -1490,7 +1447,7 @@ CharacterScreenDatasource.prototype.updateStash = function (_data)
 	{
 		var sourceItem = this.mStashList[i];
 		var targetItem = _data[i];
-		
+
 		// item added to stash slot
 		if (sourceItem === null && targetItem !== null)
 		{
@@ -1516,11 +1473,6 @@ CharacterScreenDatasource.prototype.updateStash = function (_data)
 				(sourceItem[CharacterScreenIdentifier.Item.Id] !== targetItem[CharacterScreenIdentifier.Item.Id])
 				)
 			{
-/*
-                console.info('STASH: Item updated srcType: ' + sourceItem[CharacterScreenIdentifier.Item.Slot]);
-                console.info('STASH: Item updated trgType: ' + targetItem[CharacterScreenIdentifier.Item.Slot]);
-*/
-                //console.log('STASH: Item updated (Index: ' + i + ')');
 				this.mStashList[i] = targetItem;
 				this.notifyEventListener(CharacterScreenDatasourceIdentifier.Inventory.StashItemUpdated.Key, { item: targetItem, index: i, flag: CharacterScreenDatasourceIdentifier.Inventory.StashItemUpdated.Flag.Updated });
 			}
@@ -1528,7 +1480,7 @@ CharacterScreenDatasource.prototype.updateStash = function (_data)
 	}
 };
 
-CharacterScreenDatasource.prototype.updateNameAndTitle = function(_brotherId, _name, _title)
+RosterManagerDatasource.prototype.updateNameAndTitle = function(_brotherId, _name, _title)
 {
     var brotherId = _brotherId;
     if (brotherId === null)
@@ -1572,7 +1524,7 @@ CharacterScreenDatasource.prototype.updateNameAndTitle = function(_brotherId, _n
     });
 };
 
-CharacterScreenDatasource.prototype.commitLevelUpStats = function(_brotherId, _statsIncreaseValues)
+RosterManagerDatasource.prototype.commitLevelUpStats = function(_brotherId, _statsIncreaseValues)
 {
     var brotherId = _brotherId;
     if (brotherId === null)
@@ -1618,56 +1570,28 @@ CharacterScreenDatasource.prototype.commitLevelUpStats = function(_brotherId, _s
     });
 };
 
-
-/*CharacterScreenDatasource.prototype.notifyBackendQueryBrothersList = function ()
-{
-	if (this.mSQHandle !== null)
-	{
-		return SQ.call(this.mSQHandle, 'onQueryBrothersList');
-	}
-	return null;
-};*/
-
-CharacterScreenDatasource.prototype.notifyBackendSortButtonClicked = function () 
+RosterManagerDatasource.prototype.notifyBackendSortButtonClicked = function ()
 {
    	SQ.call(this.mSQHandle, 'onSortButtonClicked');
 }
 
-/*CharacterScreenDatasource.prototype.notifyBackendQueryStashList = function ()
-{
-	if (this.mSQHandle !== null)
-	{
-		return SQ.call(this.mSQHandle, 'onQueryStashList');
-	}
-	return null;
-};*/
-
-/*CharacterScreenDatasource.prototype.notifyBackendQueryPerkTrees = function ()
-{
-    if (this.mSQHandle !== null)
-    {
-        return SQ.call(this.mSQHandle, 'onQueryPerkTrees');
-    }
-    return null;
-};*/
-
-CharacterScreenDatasource.prototype.notifyBackendQueryPerkInformation = function (_perkId, _callback)
+RosterManagerDatasource.prototype.notifyBackendQueryPerkInformation = function (_perkId, _callback)
 {
     SQ.call(this.mSQHandle, 'onQueryPerkInformation', [_perkId], _callback);
 };
 
-CharacterScreenDatasource.prototype.notifyBackendUnlockPerk = function (_brotherId, _perkId, _callback)
+RosterManagerDatasource.prototype.notifyBackendUnlockPerk = function (_brotherId, _perkId, _callback)
 {
     SQ.call(this.mSQHandle, 'onUnlockPerk', [_brotherId, _perkId], _callback);
 };
 
-CharacterScreenDatasource.prototype.notifyBackendUpdateNameAndTitle = function (_brotherId, _name, _title, _callback)
+RosterManagerDatasource.prototype.notifyBackendUpdateNameAndTitle = function (_brotherId, _name, _title, _callback)
 {
     SQ.call(this.mSQHandle, 'onUpdateNameAndTitle', [_brotherId, _name, _title], _callback);
 };
 
-CharacterScreenDatasource.prototype.notifyBackendCommitStatIncreaseValues = function (_brotherId, _statsIncreaseValues, _callback)
-{   
+RosterManagerDatasource.prototype.notifyBackendCommitStatIncreaseValues = function (_brotherId, _statsIncreaseValues, _callback)
+{
     // NOTE: (js) Convert Object to array..as we cannot deliver objects with a function call to the backend... thanks Awesomium...
     var increaseValues = [];
     increaseValues.push(_statsIncreaseValues[CharacterScreenIdentifier.Entity.Character.LevelUp.HitpointsIncrease]);
@@ -1682,112 +1606,103 @@ CharacterScreenDatasource.prototype.notifyBackendCommitStatIncreaseValues = func
     SQ.call(this.mSQHandle, 'onCommitStatsIncreaseValues', [_brotherId, increaseValues], _callback);
 };
 
-CharacterScreenDatasource.prototype.notifyBackendSwapInventoryItem = function (_sourceItemIdx, _targetItemIdx, _callback)
+RosterManagerDatasource.prototype.notifyBackendSwapInventoryItem = function (_sourceItemIdx, _targetItemIdx, _callback)
 {
     SQ.call(this.mSQHandle, 'onSwapInventoryItem', [_sourceItemIdx, _targetItemIdx], _callback);
 };
 
-/*CharacterScreenDatasource.prototype.notifyBackendDestroyInventoryItem = function (_brotherId, _sourceItemId)
-{
-    if (this.mSQHandle !== null)
-    {
-        return SQ.call(this.mSQHandle, 'onDestroyInventoryItem', [_brotherId, _sourceItemId]);
-    }
-    return null;
-};*/
-
-CharacterScreenDatasource.prototype.notifyBackendRepairInventoryItem = function (_sourceItemId, _callback)
+RosterManagerDatasource.prototype.notifyBackendRepairInventoryItem = function (_sourceItemId, _callback)
 {
     SQ.call(this.mSQHandle, 'onRepairInventoryItem', _sourceItemId, _callback);
 };
 
-CharacterScreenDatasource.prototype.notifyBackendEquipInventoryItem = function (_brotherId, _sourceItemId, _sourceItemIdx, _callback)
+RosterManagerDatasource.prototype.notifyBackendEquipInventoryItem = function (_brotherId, _sourceItemId, _sourceItemIdx, _callback)
 {
 	SQ.call(this.mSQHandle, 'onEquipInventoryItem', [_brotherId, _sourceItemId, _sourceItemIdx], _callback);
 };
 
-CharacterScreenDatasource.prototype.notifyBackendDropInventoryItemIntoBag = function (_brotherId, _sourceItemId, _sourceItemIdx, _targetItemIdx, _callback)
+RosterManagerDatasource.prototype.notifyBackendDropInventoryItemIntoBag = function (_brotherId, _sourceItemId, _sourceItemIdx, _targetItemIdx, _callback)
 {
 	SQ.call(this.mSQHandle, 'onDropInventoryItemIntoBag', [_brotherId, _sourceItemId, _sourceItemIdx, _targetItemIdx], _callback);
 };
 
-CharacterScreenDatasource.prototype.notifyBackendDropBagItemIntoInventory = function (_brotherId, _sourceItemId, _sourceItemIdx, _targetItemIdx, _callback)
+RosterManagerDatasource.prototype.notifyBackendDropBagItemIntoInventory = function (_brotherId, _sourceItemId, _sourceItemIdx, _targetItemIdx, _callback)
 {
     SQ.call(this.mSQHandle, 'onDropBagItemIntoInventory', [_brotherId, _sourceItemId, _sourceItemIdx, _targetItemIdx], _callback);
 };
 
-CharacterScreenDatasource.prototype.notifyBackendEquipBagItem = function (_brotherId, _sourceItemId, _sourceItemIdx, _callback)
+RosterManagerDatasource.prototype.notifyBackendEquipBagItem = function (_brotherId, _sourceItemId, _sourceItemIdx, _callback)
 {
 	SQ.call(this.mSQHandle, 'onEquipBagItem', [_brotherId, _sourceItemId, _sourceItemIdx], _callback);
 };
 
-CharacterScreenDatasource.prototype.notifyBackendSwapBagItem = function (_brotherId, _sourceItemIdx, _targetItemIdx, _callback)
+RosterManagerDatasource.prototype.notifyBackendSwapBagItem = function (_brotherId, _sourceItemIdx, _targetItemIdx, _callback)
 {
     SQ.call(this.mSQHandle, 'onSwapBagItem', [_brotherId, _sourceItemIdx, _targetItemIdx], _callback);
 };
 
-CharacterScreenDatasource.prototype.notifyBackendDropPaperdollItem = function (_brotherId, _sourceItemId, _targetItemIdx, _callback)
+RosterManagerDatasource.prototype.notifyBackendDropPaperdollItem = function (_brotherId, _sourceItemId, _targetItemIdx, _callback)
 {
 	SQ.call(this.mSQHandle, 'onDropPaperdollItem', [_brotherId, _sourceItemId, _targetItemIdx], _callback);
 };
 
-CharacterScreenDatasource.prototype.notifyBackendDropPaperdollItemIntoBag = function (_brotherId, _sourceItemId, _targetItemIdx, _callback)
+RosterManagerDatasource.prototype.notifyBackendDropPaperdollItemIntoBag = function (_brotherId, _sourceItemId, _targetItemIdx, _callback)
 {
 	SQ.call(this.mSQHandle, 'onDropPaperdollItemIntoBag', [_brotherId, _sourceItemId, _targetItemIdx], _callback);
 };
 
-CharacterScreenDatasource.prototype.notifyBackendStartBattleButtonClicked = function ()
+RosterManagerDatasource.prototype.notifyBackendStartBattleButtonClicked = function ()
 {
 	SQ.call(this.mSQHandle, 'onStartBattleButtonClicked');
 };
 
-CharacterScreenDatasource.prototype.notifyBackendCloseButtonClicked = function ()
+RosterManagerDatasource.prototype.notifyBackendCloseButtonClicked = function ()
 {
 	SQ.call(this.mSQHandle, 'onCloseButtonClicked');
 };
 
-CharacterScreenDatasource.prototype.notifyBackendPopupDialogIsVisible = function (_visible)
+RosterManagerDatasource.prototype.notifyBackendPopupDialogIsVisible = function (_visible)
 {
     this.mIsPopupOpen = _visible;
     SQ.call(this.mSQHandle, 'onPopupDialogIsVisible', [_visible]);
 };
 
-CharacterScreenDatasource.prototype.notifyBackendDismissCharacter = function (_payCompensation)
+RosterManagerDatasource.prototype.notifyBackendDismissCharacter = function (_payCompensation)
 {
 	var activeCharacterID = this.mBrothersList[this.mSelectedBrotherIndex]['id'];
     SQ.call(this.mSQHandle, 'onDismissCharacter', [ activeCharacterID, _payCompensation ]);
 };
 
-CharacterScreenDatasource.prototype.notifyBackendFilterAllButtonClicked = function ()
+RosterManagerDatasource.prototype.notifyBackendFilterAllButtonClicked = function ()
 {
 	SQ.call(this.mSQHandle, 'onFilterAll');
 };
 
-CharacterScreenDatasource.prototype.notifyBackendFilterWeaponsButtonClicked = function ()
+RosterManagerDatasource.prototype.notifyBackendFilterWeaponsButtonClicked = function ()
 {
 	SQ.call(this.mSQHandle, 'onFilterWeapons');
 };
 
-CharacterScreenDatasource.prototype.notifyBackendFilterArmorButtonClicked = function ()
+RosterManagerDatasource.prototype.notifyBackendFilterArmorButtonClicked = function ()
 {
 	SQ.call(this.mSQHandle, 'onFilterArmor');
 };
 
-CharacterScreenDatasource.prototype.notifyBackendFilterMiscButtonClicked = function ()
+RosterManagerDatasource.prototype.notifyBackendFilterMiscButtonClicked = function ()
 {
 	SQ.call(this.mSQHandle, 'onFilterMisc');
 };
 
-CharacterScreenDatasource.prototype.notifyBackendFilterUsableButtonClicked = function () {
+RosterManagerDatasource.prototype.notifyBackendFilterUsableButtonClicked = function () {
     SQ.call(this.mSQHandle, 'onFilterUsable');
 };
 
-CharacterScreenDatasource.prototype.notifyBackendDiceThrow = function ()
+RosterManagerDatasource.prototype.notifyBackendDiceThrow = function ()
 {
 	SQ.call(this.mSQHandle, 'onDiceThrow');
 };
 
-CharacterScreenDatasource.prototype.notifyBackendUpdateRosterPosition = function (_id, _pos)
+RosterManagerDatasource.prototype.notifyBackendUpdateRosterPosition = function (_id, _pos)
 {
     SQ.call(this.mSQHandle, 'onUpdateRosterPosition', [ _id, _pos ]);
 };

@@ -5,7 +5,7 @@
 var RosterManagerScreen = function()
 {
     this.mSQHandle = null;
-    this.mDataSource = new CharacterScreenDatasource(false);
+    this.mDataSource = new RosterManagerDatasource();
 
     // generic containers
     this.mContainer = null;
@@ -17,7 +17,6 @@ var RosterManagerScreen = function()
 
     // modules
     this.mCharacterPanelModule = null;
-    this.mRightPanelModule = null;
     this.mBrothersModule = null;
 
     this.createModules();
@@ -127,21 +126,18 @@ RosterManagerScreen.prototype.destroyDIV = function ()
 RosterManagerScreen.prototype.createModules = function()
 {
     this.mCharacterPanelModule = new CharacterScreenLeftPanelModule(this, this.mDataSource);
-    this.mRightPanelModule = new CharacterScreenRightPanelModule(this, this.mDataSource);
     this.mBrothersModule = new CharacterScreenBrothersListModule(this, this.mDataSource);
 };
 
 RosterManagerScreen.prototype.registerModules = function ()
 {
     this.mCharacterPanelModule.register(this.mLeftContentContainer);
-    this.mRightPanelModule.register(this.mRightContentContainer);
     this.mBrothersModule.register(this.mRightContentContainer);
 };
 
 RosterManagerScreen.prototype.unregisterModules = function ()
 {
     this.mCharacterPanelModule.unregister();
-    this.mRightPanelModule.unregister();
     this.mBrothersModule.unregister();
 };
 
@@ -228,11 +224,6 @@ RosterManagerScreen.prototype.show = function (_data)
         this.mDataSource.loadBrothersList();
         this.mDataSource.loadStashList();
     }
-
-    var parentWidth = this.mContainer.width();
-    var parentHeight = this.mContainer.height();
-    var width = this.mRosterManagerScreenStatuetes.width();
-    var height = this.mRosterManagerScreenStatuetes.height();
 
     this.mContainer.velocity("finish", true).velocity({ opacity: 1 },
     {
