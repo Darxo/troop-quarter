@@ -84,8 +84,8 @@ BrotherManager.prototype.loadFromData = function( _data )
         if (identifier in _data && _data[identifier] !== null)
         {
             this.get(identifier).loadFromData(_data[identifier]);
-            // this.createBrotherSlots(identifier);
-            // this.onBrothersListLoaded(identifier);
+            this.createBrotherSlots(identifier);
+            this.onBrothersListLoaded(identifier);
         }
     }
 }
@@ -408,8 +408,18 @@ BrotherManager.prototype.notifyBackendRelocateBrother = function (_brotherID, _p
 BrotherManager.prototype.notifyBackendMoveAtoB = function (_id, _tagA, _pos, _tagB)
 {
     SQ.call(this.mSQHandle, 'MoveAtoB', [ _id, _tagA, _pos, _tagB ]);
+    this.mDataSource.setRosterLimit(this.get(_tagA).mBrotherMax);
 };
 
+
+BrotherManager.prototype.destroyDIV = function()
+{
+    for(var i = 0; i < this.mBrotherContainer.length; i++)
+    {
+        this.mBrotherContainer[i].mListScrollContainer.empty();
+        this.mBrotherContainer[i].mListScrollContainer = null;
+    }
+}
 
 
 // Generic Stuff

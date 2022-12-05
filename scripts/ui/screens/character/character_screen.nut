@@ -249,10 +249,9 @@ this.character_screen <- {
 	function queryData()
 	{
 		local result = {
-			Formation = this.queryPlayerFormationInformation()
+			Formation = this.queryPlayerFormationInformation(),
+			Reserve = this.queryPlayerReserveInformation()
 		};
-
-
 
 		return result;
 	}
@@ -555,6 +554,48 @@ this.character_screen <- {
 	// THis is getting called from outside. delete later
 	function resetInventoryFilter()
 	{
+	}
+
+	// Changes the place in formation of a single brother only within their roster
+	function onRelocateBrother( _data )	// [0] == brotherID, [1] = place in formation
+	{
+		local newPosition = _data[1];
+		foreach (i, bro in this.World.getPlayerRoster().getAll())
+		{
+		 	if (bro.getID() != _data[0]) continue;
+
+			if (i >= 18) newPosition += 18;
+
+			bro.setPlaceInFormation(newPosition);
+			return;
+		}
+	}
+
+	function MoveAtoB( _data )
+	{
+		this.onRelocateBrother([_data[0], _data[2]]);
+		/*
+		local isMovingToPlayerRoster = _data[3] == this.m.PlayerID;
+		local rosterA = this.getRoster(_data[1]);
+		local rosterB = this.getRoster(_data[3]);
+
+		foreach(i, bro in rosterA.getAll())
+		{
+			if (bro.getID() == _data[0])
+			{
+				rosterB.add(bro);
+				rosterA.remove(bro);
+
+				bro.setPlaceInFormation(_data[2]);
+				break;
+			}
+		}
+
+		local ret = {
+			Assets = {}
+		};
+		this.queryAssetsInformation(ret.Assets);
+		this.m.JSHandle.asyncCall("loadFromData", ret);*/
 	}
 
 };

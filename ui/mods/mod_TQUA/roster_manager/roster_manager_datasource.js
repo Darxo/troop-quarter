@@ -50,11 +50,10 @@ var RosterManagerDatasource = function()
 	// Caches
     this.mRosterManager = new BrotherManager();
     this.mRosterManager.addContainer(new BrotherContainer(Owner.Formation));
+    this.mRosterManager.addContainer(new BrotherContainer(Owner.Reserve)).mSlotClasses = '<div class="ui-control is-brother-slot is-reserve-slot"/>';
 
     // this.mRosterManager.addContainer(troopQuarter);
     // this.mRosterManager.addContainer(playerRoster);
-
-	this.mSelectedBrotherIndex = null;
 
 	// fucking bullshit
     this.mIsPopupOpen = false;
@@ -63,12 +62,10 @@ var RosterManagerDatasource = function()
 	this.init();
 };
 
-
 RosterManagerDatasource.prototype.getPlayerRoster = function ()
 {
 	return this.mRosterManager.get(Owner.Formation);
 }
-
 
 RosterManagerDatasource.prototype.getInventoryMode = function ()
 {
@@ -187,6 +184,7 @@ RosterManagerDatasource.prototype.loadFromData = function(_data)
     }
 
     this.mRosterManager.loadFromData(_data);
+    this.mRosterManager.selectAnything();
     this.loadBrothersList();
 };
 
@@ -318,7 +316,6 @@ RosterManagerDatasource.prototype.selectedBrotherById = function(_brotherId, _wi
     // notify every listener
     if ((_withoutNotify === undefined || _withoutNotify !== true))
     {
-        console.error("this.getSelectedBrother() " + this.getSelectedBrother() + " _brotherId " + _brotherId);
         this.notifyEventListener(CharacterScreenDatasourceIdentifier.Brother.Selected, this.getSelectedBrother());
     }
 };

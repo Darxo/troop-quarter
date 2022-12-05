@@ -9,17 +9,13 @@ var RosterManagerBrothersListModule = function(_parent, _dataSource)
     // container
     this.mContainer                     = null;
     this.mListContainer                 = null;
-    this.mDataSource.getPlayerRoster().mListScrollContainer           = null;
+    this.mDataSource.getPlayerRoster().mListScrollContainer                 = null;
+    this.mDataSource.mRosterManager.get(Owner.Reserve).mListScrollContainer = null;
 
     this.mRosterCountLabel              = null;
     this.mRosterCountContainer          = null;
 
-    this.mStartBattleButton             = null;
-    this.mStartBattleButtonContainer    = null;
 
-    this.mSlots                         = null;
-
-    this.IsMoodVisible					= true;
 
     this.registerDatasourceListener();
 };
@@ -44,12 +40,17 @@ RosterManagerBrothersListModule.prototype.createDIV = function (_parentDiv)
     this.mRosterCountLabel = $('<div class="label text-font-small font-bold font-color-value"/>');
     this.mRosterCountContainer.append(this.mRosterCountLabel);
     this.mRosterCountContainer.bindTooltip({ contentType: 'ui-element', elementId: TooltipIdentifier.Stash.ActiveRoster });
+
+
+    var listContainerLayoutTWo = $('<div class="l-list-container"/>');
+    this.mContainer.append(listContainerLayoutTWo);
+    this.mDataSource.mRosterManager.get(Owner.Reserve).mListScrollContainer = listContainerLayoutTWo;
+
 };
 
 RosterManagerBrothersListModule.prototype.destroyDIV = function ()
 {
-    this.mDataSource.getPlayerRoster().mListScrollContainer.empty();
-    this.mDataSource.getPlayerRoster().mListScrollContainer = null;
+    this.mDataSource.mRosterManager.destroyDIV();
 
     // this.mSlots = null;      // dont forget this!
 
@@ -57,30 +58,6 @@ RosterManagerBrothersListModule.prototype.destroyDIV = function ()
     this.mContainer.remove();
     this.mContainer = null;
 };
-
-
-RosterManagerBrothersListModule.prototype.toggleMoodVisibility = function ()
-{
-	this.IsMoodVisible = !this.IsMoodVisible;
-
-	for(var i = 0; i < this.mDataSource.getPlayerRoster().mSlots.length; ++i)
-	{
-		if(this.mDataSource.getPlayerRoster().mSlots[i].data('child') != null)
-			this.mDataSource.getPlayerRoster().mSlots[i].data('child').showListBrotherMoodImage(this.IsMoodVisible);
-	}
-
-	return this.IsMoodVisible;
-};
-
-RosterManagerBrothersListModule.prototype.addBrotherSlotDIV = function (_data, _index)
-{
-
-    // create: slot & background layer
-    var parent = this.mDataSource.getPlayerRoster();
-    var result = this.mDataSource.mRosterManager.addBrotherSlotDIV(parent, _data, _index);
-
-};
-
 
 RosterManagerBrothersListModule.prototype.updateRosterLabel = function ()
 {
@@ -226,6 +203,7 @@ RosterManagerBrothersListModule.prototype.clearBrothersList = function ()
 RosterManagerBrothersListModule.prototype.updateBrotherSlot = function (_data)
 {
 	this.mRosterManager.get(Owner.Formation).updateBrotherDIV(_data);
+	this.mRosterManager.get(Owner.Reserve).updateBrotherDIV(_data);
 };
 
 /*RosterManagerBrothersListModule.prototype.showBrotherSlotLock = function(_brotherId, _showLock)
@@ -276,11 +254,11 @@ RosterManagerBrothersListModule.prototype.onBrotherSelected = function (_dataSou
 
 RosterManagerBrothersListModule.prototype.onBrothersListLoaded = function (_dataSource, _brothers)
 {
-	this.clearBrothersList();
+	// this.clearBrothersList();
 
-    this.mDataSource.mRosterManager.createBrotherSlots(Owner.Formation);
-    this.mDataSource.mRosterManager.onBrothersListLoaded(Owner.Formation);
-    this.mDataSource.mRosterManager.selectAnything();
+    // this.mDataSource.mRosterManager.createBrotherSlots(Owner.Formation);
+    // this.mDataSource.mRosterManager.onBrothersListLoaded(Owner.Formation);
+
 
 	/*if (!allowReordering)
 	{
@@ -300,12 +278,12 @@ RosterManagerBrothersListModule.prototype.onBrothersListLoaded = function (_data
 	    });
 	}
 	else*/
-	{
+	/*{
 	    this.updateBlockedSlots();
 	}
 
 	var inventoryMode  = _dataSource.getInventoryMode();
-	this.updateBrotherSlotLocks(inventoryMode);
+	this.updateBrotherSlotLocks(inventoryMode);*/
 
 	this.updateRosterLabel();
 };

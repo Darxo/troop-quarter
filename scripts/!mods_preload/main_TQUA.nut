@@ -37,6 +37,7 @@
     ::mods_registerJS("mod_TQUA/world_town_screen.js");
 
 	::mods_registerJS("mod_TQUA/roster_manager/character_screen_brothers_list/character_screen_brothers_list_module.js");
+	::mods_registerCSS("mod_TQUA/roster_manager/character_screen_brothers_list/character_screen_brothers_list_module.css");
 
     ::mods_registerJS("mod_TQUA/roster_manager/roster_manager_datasource.js");
     ::mods_registerJS("mod_TQUA/roster_manager/roster_manager_screen.js");

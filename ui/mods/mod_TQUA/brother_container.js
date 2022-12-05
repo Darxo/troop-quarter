@@ -239,6 +239,7 @@ BrotherContainer.prototype.updateBrotherDIV = function(_brotherData)
 {
     var brotherID = _brotherData[CharacterScreenIdentifier.Entity.Id];
     var brother = this.getBrotherByID(brotherID);
+    if (brother === null) return false;
 
     var slotDIV = this.mSlots[brother.Index].find('#slot-index:first');
     if (slotDIV.length === 0)
