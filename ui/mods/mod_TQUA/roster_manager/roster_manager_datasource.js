@@ -49,7 +49,7 @@ var RosterManagerDatasource = function()
 
 	// Caches
     this.mRosterManager = new BrotherManager();
-    this.mRosterManager.addContainer(new BrotherContainer(Owner.Player));
+    this.mRosterManager.addContainer(new BrotherContainer(Owner.Formation));
 
     // this.mRosterManager.addContainer(troopQuarter);
     // this.mRosterManager.addContainer(playerRoster);
@@ -66,7 +66,7 @@ var RosterManagerDatasource = function()
 
 RosterManagerDatasource.prototype.getPlayerRoster = function ()
 {
-	return this.mRosterManager.get(Owner.Player);
+	return this.mRosterManager.get(Owner.Formation);
 }
 
 
@@ -150,7 +150,6 @@ RosterManagerDatasource.prototype.reset = function()
 {
 	// Caches
 	this.getBrothersList() = null;
-	this.mSelectedBrotherIndex = null;
 };
 
 RosterManagerDatasource.prototype.isInStashMode = function()
@@ -170,7 +169,7 @@ RosterManagerDatasource.prototype.isTacticalMode = function ()
 
 RosterManagerDatasource.prototype.getBrothersList = function ()
 {
-    return this.mRosterManager.get(Owner.Player).mBrotherList;
+    return this.mRosterManager.get(Owner.Formation).mBrotherList;
 };
 
 RosterManagerDatasource.prototype.getTooltipItemOwner = function()
@@ -202,43 +201,12 @@ RosterManagerDatasource.prototype.swapBrothers = function (_a, _b)
 
 RosterManagerDatasource.prototype.loadBrothersList = function(_withoutNotify)
 {
-	this.mSelectedBrotherIndex = null;
 	// this.getBrothersList() = data;
-
-	// find selected one
-	if (this.getBrothersList() !== null && jQuery.isArray(this.getBrothersList()))
-	{
-		for (var i = 0; i < this.getBrothersList().length; ++i)
-		{
-		    if (this.getBrothersList()[i] !== null && CharacterScreenIdentifier.Entity.Flags in this.getBrothersList()[i] && CharacterScreenIdentifier.EntityFlags.IsSelected in this.getBrothersList()[i][CharacterScreenIdentifier.Entity.Flags])
-			{
-				if (this.getBrothersList()[i][CharacterScreenIdentifier.Entity.Flags][CharacterScreenIdentifier.EntityFlags.IsSelected] === true)
-				{
-					this.mSelectedBrotherIndex = i;
-					break;
-				}
-			}
-		}
-
-		// no selected found - use the first usable as default
-		if (this.mSelectedBrotherIndex === null && this.getBrothersList().length > 0)
-		{
-		    for (var i = 0; i < this.getBrothersList().length; ++i)
-		    {
-		        if(this.getBrothersList()[i] != null)
-		        {
-		            this.mSelectedBrotherIndex = i;
-		            break;
-		        }
-		    }
-		}
-	}
 
 	// notify every listener
 	if (_withoutNotify === undefined || _withoutNotify !== true)
 	{
 		this.notifyEventListener(CharacterScreenDatasourceIdentifier.Brother.ListLoaded, this.getBrothersList());
-		this.notifyEventListener(CharacterScreenDatasourceIdentifier.Brother.Selected, this.getSelectedBrother());
 	}
 
 	return this.getBrothersList();
@@ -259,30 +227,19 @@ RosterManagerDatasource.prototype.getNumBrothers = function ()
 
 RosterManagerDatasource.prototype.getSelectedBrother = function()
 {
-	if (this.mSelectedBrotherIndex !== null && this.getBrothersList() !== null && this.mSelectedBrotherIndex < this.getBrothersList().length)
-	{
-		return this.getBrothersList()[this.mSelectedBrotherIndex];
-	}
-	return null;
+    var selection = this.mRosterManager.getSelected();
+    if (selection === null) return null;
+
+    return selection.Brother;
 };
 
 RosterManagerDatasource.prototype.getSelectedBrotherIndex = function ()
 {
-    return this.mSelectedBrotherIndex;
+    var selection = this.mRosterManager.getSelected();
+    if (selection === null) return null;
+
+    return selection.Index;
 };
-
-RosterManagerDatasource.prototype.setSelectedBrotherIndex = function (_rosterPosition, _withoutNotify)
-{
-    this.mSelectedBrotherIndex = _rosterPosition;
-
-    // notify every listener
-    if (_withoutNotify === undefined || _withoutNotify !== true)
-    {
-        this.notifyEventListener(CharacterScreenDatasourceIdentifier.Brother.ListLoaded, this.getBrothersList());
-        this.notifyEventListener(CharacterScreenDatasourceIdentifier.Brother.Selected, this.getSelectedBrother());
-    }
-};
-
 
 RosterManagerDatasource.prototype.getBrotherPerkPoints = function(_brother)
 {
@@ -342,101 +299,28 @@ RosterManagerDatasource.prototype.isSelectedBrother = function(_brother)
 			selectedBrother[CharacterScreenIdentifier.Entity.Id] === _brother[CharacterScreenIdentifier.Entity.Id];
 };
 
-RosterManagerDatasource.prototype.switchToPreviousBrother = function(_withoutNotify)
+RosterManagerDatasource.prototype.switchToPreviousBrother = function()
 {
-    if (this.getBrothersList() == null || this.mIsPopupOpen)
-        return;
+    if (this.getBrothersList() == null || this.mIsPopupOpen) return;
 
-    var currentIndex = this.mSelectedBrotherIndex;
-
-    for (var i = this.mSelectedBrotherIndex - 1; i >= 0; --i)
-    {
-        if (this.getBrothersList()[i] !== null)
-        {
-            this.mSelectedBrotherIndex = i;
-            break;
-        }
-    }
-
-    if (this.mSelectedBrotherIndex == currentIndex)
-    {
-        for (var i = this.getBrothersList().length - 1; i > currentIndex; --i)
-        {
-            if (this.getBrothersList()[i] !== null)
-            {
-                this.mSelectedBrotherIndex = i;
-                break;
-            }
-        }
-    }
-
-    // notify every listener
-    if (_withoutNotify === undefined || _withoutNotify !== true)
-    {
-        this.notifyEventListener(CharacterScreenDatasourceIdentifier.Brother.Selected, this.getSelectedBrother());
-    }
+    this.mRosterManager.switchToPreviousBrother();
 };
 
-RosterManagerDatasource.prototype.switchToNextBrother = function(_withoutNotify)
+RosterManagerDatasource.prototype.switchToNextBrother = function()
 {
-    if (this.getBrothersList() == null || this.mIsPopupOpen)
-        return;
+    if (this.getBrothersList() == null || this.mIsPopupOpen) return;
 
-    var currentIndex = this.mSelectedBrotherIndex;
-
-    for (var i = this.mSelectedBrotherIndex + 1; i < this.getBrothersList().length; ++i)
-    {
-        if (this.getBrothersList()[i] !== null)
-        {
-            this.mSelectedBrotherIndex = i;
-            break;
-        }
-    }
-
-    if(this.mSelectedBrotherIndex == currentIndex)
-    {
-        for (var i = 0; i < this.mSelectedBrotherIndex; ++i)
-        {
-            if (this.getBrothersList()[i] !== null)
-            {
-                this.mSelectedBrotherIndex = i;
-                break;
-            }
-        }
-    }
-
-    // notify every listener
-	if (_withoutNotify === undefined || _withoutNotify !== true)
-	{
-		this.notifyEventListener(CharacterScreenDatasourceIdentifier.Brother.Selected, this.getSelectedBrother());
-	}
+    this.mRosterManager.switchToNextBrother();
 };
 
 RosterManagerDatasource.prototype.selectedBrotherById = function(_brotherId, _withoutNotify)
 {
-	if (this.mSelectedBrotherIndex !== null && this.getBrothersList() !== null)
-	{
-        var hasChanged = false;
-		for (var i = 0; i < this.getBrothersList().length; ++i)
-		{
-		    if (this.getBrothersList()[i] != null && CharacterScreenIdentifier.Entity.Id in this.getBrothersList()[i])
-			{
-				if (this.getBrothersList()[i][CharacterScreenIdentifier.Entity.Id] === _brotherId && this.mSelectedBrotherIndex !== i)
-				{
-
-                    hasChanged = true;
-                    this.mSelectedBrotherIndex = i;
-					break;
-				}
-			}
-		}
-
-		// notify every listener
-		if ((_withoutNotify === undefined || _withoutNotify !== true) && hasChanged === true)
-		{
-			this.notifyEventListener(CharacterScreenDatasourceIdentifier.Brother.Selected, this.getSelectedBrother());
-		}
-	}
+    // notify every listener
+    if ((_withoutNotify === undefined || _withoutNotify !== true))
+    {
+        console.error("this.getSelectedBrother() " + this.getSelectedBrother() + " _brotherId " + _brotherId);
+        this.notifyEventListener(CharacterScreenDatasourceIdentifier.Brother.Selected, this.getSelectedBrother());
+    }
 };
 
 RosterManagerDatasource.prototype.setRosterLimit = function(_data, _withoutNotify)

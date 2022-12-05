@@ -71,6 +71,47 @@ BrotherContainer.prototype.selectBrother = function (_brotherID)
     return false;
 };
 
+BrotherContainer.prototype.selectNext = function()
+{
+    if (this.mSelectedBrother < 0) return false;
+    for (var i = this.mSelectedBrother + 1; i < this.mBrotherList.length; i++)
+    {
+        if (this.mBrotherList[i] === null) continue;
+        return this.selectSlot(i);
+    }
+    return this.selectFirst();
+}
+
+BrotherContainer.prototype.selectFirst = function()
+{
+    for (var i = 0; i < this.mBrotherList.length; ++i)
+    {
+        if (this.mBrotherList[i] === null) continue;
+        return this.selectSlot(i);
+    }
+    return false;
+}
+
+BrotherContainer.prototype.selectPrev = function()
+{
+    if (this.mSelectedBrother < 0) return false;
+    for (var i = this.mSelectedBrother - 1; i >= 0; i--)
+    {
+        if (this.mBrotherList[i] === null) continue;
+        return this.selectSlot(i);
+    }
+    return this.selectLast();
+}
+
+BrotherContainer.prototype.selectLast = function()
+{
+    for (var i = (this.mBrotherList.length - 1); i >= 0; i--)
+    {
+        if (this.mBrotherList[i] === null) continue;
+        return this.selectSlot(i);
+    }
+}
+
 BrotherContainer.prototype.hasSelected = function()     // Maybe make this function a bit smarter to detect/correct errors?
 {
     return (this.mSelectedBrother >= 0);
@@ -79,6 +120,7 @@ BrotherContainer.prototype.hasSelected = function()     // Maybe make this funct
 // SAFE - Selects the slot on the index
 BrotherContainer.prototype.selectSlot = function(_slotIndex)    // todo add default value -1
 {
+    // console.error("_slotIndex " + _slotIndex);
     if (this.mCanSelect === false) return false;
     this.deselectCurrent();
     if (_slotIndex === null) return console.error("_slotIndex is null");
@@ -144,7 +186,7 @@ BrotherContainer.prototype.getBrotherByID = function (_brotherId)
 // Create a new DIV object out of a brother object to assign to a slot
 BrotherContainer.prototype.addBrotherSlotDIV = function(_brotherData, _index)
 {
-    console.error(this.mSlots.length + " " + _index);
+    // console.error(this.mSlots.length + " " + _index);
     var parentDiv = this.mSlots[_index];
     var character = _brotherData[CharacterScreenIdentifier.Entity.Character.Key];
     var brotherID = _brotherData[CharacterScreenIdentifier.Entity.Id];
@@ -161,7 +203,7 @@ BrotherContainer.prototype.addBrotherSlotDIV = function(_brotherData, _index)
     this.mBrotherCurrent++;
 
     // Temporary
-    result.attr('id', 'slot-index_' + _brotherData[CharacterScreenIdentifier.Entity.Id]);
+    // result.attr('id', 'slot-index_' + _brotherData[CharacterScreenIdentifier.Entity.Id]);
 
     // update image & name
     var imageOffsetX = (CharacterScreenIdentifier.Entity.Character.ImageOffsetX in character ? character[CharacterScreenIdentifier.Entity.Character.ImageOffsetX] : 0);
@@ -191,6 +233,47 @@ BrotherContainer.prototype.addBrotherSlotDIV = function(_brotherData, _index)
     }
 
     return result;
+}
+
+BrotherContainer.prototype.updateBrotherDIV = function(_brotherData)
+{
+    var brotherID = _brotherData[CharacterScreenIdentifier.Entity.Id];
+    var brother = this.getBrotherByID(brotherID);
+
+    var slotDIV = this.mSlots[brother.Index].find('#slot-index:first');
+    if (slotDIV.length === 0)
+	{
+        console.error("slot.length === 0");
+		return;
+	}
+
+	// update image & name
+    var character = _data[CharacterScreenIdentifier.Entity.Character.Key];
+    var imageOffsetX = (CharacterScreenIdentifier.Entity.Character.ImageOffsetX in character ? character[CharacterScreenIdentifier.Entity.Character.ImageOffsetX] : 0);
+    var imageOffsetY = (CharacterScreenIdentifier.Entity.Character.ImageOffsetY in character ? character[CharacterScreenIdentifier.Entity.Character.ImageOffsetY] : 0);
+
+    slotDIV.assignListBrotherImage(Path.PROCEDURAL + character[CharacterScreenIdentifier.Entity.Character.ImagePath], imageOffsetX, imageOffsetY, 0.66);
+    slotDIV.assignListBrotherName(character[CharacterScreenIdentifier.Entity.Character.Name]);
+    slotDIV.assignListBrotherDailyMoneyCost(character[CharacterScreenIdentifier.Entity.Character.DailyMoneyCost]);
+
+    slotDIV.showListBrotherMoodImage(this.IsMoodVisible, character['moodIcon']);
+
+    slotDIV.removeListBrotherStatusEffects();
+
+    for (var i = 0; i != _data['injuries'].length && i < 3; ++i)
+    {
+        slotDIV.assignListBrotherStatusEffect(_data['injuries'][i].imagePath, character[CharacterScreenIdentifier.Entity.Id], _data['injuries'][i].id)
+    }
+
+    if (_data['injuries'].length <= 2 && _data['stats'].hitpoints < _data['stats'].hitpointsMax)
+    {
+        slotDIV.assignListBrotherDaysWounded();
+    }
+
+    if (CharacterScreenIdentifier.Entity.Character.LeveledUp in character && character[CharacterScreenIdentifier.Entity.Character.LeveledUp] === false)
+    {
+        slotDIV.removeListBrotherLeveledUp();
+    }
 }
 
 BrotherContainer.prototype.createBrotherSlots = function()

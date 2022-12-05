@@ -223,79 +223,12 @@ RosterManagerBrothersListModule.prototype.clearBrothersList = function ()
     // this.mNumActive = 0;
 };
 
-RosterManagerBrothersListModule.prototype.removeCurrentBrotherSlotSelection = function ()
-{
-    this.mDataSource.getPlayerRoster().mListScrollContainer.find('.is-selected').each(function (index, element)
-    {
-		var slot = $(element);
-		slot.removeClass('is-selected');
-	});
-};
-
-RosterManagerBrothersListModule.prototype.selectBrotherSlot = function (_brotherId)
-{
-	var slot = this.mDataSource.getPlayerRoster().mListScrollContainer.find('#slot-index_' + _brotherId + ':first');
-	if (slot.length > 0)
-	{
-		slot.addClass('is-selected');
-
-		//this.mDataSource.getPlayerRoster().mListScrollContainer.trigger('scroll', { element: slot });
-        //this.mListContainer.scrollListToElement(slot);
-	}
-};
-
-
-RosterManagerBrothersListModule.prototype.setBrotherSlotActive = function (_brother)
-{
-	if (_brother === null || !(CharacterScreenIdentifier.Entity.Id in _brother))
-	{
-		return;
-	}
-
-	this.removeCurrentBrotherSlotSelection();
-    this.selectBrotherSlot(_brother[CharacterScreenIdentifier.Entity.Id]);
-};
-
-
 RosterManagerBrothersListModule.prototype.updateBrotherSlot = function (_data)
 {
-	var slot = this.mDataSource.getPlayerRoster().mListScrollContainer.find('#slot-index_' + _data[CharacterScreenIdentifier.Entity.Id] + ':first');
-	if (slot.length === 0)
-	{
-		return;
-	}
-
-	// update image & name
-    var character = _data[CharacterScreenIdentifier.Entity.Character.Key];
-    var imageOffsetX = (CharacterScreenIdentifier.Entity.Character.ImageOffsetX in character ? character[CharacterScreenIdentifier.Entity.Character.ImageOffsetX] : 0);
-    var imageOffsetY = (CharacterScreenIdentifier.Entity.Character.ImageOffsetY in character ? character[CharacterScreenIdentifier.Entity.Character.ImageOffsetY] : 0);
-
-    slot.assignListBrotherImage(Path.PROCEDURAL + character[CharacterScreenIdentifier.Entity.Character.ImagePath], imageOffsetX, imageOffsetY, 0.66);
-    slot.assignListBrotherName(character[CharacterScreenIdentifier.Entity.Character.Name]);
-    slot.assignListBrotherDailyMoneyCost(character[CharacterScreenIdentifier.Entity.Character.DailyMoneyCost]);
-
-    if(this.mDataSource.getInventoryMode() == CharacterScreenDatasourceIdentifier.InventoryMode.Stash)
-        slot.showListBrotherMoodImage(this.IsMoodVisible, character['moodIcon']);
-
-    slot.removeListBrotherStatusEffects();
-
-    for (var i = 0; i != _data['injuries'].length && i < 3; ++i)
-    {
-        slot.assignListBrotherStatusEffect(_data['injuries'][i].imagePath, character[CharacterScreenIdentifier.Entity.Id], _data['injuries'][i].id)
-    }
-
-    if (_data['injuries'].length <= 2 && _data['stats'].hitpoints < _data['stats'].hitpointsMax)
-    {
-        slot.assignListBrotherDaysWounded();
-    }
-
-    if (CharacterScreenIdentifier.Entity.Character.LeveledUp in character && character[CharacterScreenIdentifier.Entity.Character.LeveledUp] === false)
-    {
-        slot.removeListBrotherLeveledUp();
-    }
+	this.mRosterManager.get(Owner.Formation).updateBrotherDIV(_data);
 };
 
-RosterManagerBrothersListModule.prototype.showBrotherSlotLock = function(_brotherId, _showLock)
+/*RosterManagerBrothersListModule.prototype.showBrotherSlotLock = function(_brotherId, _showLock)
 {
 	var slot = this.mDataSource.getPlayerRoster().mListScrollContainer.find('#slot-index_' + _brotherId + ':first');
 	if (slot.length === 0)
@@ -304,13 +237,12 @@ RosterManagerBrothersListModule.prototype.showBrotherSlotLock = function(_brothe
 	}
 
     slot.showListBrotherLockImage(_showLock);
-};
+};*/
 
 RosterManagerBrothersListModule.prototype.updateBrotherSlotLocks = function(_inventoryMode)
 {
-	switch(_inventoryMode)
+	/*switch(_inventoryMode)
 	{
-	    case CharacterScreenDatasourceIdentifier.InventoryMode.BattlePreparation:
 		case CharacterScreenDatasourceIdentifier.InventoryMode.Stash:
 		{
 			var brothersList = this.mDataSource.getBrothersList();
@@ -328,22 +260,8 @@ RosterManagerBrothersListModule.prototype.updateBrotherSlotLocks = function(_inv
 				}
 			}
 
-		} break;
-		case CharacterScreenDatasourceIdentifier.InventoryMode.Ground:
-		{
-			var brothersList = this.mDataSource.getBrothersList();
-			if (brothersList === null || !jQuery.isArray(brothersList))
-			{
-				return;
-			}
-
-			for (var i = 0; i < brothersList.length; ++i)
-			{
-				var brother = brothersList[i];
-				this.showBrotherSlotLock(brother[CharacterScreenIdentifier.Entity.Id], !this.mDataSource.isSelectedBrother(brother));
-			}
-		} break;
-	}
+		}
+	}*/
 };
 
 RosterManagerBrothersListModule.prototype.onBrothersSettingsChanged = function (_dataSource, _brothers)
@@ -351,11 +269,18 @@ RosterManagerBrothersListModule.prototype.onBrothersSettingsChanged = function (
     this.updateRosterLabel();
 };
 
+RosterManagerBrothersListModule.prototype.onBrotherSelected = function (_dataSource, _brothers)
+{
+    // just in case I need this later on
+};
+
 RosterManagerBrothersListModule.prototype.onBrothersListLoaded = function (_dataSource, _brothers)
 {
 	this.clearBrothersList();
-    this.mDataSource.mRosterManager.createBrotherSlots(Owner.Player);
-    this.mDataSource.mRosterManager.onBrothersListLoaded(Owner.Player);
+
+    this.mDataSource.mRosterManager.createBrotherSlots(Owner.Formation);
+    this.mDataSource.mRosterManager.onBrothersListLoaded(Owner.Formation);
+    this.mDataSource.mRosterManager.selectAnything();
 
 	/*if (!allowReordering)
 	{
@@ -382,11 +307,6 @@ RosterManagerBrothersListModule.prototype.onBrothersListLoaded = function (_data
 	var inventoryMode  = _dataSource.getInventoryMode();
 	this.updateBrotherSlotLocks(inventoryMode);
 
-	if (inventoryMode === CharacterScreenDatasourceIdentifier.InventoryMode.Ground)
-	{
-		this.setBrotherSlotActive(_dataSource.getSelectedBrother());
-	}
-
 	this.updateRosterLabel();
 };
 
@@ -399,15 +319,6 @@ RosterManagerBrothersListModule.prototype.onBrotherUpdated = function (_dataSour
 		CharacterScreenIdentifier.Entity.Character.ImagePath in _brother[CharacterScreenIdentifier.Entity.Character.Key])
 	{
 		this.updateBrotherSlot(_brother);
-	}
-};
-
-RosterManagerBrothersListModule.prototype.onBrotherSelected = function (_dataSource, _brother)
-{
-	if (_brother !== null && CharacterScreenIdentifier.Entity.Id in _brother)
-	{
-		this.removeCurrentBrotherSlotSelection();
-		this.selectBrotherSlot(_brother[CharacterScreenIdentifier.Entity.Id]);
 	}
 };
 

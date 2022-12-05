@@ -66,7 +66,9 @@ BrotherManager.prototype.getSelected = function()
             return {
                 Index       : this.mBrotherContainer[i].mSelectedBrother,
                 OwnerID     : this.mBrotherContainer[i].mContainerID,
-                Brother     : this.mBrotherContainer[i].getSelected()
+                Owner       : this.mBrotherContainer[i],
+                Brother     : this.mBrotherContainer[i].getSelected(),
+                BrotherID   : this.mBrotherContainer[i].getSelected()[CharacterScreenIdentifier.Entity.Id]
             };
         }
     }
@@ -221,8 +223,7 @@ BrotherManager.prototype.addBrotherSlotDIV = function(_parent, _data, _index)
         if (_event.button !== 0) return;   // We are only interested in LMB clicks
         var brotherID = _brother.data('brother')[CharacterScreenIdentifier.Entity.Id];
 
-        // self.setBrotherSelectedByID(brotherID);
-        self.mDataSource.selectedBrotherById(brotherID);
+        self.setBrotherSelectedByID(brotherID);
     });
 
     // event listener when right-click the brother
@@ -238,14 +239,62 @@ BrotherManager.prototype.addBrotherSlotDIV = function(_parent, _data, _index)
     return result;
 };
 
+BrotherManager.prototype.notifyDataSourceSelection = function( _brotherID )
+{
+    // if (this.mDataSource !== null)
+    this.mDataSource.selectedBrotherById(_brotherID);
+}
+
 BrotherManager.prototype.setBrotherSelectedByID = function (_brotherID)
 {
     for(var i = 0; i < this.mBrotherContainer.length; i++)
     {
         this.mBrotherContainer[i].deselectCurrent();
-        this.mBrotherContainer[i].selectBrother(_brotherID);
+        if (this.mBrotherContainer[i].selectBrother(_brotherID) === false) continue;
+
+        this.notifyDataSourceSelection(_brotherID);
     }
 };
+
+BrotherManager.prototype.selectAnything = function()
+{
+    for(var i = 0; i < this.mBrotherContainer.length; i++)
+    {
+        this.mBrotherContainer[i].deselectCurrent();
+    }
+
+    for(var i = 0; i < this.mBrotherContainer.length; i++)
+    {
+        if (this.mBrotherContainer[i].selectFirst() === false) continue;
+        this.notifyDataSourceSelection(this.getSelected().BrotherID);
+        return true;
+    }
+    return false;
+}
+
+BrotherManager.prototype.switchToPreviousBrother = function()
+{
+    var currentSelection = this.getSelected();
+    if (currentSelection === null) return;
+    if (currentSelection.Owner.mBrotherCurrent <= 1) return;
+
+    if (currentSelection.Owner.selectPrev() === true)
+    {
+        this.notifyDataSourceSelection(currentSelection.BrotherID);
+    }
+}
+
+BrotherManager.prototype.switchToNextBrother = function()
+{
+    var currentSelection = this.getSelected();
+    if (currentSelection === null) return;
+    if (currentSelection.Owner.mBrotherCurrent <= 1) return;
+
+    if (currentSelection.Owner.selectNext() === true)
+    {
+        this.notifyDataSourceSelection(currentSelection.BrotherID);
+    }
+}
 
 // Moving Brothers around
 
@@ -277,8 +326,8 @@ BrotherManager.prototype.transferBrother = function ( _sourceIdx, _sourceOwnerID
 // Swap the contents of two slots no matter where they are or what their state is
 BrotherManager.prototype.swapSlots = function (_firstIdx, _tagA, _secondIdx, _tagB)
 {
-    console.error("_firstIdx " + _firstIdx + " _secondIdx " + _secondIdx);
-    console.error("_tagA " + _tagA + " _tagB " + _tagB);
+    // console.error("_firstIdx " + _firstIdx + " _secondIdx " + _secondIdx);
+    // console.error("_tagA " + _tagA + " _tagB " + _tagB);
     if (_firstIdx === null || _secondIdx === null) return false;
     var sourceOwner = this.get(_tagA);
     var targetOwner = this.get(_tagB);
@@ -335,6 +384,8 @@ BrotherManager.prototype.quickMoveBrother = function (_clickedSlot)
     var sourceOwner = this.get(data.Tag);
     var targetOwner = this.getNext(data.Tag);
 
+    if (targetOwner === null) return;   // This happens when there are no or only one container in total
+
     // Source roster is at minimum
     if (sourceOwner.mBrotherCurrent <= sourceOwner.mBrotherMin) return false;
 
@@ -347,8 +398,6 @@ BrotherManager.prototype.quickMoveBrother = function (_clickedSlot)
 
     return true;
 };
-
-
 
 //- Call Squirrel backend function
 BrotherManager.prototype.notifyBackendRelocateBrother = function (_brotherID, _placeInFormation)
