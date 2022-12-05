@@ -6,6 +6,7 @@ var RosterManagerScreen = function()
 {
     this.mSQHandle = null;
     this.mDataSource = new RosterManagerDatasource();
+    this.mDataSource.mRosterManager.mDataSource = this.mDataSource;
 
     // generic containers
     this.mContainer = null;

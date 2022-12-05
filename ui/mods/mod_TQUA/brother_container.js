@@ -19,6 +19,7 @@ var BrotherContainer = function( _containerID )
     this.mSelectedBrother = -1;   // Index of the currently selected brother; negative = none
 
     // Config
+    this.IsMoodVisible = true;
     this.mCanSelect = true;
     this.mCanRemove = true;
     this.mCanImport = true;
@@ -159,14 +160,25 @@ BrotherContainer.prototype.addBrotherSlotDIV = function(_brotherData, _index)
     parentDiv.data('child', result);
     this.mBrotherCurrent++;
 
+    // Temporary
+    result.attr('id', 'slot-index_' + _brotherData[CharacterScreenIdentifier.Entity.Id]);
+
     // update image & name
     var imageOffsetX = (CharacterScreenIdentifier.Entity.Character.ImageOffsetX in character ? character[CharacterScreenIdentifier.Entity.Character.ImageOffsetX] : 0);
     var imageOffsetY = (CharacterScreenIdentifier.Entity.Character.ImageOffsetY in character ? character[CharacterScreenIdentifier.Entity.Character.ImageOffsetY] : 0);
 
     result.assignListBrotherImage(Path.PROCEDURAL + character[CharacterScreenIdentifier.Entity.Character.ImagePath], imageOffsetX, imageOffsetY, 0.66);
 
-    // the mood icon is messed up in the screen, i hate it so i hide it, problem solve with minimum effort
-    //result.showListBrotherMoodImage(this.IsMoodVisible, character['moodIcon']);
+    var character = _brotherData[CharacterScreenIdentifier.Entity.Character.Key];
+    if(CharacterScreenIdentifier.Entity.Character.LeveledUp in character && character[CharacterScreenIdentifier.Entity.Character.LeveledUp] === true)
+    {
+        result.assignListBrotherLeveledUp();
+    }
+
+    if('moodIcon' in character)
+    {
+    	result.showListBrotherMoodImage(this.IsMoodVisible, character['moodIcon']);
+    }
 
     for(var i = 0; i != _brotherData['injuries'].length && i < 3; ++i)
     {

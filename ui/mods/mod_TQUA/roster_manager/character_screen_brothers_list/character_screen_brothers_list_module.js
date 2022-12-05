@@ -18,8 +18,6 @@ var RosterManagerBrothersListModule = function(_parent, _dataSource)
     this.mStartBattleButtonContainer    = null;
 
     this.mSlots                         = null;
-    this.mNumActive                     = 0;
-    this.mNumActiveMax                  = 12;
 
     this.IsMoodVisible					= true;
 
@@ -74,91 +72,19 @@ RosterManagerBrothersListModule.prototype.toggleMoodVisibility = function ()
 	return this.IsMoodVisible;
 };
 
-RosterManagerBrothersListModule.prototype.addBrotherSlotDIV = function (_parentDiv, _data, _index)
+RosterManagerBrothersListModule.prototype.addBrotherSlotDIV = function (_data, _index)
 {
-    var self = this;
 
     // create: slot & background layer
-    var result = this.mDataSource.getPlayerRoster().addBrotherSlotDIV(_data, _index);
-    result.attr('id', 'slot-index_' + _data[CharacterScreenIdentifier.Entity.Id]);
+    var parent = this.mDataSource.getPlayerRoster();
+    var result = this.mDataSource.mRosterManager.addBrotherSlotDIV(parent, _data, _index);
 
-    if (_index <= 17)
-        ++this.mNumActive;
-
-    // drag handler
-    result.drag("start", function (ev, dd)
-    {
-        // build proxy
-        var proxy = $('<div class="ui-control brother is-proxy"/>');
-        proxy.appendTo(document.body);
-        proxy.data('idx', _index);
-
-        var imageLayer = result.find('.image-layer:first');
-        if (imageLayer.length > 0)
-        {
-            imageLayer = imageLayer.clone();
-            proxy.append(imageLayer);
-        }
-
-        $(dd.drag).addClass('is-dragged');
-
-        return proxy;
-    }, { distance: 3 });
-
-    result.drag(function (ev, dd)
-    {
-        $(dd.proxy).css({ top: dd.offsetY, left: dd.offsetX });
-    }, { relative: false, distance: 3 });
-
-    result.drag("end", function (ev, dd)
-    {
-        var drag = $(dd.drag);
-        var drop = $(dd.drop);
-        var proxy = $(dd.proxy);
-
-        var allowDragEnd = true; // TODO: check what we're dropping onto
-
-        // not dropped into anything?
-        if (drop.length === 0 || allowDragEnd === false)
-        {
-            proxy.velocity("finish", true).velocity({ top: dd.originalY, left: dd.originalX },
-            {
-                duration: 300,
-                complete: function ()
-                {
-                    proxy.remove();
-                    drag.removeClass('is-dragged');
-                }
-            });
-        }
-        else
-        {
-            proxy.remove();
-        }
-    }, { drop: '.is-brother-slot' });
-
-    var character = _data[CharacterScreenIdentifier.Entity.Character.Key];
-    if(CharacterScreenIdentifier.Entity.Character.LeveledUp in character && character[CharacterScreenIdentifier.Entity.Character.LeveledUp] === true)
-    {
-        result.assignListBrotherLeveledUp();
-    }
-
-    if('moodIcon' in character && this.mDataSource.getInventoryMode() == CharacterScreenDatasourceIdentifier.InventoryMode.Stash)
-    {
-    	result.showListBrotherMoodImage(this.IsMoodVisible, character['moodIcon']);
-    }
-
-    result.assignListBrotherClickHandler(function (_brother, _event)
-	{
-        var data = _brother.data('brother');
-        self.mDataSource.selectedBrotherById(data.id);
-    });
 };
 
 
 RosterManagerBrothersListModule.prototype.updateRosterLabel = function ()
 {
-    this.mRosterCountLabel.html('' + this.mNumActive + '/' + this.mNumActiveMax);
+    this.mRosterCountLabel.html('' + this.mDataSource.getPlayerRoster().mBrotherCurrent + '/' + this.mDataSource.getPlayerRoster().mBrotherMax);
 };
 
 
@@ -254,71 +180,6 @@ RosterManagerBrothersListModule.prototype.isVisible = function ()
 	return this.mContainer.hasClass('display-block');
 };
 
-
-RosterManagerBrothersListModule.prototype.swapSlots = function (_a, _b)
-{
-    // dragging into empty slot
-    if(this.mDataSource.getPlayerRoster().mSlots[_b].data('child') == null)
-    {
-        var A = this.mDataSource.getPlayerRoster().mSlots[_a].data('child');
-
-        A.data('idx', _b);
-        A.appendTo(this.mDataSource.getPlayerRoster().mSlots[_b]);
-
-        this.mDataSource.getPlayerRoster().mSlots[_b].data('child', A);
-        this.mDataSource.getPlayerRoster().mSlots[_a].data('child', null);
-
-        if (_a <= 17 && _b > 17)
-            --this.mNumActive;
-        else if (_a > 17 && _b <= 17)
-            ++this.mNumActive;
-
-        this.updateBlockedSlots();
-
-        this.mDataSource.swapBrothers(_a, _b);
-        this.mDataSource.notifyBackendUpdateRosterPosition(A.data('ID'), _b);
-
-        if(this.mDataSource.getSelectedBrotherIndex() == _a)
-        {
-            this.mDataSource.setSelectedBrotherIndex(_b, true);
-        }
-    }
-
-    // swapping two full slots
-    else
-    {
-        var A = this.mDataSource.getPlayerRoster().mSlots[_a].data('child');
-        var B = this.mDataSource.getPlayerRoster().mSlots[_b].data('child');
-
-        A.data('idx', _b);
-        B.data('idx', _a);
-
-        B.detach();
-
-        A.appendTo(this.mDataSource.getPlayerRoster().mSlots[_b]);
-        this.mDataSource.getPlayerRoster().mSlots[_b].data('child', A);
-
-        B.appendTo(this.mDataSource.getPlayerRoster().mSlots[_a]);
-        this.mDataSource.getPlayerRoster().mSlots[_a].data('child', B);
-
-        this.mDataSource.swapBrothers(_a, _b);
-        this.mDataSource.notifyBackendUpdateRosterPosition(A.data('ID'), _b);
-        this.mDataSource.notifyBackendUpdateRosterPosition(B.data('ID'), _a);
-
-        if (this.mDataSource.getSelectedBrotherIndex() == _a)
-        {
-            this.mDataSource.setSelectedBrotherIndex(_b, true);
-        }
-        else if (this.mDataSource.getSelectedBrotherIndex() == _b)
-        {
-            this.mDataSource.setSelectedBrotherIndex(_a, true);
-        }
-    }
-
-    this.updateRosterLabel();
-}
-
-
 RosterManagerBrothersListModule.prototype.updateBlockedSlots = function ()
 {
     var self = this;
@@ -333,7 +194,7 @@ RosterManagerBrothersListModule.prototype.updateBlockedSlots = function ()
     {
         var slot = $(element);
 
-        if (slot.data('child') != null || self.mNumActive >= self.mNumActiveMax)
+        if (slot.data('child') != null || self.mDataSource.getPlayerRoster().mBrotherCurrent >= self.mDataSource.getPlayerRoster().mBrotherMax)
         {
             slot.addClass('is-blocked-slot');
         }
@@ -359,7 +220,7 @@ RosterManagerBrothersListModule.prototype.clearBrothersList = function ()
         this.mDataSource.getPlayerRoster().mSlots[i].data('child', null);
     }
 
-    this.mNumActive = 0;
+    // this.mNumActive = 0;
 };
 
 RosterManagerBrothersListModule.prototype.removeCurrentBrotherSlotSelection = function ()
@@ -487,7 +348,6 @@ RosterManagerBrothersListModule.prototype.updateBrotherSlotLocks = function(_inv
 
 RosterManagerBrothersListModule.prototype.onBrothersSettingsChanged = function (_dataSource, _brothers)
 {
-    this.mNumActiveMax = _brothers;
     this.updateRosterLabel();
 };
 
@@ -495,21 +355,7 @@ RosterManagerBrothersListModule.prototype.onBrothersListLoaded = function (_data
 {
 	this.clearBrothersList();
     this.mDataSource.mRosterManager.createBrotherSlots(Owner.Player);
-
-	if (_brothers === null || !jQuery.isArray(_brothers) || _brothers.length === 0)
-	{
-		return;
-	}
-
-	for (var i = 0; i < _brothers.length; ++i)
-	{
-	    var brother = _brothers[i];
-
-		if (brother !== null)
-		{
-		    this.addBrotherSlotDIV(this.mDataSource.getPlayerRoster().mSlots[i], brother, i);
-		}
-	}
+    this.mDataSource.mRosterManager.onBrothersListLoaded(Owner.Player);
 
 	/*if (!allowReordering)
 	{

@@ -1,5 +1,6 @@
-var BrotherManager = function()
+var BrotherManager = function(_dataSource)
 {
+    this.mDataSource = null;
     this.mSQHandle        = null;
     this.mEventListener     = null;
     this.mBrotherContainer = [];        // Array of BrotherContainer
@@ -220,7 +221,8 @@ BrotherManager.prototype.addBrotherSlotDIV = function(_parent, _data, _index)
         if (_event.button !== 0) return;   // We are only interested in LMB clicks
         var brotherID = _brother.data('brother')[CharacterScreenIdentifier.Entity.Id];
 
-        self.setBrotherSelectedByID(brotherID);
+        // self.setBrotherSelectedByID(brotherID);
+        self.mDataSource.selectedBrotherById(brotherID);
     });
 
     // event listener when right-click the brother
@@ -233,6 +235,7 @@ BrotherManager.prototype.addBrotherSlotDIV = function(_parent, _data, _index)
             return self.quickMoveBrother($(this));
         }
     });
+    return result;
 };
 
 BrotherManager.prototype.setBrotherSelectedByID = function (_brotherID)
