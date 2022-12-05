@@ -11,7 +11,7 @@ this.character_screen <- {
 		QuarterID = "Quarter",
 
 		MinPlayerRoster = 1,
-		PlayerRosterLimit = 18,
+		PlayerRosterLimit = 27,
 	},
 	function isVisible()
 	{
@@ -56,9 +56,65 @@ this.character_screen <- {
 		this.m.JSHandle = this.UI.disconnect(this.m.JSHandle);
 	}
 
-	function queryPlayerRosterInformation( _result )
+	function queryPlayerFormationInformation()
 	{
-		local roster = this.World.Assets.getFormation();
+		local fullRoster = ::World.Assets.getFormation();
+
+		local convertedRoster = [];
+
+		local formationCount = 0;
+		for( local i = 0; i != fullRoster.len(); i = ++i )
+		{
+			if (i >= 18) break;
+			if (fullRoster[i] == null)
+			{
+				convertedRoster.push(null);
+				continue;
+			}
+			convertedRoster.push(this.UIDataHelper.convertEntityToUIData(fullRoster[i], null));
+			formationCount++;
+		}
+
+		return {
+			Roster = convertedRoster,
+			BrotherCount = formationCount,
+			BrotherMin = 1,
+			BrotherMax = 12,
+			SlotLimit = 18
+		}
+	}
+
+	function queryPlayerReserveInformation()
+	{
+		local fullRoster = ::World.Assets.getFormation();
+
+		local convertedRoster = [];
+
+		local reserveCount = 0;
+		for( local i = 0; i != fullRoster.len(); i = ++i )
+		{
+			if (i < 18) continue;
+			if (fullRoster[i] == null)
+			{
+				convertedRoster.push(null);
+				continue;
+			}
+			convertedRoster.push(this.UIDataHelper.convertEntityToUIData(fullRoster[i], null));
+			reserveCount++;
+		}
+
+		return {
+			Roster = convertedRoster,
+			BrotherCount = reserveCount,
+			BrotherMin = 0,
+			BrotherMax = 9,
+			SlotLimit = 9
+		}
+	}
+
+	function queryPlayerRosterInformation()
+	{
+		local roster = ::World.Assets.getFormation();
 
 		for( local i = 0; i != roster.len(); i = ++i )
 		{
@@ -68,15 +124,15 @@ this.character_screen <- {
 			}
 		}
 
-		_result.Player <- {
+		return {
 			Roster = roster,
 			BrotherCount = ::World.getPlayerRoster().getSize(),
 			BrotherMin = this.m.MinPlayerRoster,
 			BrotherMax = ::World.Assets.getBrothersMax(),
-			SlotLimit = this.m.PlayerRosterLimit
-		}
+			SlotLimit = this.m.PlayerRosterLimit,
 
-		// _result.BrothersMaxInCombat <- ::World.Assets.getBrothersMaxInCombat();
+			BrothersMaxInCombat = ::World.Assets.getBrothersMaxInCombat()
+		}
 	}
 
 	function show()
@@ -193,9 +249,10 @@ this.character_screen <- {
 	function queryData()
 	{
 		local result = {
+			Formation = this.queryPlayerFormationInformation()
 		};
 
-		this.queryPlayerRosterInformation(result);
+
 
 		return result;
 	}

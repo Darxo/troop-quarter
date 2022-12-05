@@ -4,7 +4,7 @@
 var Owner =
 {
     Quarter: 'Quarter',
-    Player: 'Player'
+    Player: 'Formation'
 };
 
 var TroopQuarterDialogModule = function(_parent)

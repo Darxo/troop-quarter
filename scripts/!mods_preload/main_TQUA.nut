@@ -36,10 +36,13 @@
     ::mods_registerCSS("mod_TQUA/troop_quarter_dialog_module.css");
     ::mods_registerJS("mod_TQUA/world_town_screen.js");
 
+	::mods_registerJS("mod_TQUA/roster_manager/character_screen_brothers_list/character_screen_brothers_list_module.js");
+
     ::mods_registerJS("mod_TQUA/roster_manager/roster_manager_datasource.js");
     ::mods_registerJS("mod_TQUA/roster_manager/roster_manager_screen.js");
 
     ::mods_registerJS("mod_TQUA/roster_manager/character_screen_left_panel/character_screen_paperdoll_module.js");
 	::mods_registerJS("mod_TQUA/roster_manager/character_screen_left_panel/character_screen_left_panel_header_module.js");
+
 
 });

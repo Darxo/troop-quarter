@@ -78,11 +78,13 @@ RosterManagerDatasource.prototype.getInventoryMode = function ()
 RosterManagerDatasource.prototype.onConnection = function (_handle)
 {
 	this.mSQHandle = _handle;
+    this.mRosterManager.onConnection(_handle);
 };
 
 RosterManagerDatasource.prototype.onDisconnection = function ()
 {
 	this.mSQHandle = null;
+    this.mRosterManager.onDisconnection();
 	this.reset();
 };
 

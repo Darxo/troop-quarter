@@ -126,7 +126,7 @@ RosterManagerScreen.prototype.destroyDIV = function ()
 RosterManagerScreen.prototype.createModules = function()
 {
     this.mCharacterPanelModule = new CharacterScreenLeftPanelModule(this, this.mDataSource);
-    this.mBrothersModule = new CharacterScreenBrothersListModule(this, this.mDataSource);
+    this.mBrothersModule = new RosterManagerBrothersListModule(this, this.mDataSource);
 };
 
 RosterManagerScreen.prototype.registerModules = function ()

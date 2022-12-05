@@ -94,7 +94,7 @@ BrotherManager.prototype.createBrotherSlots = function ( _ownerID )
 
     var parent = this.get(_ownerID);
     if (parent.mSlots.length >= parent.mSlotLimit) return;
-    parent.ListScrollContainer.empty();
+    parent.mListScrollContainer.empty();
     parent.createBrotherSlots();
 
     // event listener when dragging then drop bro to an empty slot
@@ -128,7 +128,7 @@ BrotherManager.prototype.createBrotherSlots = function ( _ownerID )
 
     for (var i = 0; i < parent.mSlots.length; ++i)
     {
-        parent.ListScrollContainer.append(parent.mSlots[i]);
+        parent.mListScrollContainer.append(parent.mSlots[i]);
         parent.mSlots[i].drop("end", dropHandler);
     }
 };
@@ -274,6 +274,8 @@ BrotherManager.prototype.transferBrother = function ( _sourceIdx, _sourceOwnerID
 // Swap the contents of two slots no matter where they are or what their state is
 BrotherManager.prototype.swapSlots = function (_firstIdx, _tagA, _secondIdx, _tagB)
 {
+    console.error("_firstIdx " + _firstIdx + " _secondIdx " + _secondIdx);
+    console.error("_tagA " + _tagA + " _tagB " + _tagB);
     if (_firstIdx === null || _secondIdx === null) return false;
     var sourceOwner = this.get(_tagA);
     var targetOwner = this.get(_tagB);

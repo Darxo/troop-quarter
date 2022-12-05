@@ -192,6 +192,7 @@ BrotherContainer.prototype.createBrotherSlots = function()
         this.mSlots[i].data('tag', this.mContainerID);
         this.mSlots[i].data('child', null);
     }
+    console.error("this.mSlots.length: " + this.mSlots.length);
     return this.mSlots;
 }
 
