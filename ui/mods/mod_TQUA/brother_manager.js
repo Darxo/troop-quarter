@@ -81,8 +81,8 @@ BrotherManager.prototype.loadFromData = function( _data )
         if (identifier in _data && _data[identifier] !== null)
         {
             this.get(identifier).loadFromData(_data[identifier]);
-            this.createBrotherSlots(identifier);
-            this.onBrothersListLoaded(identifier);
+            // this.createBrotherSlots(identifier);
+            // this.onBrothersListLoaded(identifier);
         }
     }
 }

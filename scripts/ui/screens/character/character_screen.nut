@@ -6,7 +6,12 @@ this.character_screen <- {
 		Visible = null,
 		PopupDialogVisible = null,
 		Animating = null,
-		OnCloseButtonClickedListener = null
+		OnCloseButtonClickedListener = null,
+		PlayerID = "Player",
+		QuarterID = "Quarter",
+
+		MinPlayerRoster = 1,
+		PlayerRosterLimit = 18,
 	},
 	function isVisible()
 	{
@@ -49,6 +54,29 @@ this.character_screen <- {
 		this.clearEventListener();
 		this.m.JSDataSourceHandle = this.UI.disconnect(this.m.JSDataSourceHandle);
 		this.m.JSHandle = this.UI.disconnect(this.m.JSHandle);
+	}
+
+	function queryPlayerRosterInformation( _result )
+	{
+		local roster = this.World.Assets.getFormation();
+
+		for( local i = 0; i != roster.len(); i = ++i )
+		{
+			if (roster[i] != null)
+			{
+				roster[i] = this.UIDataHelper.convertEntityToUIData(roster[i], null);
+			}
+		}
+
+		_result.Player <- {
+			Roster = roster,
+			BrotherCount = ::World.getPlayerRoster().getSize(),
+			BrotherMin = this.m.MinPlayerRoster,
+			BrotherMax = ::World.Assets.getBrothersMax(),
+			SlotLimit = this.m.PlayerRosterLimit
+		}
+
+		// _result.BrothersMaxInCombat <- ::World.Assets.getBrothersMaxInCombat();
 	}
 
 	function show()
@@ -165,8 +193,9 @@ this.character_screen <- {
 	function queryData()
 	{
 		local result = {
-			brothers = this.onQueryBrothersList()
 		};
+
+		this.queryPlayerRosterInformation(result);
 
 		return result;
 	}
