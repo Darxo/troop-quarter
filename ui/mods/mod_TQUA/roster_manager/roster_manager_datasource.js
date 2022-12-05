@@ -660,30 +660,6 @@ RosterManagerDatasource.prototype.notifyBackendPopupDialogIsVisible = function (
     SQ.call(this.mSQHandle, 'onPopupDialogIsVisible', [_visible]);
 };
 
-RosterManagerDatasource.prototype.notifyBackendFilterAllButtonClicked = function ()
-{
-	SQ.call(this.mSQHandle, 'onFilterAll');
-};
-
-RosterManagerDatasource.prototype.notifyBackendFilterWeaponsButtonClicked = function ()
-{
-	SQ.call(this.mSQHandle, 'onFilterWeapons');
-};
-
-RosterManagerDatasource.prototype.notifyBackendFilterArmorButtonClicked = function ()
-{
-	SQ.call(this.mSQHandle, 'onFilterArmor');
-};
-
-RosterManagerDatasource.prototype.notifyBackendFilterMiscButtonClicked = function ()
-{
-	SQ.call(this.mSQHandle, 'onFilterMisc');
-};
-
-RosterManagerDatasource.prototype.notifyBackendFilterUsableButtonClicked = function () {
-    SQ.call(this.mSQHandle, 'onFilterUsable');
-};
-
 RosterManagerDatasource.prototype.notifyBackendDiceThrow = function ()
 {
 	SQ.call(this.mSQHandle, 'onDiceThrow');
