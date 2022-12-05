@@ -3,24 +3,28 @@ var BrotherContainer = function( _containerID )
     // this.mSQHandle = null;
     this.mEventListener = null;
 
+    // Initialisation:
     this.mContainerID = _containerID;
 
-    // Container definitions
-        // These two arrays are always supposed to be synchronized
-        this.mSlots = [];            // Array of DIVs that a brother can fit in
-        this.mBrotherList = [];      // Array of BrotherObject objects
-
-        this.mBrotherCurrent = 0;     // Current amount of brothers in this container
-        this.mBrotherMin = 0;       // minimum allowed brothers in a contaner (player roster can never have less than 1)
-        this.mBrotherMax = 27;      // Maximum allows brothers in this list
-        this.mSlotLimit = 27;       // Maximum slots on this list
+    // Load From Data
+    this.mName = null;
+    this.mSlots = [];            // Array of DIVs that a brother can fit in
+    this.mBrotherList = [];      // Array of BrotherObject objects
+    this.mBrotherMin = null;       // minimum allowed brothers in a contaner (player roster can never have less than 1)
+    this.mBrotherMax = null;      // Maximum allows brothers in this list
+    this.mSlotLimit = null;       // Maximum slots on this list
 
     // Dynamic Variables
+    this.mBrotherCurrent = null;     // Current amount of brothers in this container
     this.mSelectedBrother = -1;   // Index of the currently selected brother; negative = none
 
     // Config
+    this.mCanSelect = true;
+    this.mCanRemove = true;
+    this.mCanImport = true;
+    this.mCanReposition = true;
     this.mCanSelectEmptySlots = false;
-    this.mSlotClasses = '<div class="ui-control is-brother-slot is-roster-slot"/>';
+    this.mSlotClasses = '<div class="ui-control is-brother-slot is-roster-slot"/>';     // Classes that are assigned to slot DIVs of this container
 }
 
 BrotherContainer.prototype.getSlots = function()
@@ -35,6 +39,7 @@ BrotherContainer.prototype.getBrothers = function()
 
 BrotherContainer.prototype.loadFromData = function( _data )
 {
+    if ('Name' in _data && _data.Name !== null) this.mName = _data.Name;
     if ('Roster' in _data && _data.Roster !== null) this.mBrotherList = _data.Roster;
     if ('BrotherMin' in _data && _data.BrotherMin !== null) this.mBrotherMin = _data.BrotherMin;
     if ('BrotherMax' in _data && _data.BrotherMax !== null) this.mBrotherMax = _data.BrotherMax;
@@ -52,6 +57,7 @@ BrotherContainer.prototype.deselectCurrent = function()
 
 BrotherContainer.prototype.selectBrother = function (_brotherID)
 {
+    if (this.mCanSelect === false) return false;
     for (var i = 0; i < this.mBrotherList.length; ++i)
     {
         var brother = this.mBrotherList[i];
@@ -72,6 +78,7 @@ BrotherContainer.prototype.hasSelected = function()     // Maybe make this funct
 // SAFE - Selects the slot on the index
 BrotherContainer.prototype.selectSlot = function(_slotIndex)    // todo add default value -1
 {
+    if (this.mCanSelect === false) return false;
     this.deselectCurrent();
     if (_slotIndex === null) return console.error("_slotIndex is null");
     if (_slotIndex < 0) return true;    // this function was called without parameter in which case we only deselect and do nothing else
@@ -185,6 +192,7 @@ BrotherContainer.prototype.createBrotherSlots = function()
         this.mSlots[i].data('tag', this.mContainerID);
         this.mSlots[i].data('child', null);
     }
+    return this.mSlots;
 }
 
 // Returns the first empty slot
@@ -290,28 +298,10 @@ BrotherContainer.prototype.isEmpty = function(_slotIndex)
     return (this.mBrotherList[_slotIndex] === null);
 };
 
-// Called once at the start; Returns the array with the slots
-BrotherContainer.prototype.createBrotherSlots = function ()
-{
-    var self = this;
-
-    this.mSlots = [];
-    for (var i = 0 ; i < this.mSlotLimit; i++)
-    {
-        var slot = $(this.mSlotClasses);
-
-        slot.data('idx', i);
-        slot.data('tag', this.mContainerID);
-        slot.data('child', null);
-
-        this.mSlots.push(slot);
-    }
-    return this.mSlots;
-};
-
 // Insert Slot and Brother data that are coming from another slot into a new slot
 BrotherContainer.prototype.importBrother = function ( _slotIdx, _data )
 {
+    if (this.mCanImport === false) return false;
     if (this.isEmpty(_slotIdx) === false) return false;
     if (_data === null) return false;
 
@@ -334,6 +324,7 @@ BrotherContainer.prototype.importBrother = function ( _slotIdx, _data )
 // Returns an object with the removed slotData, playerData and a bool indicating whether this slot was highlighted
 BrotherContainer.prototype.removeBrother = function ( _slotIdx )
 {
+    if (this.mCanRemove === false) return null;
     if (this.isEmpty(_slotIdx)) return null;
 
     var slot = this.mSlots[_slotIdx];
@@ -356,6 +347,7 @@ BrotherContainer.prototype.removeBrother = function ( _slotIdx )
 // This is bring called from outside. The contents of two slots are being swapped
 BrotherContainer.prototype.swapSlots = function ( _firstIdx, _secondIdx )
 {
+    if (this.mCanReposition === false) return false;
     if (_firstIdx === null || _secondIdx === null) return false;
     if (this.isEmpty(_firstIdx) && this.isEmpty(_secondIdx)) return true;   // We just swapped two empty slots, gg
 

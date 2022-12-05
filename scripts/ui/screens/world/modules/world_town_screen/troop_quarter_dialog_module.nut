@@ -95,12 +95,7 @@ this.troop_quarter_dialog_module <- this.inherit("scripts/ui/screens/ui_module",
 			BrotherMax = this.m.QuarterMax,
 			SlotLimit = this.m.QuarterLimit
 		}
-/*
-		_result.QuarterCurrent <- brothers.len();
-		_result.QuarterMin <- this.m.QuarterMin;
-		_result.QuarterMax <- this.m.QuarterMax;
-		_result.QuarterLimit <- this.m.QuarterLimit;
-*/
+
 		if ("Assets" in _result)
 		{
 			_result.Assets.QuarterCurrent <- brothers.len();
@@ -129,15 +124,7 @@ this.troop_quarter_dialog_module <- this.inherit("scripts/ui/screens/ui_module",
 		}
 
 		_result.BrothersMaxInCombat <- ::World.Assets.getBrothersMaxInCombat();
-/*
-		_result.Player <- roster;
-		_result.
 
-		_result.PlayerCurrent <- ::World.getPlayerRoster().getSize();
-		_result.PlayerMin <- this.m.MinPlayerRoster;
-		_result.PlayerMax <- ::World.Assets.getBrothersMax();
-		_result.PlayerLimit <- this.m.PlayerRosterLimit;
-*/
 		if ("Assets" in _result)
 		{
 			_result.Assets.PlayerCurrent <- _result.Player.BrotherCount;

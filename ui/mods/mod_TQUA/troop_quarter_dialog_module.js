@@ -1,6 +1,6 @@
 "use strict";
 
-// identifier for roster tag
+// Identifier for RosterContainer aswell as the respective Data entry in loadFromData
 var Owner =
 {
     Quarter: 'Quarter',
