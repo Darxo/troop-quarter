@@ -315,7 +315,6 @@ RosterManagerDatasource.prototype.getBrotherPerkPoints = function(_brother)
     return 0;
 };
 
-
 RosterManagerDatasource.prototype.getBrotherPerkPointsSpent = function (_brother)
 {
 	if (_brother === null || !(CharacterScreenIdentifier.Entity.Character.Key in _brother))
@@ -340,7 +339,6 @@ RosterManagerDatasource.prototype.getBrotherPerkPointsSpent = function (_brother
 
 	return 0;
 };
-
 
 RosterManagerDatasource.prototype.isSelectedBrother = function(_brother)
 {
@@ -456,32 +454,6 @@ RosterManagerDatasource.prototype.setRosterLimit = function(_data, _withoutNotif
 	}
 };
 
-RosterManagerDatasource.prototype.getGroundStatistics = function ()
-{
-    var selectedBrother = this.getSelectedBrother();
-    if (selectedBrother === null || !(CharacterScreenIdentifier.Entity.Id in selectedBrother))
-    {
-        console.error('ERROR: Failed to get ground statistics. No entity selected.');
-        return 0;
-    }
-
-    if (CharacterScreenIdentifier.Entity.Ground in selectedBrother && selectedBrother[CharacterScreenIdentifier.Entity.Ground] !== null)
-    {
-        var ground = selectedBrother[CharacterScreenIdentifier.Entity.Ground];
-        var groundItems = 0;
-        for (var i = 0; i < ground.length; ++i)
-        {
-        	if (ground[i] !== null)
-        	{
-                ++groundItems;
-            }
-        }
-        return { size: groundItems };
-    }
-
-    return 0;
-};
-
 RosterManagerDatasource.prototype.hasItemEquipped = function (_slotType)
 {
     var selectedBrother = this.getSelectedBrother();
@@ -567,52 +539,6 @@ RosterManagerDatasource.prototype.updateNameAndTitle = function(_brotherId, _nam
     });
 };
 
-RosterManagerDatasource.prototype.commitLevelUpStats = function(_brotherId, _statsIncreaseValues)
-{
-    var brotherId = _brotherId;
-    if (brotherId === null)
-    {
-        var selectedBrother = this.getSelectedBrother();
-        if (selectedBrother === null || !(CharacterScreenIdentifier.Entity.Id in selectedBrother))
-        {
-            console.error('ERROR: Failed to commit level up stat increase values. No entity selected.');
-            return;
-        }
-
-        brotherId = selectedBrother[CharacterScreenIdentifier.Entity.Id];
-    }
-
-    //console.info(_statsIncreaseValues);
-
-    var self = this;
-    this.notifyBackendCommitStatIncreaseValues(brotherId, _statsIncreaseValues, function (data)
-    {
-        if (data === undefined || data === null || typeof (data) !== 'object')
-        {
-            console.error('ERROR: Failed to commit level up stat increase values. Invalid data result.');
-            return;
-        }
-
-        // check if we have an error
-        if (ErrorCode.Key in data)
-        {
-            self.notifyEventListener(ErrorCode.Key, data[ErrorCode.Key]);
-        }
-        else
-        {
-            // find the brother and update him
-            if (CharacterScreenIdentifier.Entity.Id in data)
-            {
-                self.updateBrother(data);
-            }
-            else
-            {
-                console.error('ERROR: Failed to commit level up stat increase values. Invalid data result.');
-            }
-        }
-    });
-};
-
 RosterManagerDatasource.prototype.notifyBackendSortButtonClicked = function ()
 {
    	SQ.call(this.mSQHandle, 'onSortButtonClicked');
@@ -621,32 +547,6 @@ RosterManagerDatasource.prototype.notifyBackendSortButtonClicked = function ()
 RosterManagerDatasource.prototype.notifyBackendUpdateNameAndTitle = function (_brotherId, _name, _title, _callback)
 {
     SQ.call(this.mSQHandle, 'onUpdateNameAndTitle', [_brotherId, _name, _title], _callback);
-};
-
-RosterManagerDatasource.prototype.notifyBackendCommitStatIncreaseValues = function (_brotherId, _statsIncreaseValues, _callback)
-{
-    // NOTE: (js) Convert Object to array..as we cannot deliver objects with a function call to the backend... thanks Awesomium...
-    var increaseValues = [];
-    increaseValues.push(_statsIncreaseValues[CharacterScreenIdentifier.Entity.Character.LevelUp.HitpointsIncrease]);
-    increaseValues.push(_statsIncreaseValues[CharacterScreenIdentifier.Entity.Character.LevelUp.BraveryIncrease]);
-    increaseValues.push(_statsIncreaseValues[CharacterScreenIdentifier.Entity.Character.LevelUp.FatigueIncrease]);
-    increaseValues.push(_statsIncreaseValues[CharacterScreenIdentifier.Entity.Character.LevelUp.InitiativeIncrease]);
-    increaseValues.push(_statsIncreaseValues[CharacterScreenIdentifier.Entity.Character.LevelUp.MeleeSkillIncrease]);
-    increaseValues.push(_statsIncreaseValues[CharacterScreenIdentifier.Entity.Character.LevelUp.RangeSkillIncrease]);
-    increaseValues.push(_statsIncreaseValues[CharacterScreenIdentifier.Entity.Character.LevelUp.MeleeDefenseIncrease]);
-    increaseValues.push(_statsIncreaseValues[CharacterScreenIdentifier.Entity.Character.LevelUp.RangeDefenseIncrease]);
-
-    SQ.call(this.mSQHandle, 'onCommitStatsIncreaseValues', [_brotherId, increaseValues], _callback);
-};
-
-RosterManagerDatasource.prototype.notifyBackendDropPaperdollItem = function (_brotherId, _sourceItemId, _targetItemIdx, _callback)
-{
-	SQ.call(this.mSQHandle, 'onDropPaperdollItem', [_brotherId, _sourceItemId, _targetItemIdx], _callback);
-};
-
-RosterManagerDatasource.prototype.notifyBackendStartBattleButtonClicked = function ()
-{
-	SQ.call(this.mSQHandle, 'onStartBattleButtonClicked');
 };
 
 RosterManagerDatasource.prototype.notifyBackendCloseButtonClicked = function ()
@@ -658,11 +558,6 @@ RosterManagerDatasource.prototype.notifyBackendPopupDialogIsVisible = function (
 {
     this.mIsPopupOpen = _visible;
     SQ.call(this.mSQHandle, 'onPopupDialogIsVisible', [_visible]);
-};
-
-RosterManagerDatasource.prototype.notifyBackendDiceThrow = function ()
-{
-	SQ.call(this.mSQHandle, 'onDiceThrow');
 };
 
 RosterManagerDatasource.prototype.notifyBackendUpdateRosterPosition = function (_id, _pos)

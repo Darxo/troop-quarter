@@ -6,8 +6,7 @@ this.character_screen <- {
 		Visible = null,
 		PopupDialogVisible = null,
 		Animating = null,
-		OnCloseButtonClickedListener = null,
-		OnStartBattleButtonClickedListener = null
+		OnCloseButtonClickedListener = null
 	},
 	function isVisible()
 	{
@@ -29,15 +28,9 @@ this.character_screen <- {
 		this.m.OnCloseButtonClickedListener = _listener;
 	}
 
-	function setOnStartBattleButtonClickedListener( _listener )
-	{
-		this.m.OnStartBattleButtonClickedListener = _listener;
-	}
-
 	function clearEventListener()
 	{
 		this.m.OnCloseButtonClickedListener = null;
-		this.m.OnStartBattleButtonClickedListener = null;
 	}
 
 	function create()
@@ -47,15 +40,7 @@ this.character_screen <- {
 		this.m.PopupDialogVisible = false;
 		this.m.Animating = false;
 
-		if (this.Tactical.isActive())
-		{
-			this.m.JSHandle = this.UI.connect("TacticalCharacterScreen", this);
-		}
-		else
-		{
-			this.m.JSHandle = this.UI.connect("RosterManagerScreen", this);
-		}
-
+		this.m.JSHandle = this.UI.connect("RosterManagerScreen", this);
 		this.m.JSDataSourceHandle = this.m.JSHandle.connectToModule("DataSource", this);
 	}
 
@@ -172,22 +157,9 @@ this.character_screen <- {
 		}
 	}
 
-	function onStartBattleButtonClicked()
-	{
-		if (this.m.OnStartBattleButtonClickedListener != null)
-		{
-			this.m.OnStartBattleButtonClickedListener();
-		}
-	}
-
 	function onPopupDialogIsVisible( _data )
 	{
 		this.m.PopupDialogVisible = _data[0];
-	}
-
-	function onDiceThrow()
-	{
-		this.Sound.play(this.Const.Sound.DiceThrow[this.Math.rand(0, this.Const.Sound.DiceThrow.len() - 1)], this.Const.Sound.Volume.Inventory);
 	}
 
 	function queryData()
@@ -205,14 +177,7 @@ this.character_screen <- {
 
 	function onQueryBrothersList()
 	{
-		if (this.Tactical.isActive())
-		{
-			return this.tactical_onQueryBrothersList();
-		}
-		else
-		{
-			return this.strategic_onQueryBrothersList();
-		}
+		return this.strategic_onQueryBrothersList();
 	}
 
 	function onUpdateNameAndTitle( _data )
@@ -292,11 +257,6 @@ this.character_screen <- {
 		if (inventory == null)
 		{
 			return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.FailedToAcquireInventory);
-		}
-
-		if (_withStash == true && this.Stash == null)
-		{
-			return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.FailedToAcquireStash);
 		}
 
 		local sourceItem = inventory.getItemByInstanceID(_data[1]);
@@ -428,35 +388,6 @@ this.character_screen <- {
 		};
 	}
 
-	function helper_isActionAllowed( _entity, _items, _putIntoBags )
-	{
-		if (this.m.InventoryMode == this.Const.CharacterScreen.InventoryMode.Ground)
-		{
-			local activeEntity = this.Tactical.TurnSequenceBar.getActiveEntity();
-
-			if (activeEntity != null && _entity != null && activeEntity.getID() != _entity.getID())
-			{
-				return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.OnlyActiveEntityIsAllowedToChangeItems);
-			}
-
-			if (_entity.getItems().isActionAffordable(_items) == false)
-			{
-				return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.NotEnoughActionPoints);
-			}
-
-			if (_items[0] != null && !_items[0].isChangeableInBattle())
-			{
-				return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.ItemIsNotChangableInBattle);
-			}
-		}
-		else if (_items[0] != null && !_items[0].isChangeableInBattle() && _putIntoBags == true)
-		{
-			return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.ItemIsNotChangableInBattle);
-		}
-
-		return null;
-	}
-
 	function helper_queryEquipmentTargetItems( _inventory, _sourceItem )
 	{
 		local ret = {
@@ -516,107 +447,28 @@ this.character_screen <- {
 
 		switch(_errorCode)
 		{
-		case this.Const.CharacterScreen.ErrorCode.FailedToFindEntity:
-			errorString = "Failed to find entity.";
-			break;
+			case this.Const.CharacterScreen.ErrorCode.FailedToFindEntity:
+				errorString = "Failed to find entity.";
+				break;
 
-		case this.Const.CharacterScreen.ErrorCode.FailedToAcquireInventory:
-			errorString = "Failed to acquire inventory.";
-			break;
+			case this.Const.CharacterScreen.ErrorCode.FailedToAcquireInventory:
+				errorString = "Failed to acquire inventory.";
+				break;
 
-		case this.Const.CharacterScreen.ErrorCode.FailedToAcquireStash:
-			errorString = "Failed to acquire stash.";
-			break;
-
-		case this.Const.CharacterScreen.ErrorCode.FailedToAcquireGroundItems:
-			errorString = "Failed to acquire ground items.";
-			break;
-
-		case this.Const.CharacterScreen.ErrorCode.FailedToFindGroundItem:
-			errorString = "Failed to find ground item.";
-			break;
-
-		case this.Const.CharacterScreen.ErrorCode.FailedToFindBagItem:
-			errorString = "Failed to find bag item.";
-			break;
-
-		case this.Const.CharacterScreen.ErrorCode.FailedToFindStashItem:
-			errorString = "Failed to find stash item.";
-			break;
-
-		case this.Const.CharacterScreen.ErrorCode.FailedToRemoveItemFromBag:
-			errorString = "Failed to remove item from bag.";
-			break;
-
-		case this.Const.CharacterScreen.ErrorCode.FailedToRemoveItemFromTargetSlot:
-			errorString = "Failed to remove item from target slot.";
-			break;
-
-		case this.Const.CharacterScreen.ErrorCode.FailedToRemoveItemFromSourceSlot:
-			errorString = "Failed to remove item from source slot.";
-			break;
-
-		case this.Const.CharacterScreen.ErrorCode.FailedToEquipBagItem:
-			errorString = "Failed to equip bag item.";
-			break;
-
-		case this.Const.CharacterScreen.ErrorCode.FailedToEquipGroundItem:
-			errorString = "Failed to equip ground item.";
-			break;
-
-		case this.Const.CharacterScreen.ErrorCode.FailedToEquipStashItem:
-			errorString = "Failed to equip stash item.";
-			break;
-
-		case this.Const.CharacterScreen.ErrorCode.FailedToPutItemIntoBag:
-			errorString = "Failed to put item into bag.";
-			break;
-
-		case this.Const.CharacterScreen.ErrorCode.FailedToPutGroundItemIntoBag:
-			errorString = "Failed to put ground item into bag.";
-			break;
-
-		case this.Const.CharacterScreen.ErrorCode.FailedToPutStashItemIntoBag:
-			errorString = "Failed to put stash item into bag.";
-			break;
-
-		case this.Const.CharacterScreen.ErrorCode.ItemAlreadyWithinBag:
-			errorString = "Item already within bag.";
-			break;
-
-		case this.Const.CharacterScreen.ErrorCode.ItemIsNotChangableInBattle:
-			errorString = "Item is not changable in battle.";
-			break;
-
-		case this.Const.CharacterScreen.ErrorCode.ItemIsNotAssignedToAnySlot:
-			errorString = "Item is not assigned to any slot.";
-			break;
-
-		case this.Const.CharacterScreen.ErrorCode.NotEnoughActionPoints:
-			errorString = "Not enough Action Points.";
-			break;
-
-		case this.Const.CharacterScreen.ErrorCode.NotEnoughBagSpace:
-			errorString = "Not enough bag space.";
-			break;
-
-		case this.Const.CharacterScreen.ErrorCode.NotEnoughStashSpace:
-			errorString = "Not enough stash space.";
-			break;
-
-		case this.Const.CharacterScreen.ErrorCode.OnlyActiveEntityIsAllowedToChangeItems:
-			errorString = "Only the active entity is allowed to change items.";
-			break;
-
-		case this.Const.CharacterScreen.ErrorCode.FailedToUnlockPerk:
-			errorString = "Failed to unlock perk.";
-			break;
+			case this.Const.CharacterScreen.ErrorCode.FailedToFindBagItem:
+				errorString = "Failed to find bag item.";
+				break;
 		}
 
 		return {
 			error = errorString,
 			code = _errorCode
 		};
+	}
+
+	// THis is getting called from outside. delete later
+	function resetInventoryFilter()
+	{
 	}
 
 };
