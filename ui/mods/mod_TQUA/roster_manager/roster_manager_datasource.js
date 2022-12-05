@@ -660,12 +660,6 @@ RosterManagerDatasource.prototype.notifyBackendPopupDialogIsVisible = function (
     SQ.call(this.mSQHandle, 'onPopupDialogIsVisible', [_visible]);
 };
 
-RosterManagerDatasource.prototype.notifyBackendDismissCharacter = function (_payCompensation)
-{
-	var activeCharacterID = this.mBrothersList[this.mSelectedBrotherIndex]['id'];
-    SQ.call(this.mSQHandle, 'onDismissCharacter', [ activeCharacterID, _payCompensation ]);
-};
-
 RosterManagerDatasource.prototype.notifyBackendFilterAllButtonClicked = function ()
 {
 	SQ.call(this.mSQHandle, 'onFilterAll');

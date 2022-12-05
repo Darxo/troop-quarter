@@ -3,7 +3,7 @@
  *	@Company:		Overhype Studios
  *
  *	@Copyright:		(c) Overhype Studios | 2013 - 2020
- * 
+ *
  *  @Author:		Overhype Studios
  *  @Date:			24.05.2017 / Reworked: 26.11.2017
  *  @Description:	Left Panel Header Module JS
@@ -14,154 +14,6 @@
     + Progressbar gegen Komponente austauschen
     + Image auch mit Offsets positionieren?
  */
-
-var CharacterScreenLeftPanelHeaderModule = function(_parent, _dataSource)
-{
-    this.mParent = _parent;
-    this.mDataSource = _dataSource;
-
-	// containers
-	this.mContainer = null;
-	
-	this.mPortraitContainer = null;
-	this.mPortraitImage = null;
-	this.mPortraitPlaceholder = null;
-
-	this.mNameContainer = null;
-	this.mLevelContainer = null;
-	this.mXPProgressbar = null;
-
-	this.mDismissButton	= null;
-	this.mPayDismissalWage = false;
-
-    // current popup dialog
-    this.mCurrentPopupDialog = null;
-
-    // LevelUp Dialog Defines
-    this.mLevelUpLeftStatsRows =
-	{
-		Hitpoints:
-		{
-            IconPath: Path.GFX + Asset.ICON_HEALTH,
-            StyleName: ProgressbarStyleIdentifier.Hitpoints,
-            TooltipId: TooltipIdentifier.CharacterStats.Hitpoints,
-            ProgressbarValueIdentifier: ProgressbarValueIdentifier.Hitpoints,
-            ProgressbarValueIdentifierMax: ProgressbarValueIdentifier.HitpointsMax,
-            StatValueIdentifier: CharacterScreenIdentifier.Entity.Character.LevelUp.HitpointsIncrease,
-			TalentIdentifier: 'hitpointsTalent',
-            Progressbar: null,
-			Talent: null,
-            Button: null
-        },
-
-		Fatigue:
-		{
-            IconPath: Path.GFX + Asset.ICON_FATIGUE,
-            StyleName: ProgressbarStyleIdentifier.Fatigue,
-            TooltipId: TooltipIdentifier.CharacterStats.MaximumFatigue,
-            ProgressbarValueIdentifier: ProgressbarValueIdentifier.Fatigue,
-            ProgressbarValueIdentifierMax: ProgressbarValueIdentifier.FatigueMax,
-            StatValueIdentifier: CharacterScreenIdentifier.Entity.Character.LevelUp.FatigueIncrease,
-            TalentIdentifier: 'fatigueTalent',
-            Progressbar: null,
-            Talent: null,
-            Button: null
-        },
-
-		Bravery:
-		{
-			IconPath: Path.GFX + Asset.ICON_BRAVERY,
-			StyleName: ProgressbarStyleIdentifier.Bravery,
-			TooltipId: TooltipIdentifier.CharacterStats.Bravery,
-			ProgressbarValueIdentifier: ProgressbarValueIdentifier.Bravery,
-			ProgressbarValueIdentifierMax: ProgressbarValueIdentifier.BraveryMax,
-			StatValueIdentifier: CharacterScreenIdentifier.Entity.Character.LevelUp.BraveryIncrease,
-			TalentIdentifier: 'braveryTalent',
-			Progressbar: null,
-			Talent: null,
-			Button: null
-		},
-
-		Initiative:
-		{
-            IconPath: Path.GFX + Asset.ICON_INITIATIVE,
-            StyleName: ProgressbarStyleIdentifier.Initiative,
-            TooltipId: TooltipIdentifier.CharacterStats.Initiative,
-            ProgressbarValueIdentifier: ProgressbarValueIdentifier.Initiative,
-            ProgressbarValueIdentifierMax: ProgressbarValueIdentifier.InitiativeMax,
-            StatValueIdentifier: CharacterScreenIdentifier.Entity.Character.LevelUp.InitiativeIncrease,
-            TalentIdentifier: 'initiativeTalent',
-            Progressbar: null,
-            Talent: null,
-            Button: null
-        }
-    };
-
-    this.mLevelUpRightStatsRows =
-	{
-		MeleeSkill:
-		{
-            IconPath: Path.GFX + Asset.ICON_MELEE_SKILL,
-            StyleName: ProgressbarStyleIdentifier.MeleeSkill,
-            TooltipId: TooltipIdentifier.CharacterStats.MeleeSkill,
-            ProgressbarValueIdentifier: ProgressbarValueIdentifier.MeleeSkill,
-            ProgressbarValueIdentifierMax: ProgressbarValueIdentifier.MeleeSkillMax,
-            StatValueIdentifier: CharacterScreenIdentifier.Entity.Character.LevelUp.MeleeSkillIncrease,
-            TalentIdentifier: 'meleeSkillTalent',
-            Progressbar: null,
-            Talent: null,
-            Button: null
-        },
-
-		RangeSkill:
-		{
-            IconPath: Path.GFX + Asset.ICON_RANGE_SKILL,
-            StyleName: ProgressbarStyleIdentifier.RangeSkill,
-            TooltipId: TooltipIdentifier.CharacterStats.RangeSkill,
-            ProgressbarValueIdentifier: ProgressbarValueIdentifier.RangeSkill,
-            ProgressbarValueIdentifierMax: ProgressbarValueIdentifier.RangeSkillMax,
-            StatValueIdentifier: CharacterScreenIdentifier.Entity.Character.LevelUp.RangeSkillIncrease,
-            TalentIdentifier: 'rangeSkillTalent',
-            Progressbar: null,
-            Talent: null,
-            Button: null
-        },
-
-		MeleeDefense:
-		{
-            IconPath: Path.GFX + Asset.ICON_MELEE_DEFENCE,
-            StyleName: ProgressbarStyleIdentifier.MeleeDefense,
-            TooltipId: TooltipIdentifier.CharacterStats.MeleeDefense,
-            ProgressbarValueIdentifier: ProgressbarValueIdentifier.MeleeDefense,
-            ProgressbarValueIdentifierMax: ProgressbarValueIdentifier.MeleeDefenseMax,
-            StatValueIdentifier: CharacterScreenIdentifier.Entity.Character.LevelUp.MeleeDefenseIncrease,
-            TalentIdentifier: 'meleeDefenseTalent',
-            Progressbar: null,
-            Talent: null,
-            Button: null
-        },
-
-		RangeDefense:
-		{
-            IconPath: Path.GFX + Asset.ICON_RANGE_DEFENCE,
-            StyleName: ProgressbarStyleIdentifier.RangeDefense,
-            TooltipId: TooltipIdentifier.CharacterStats.RangeDefense,
-            ProgressbarValueIdentifier: ProgressbarValueIdentifier.RangeDefense,
-            ProgressbarValueIdentifierMax: ProgressbarValueIdentifier.RangeDefenseMax,
-            StatValueIdentifier: CharacterScreenIdentifier.Entity.Character.LevelUp.RangeDefenseIncrease,
-            TalentIdentifier: 'rangeDefenseTalent',
-            Progressbar: null,
-            Talent: null,
-            Button: null
-        }
-    };
-
-    // LevelUp Increase Values
-    this.mLevelUpIncreaseValues = null;
-
-    this.registerDatasourceListener();
-};
-
 
 CharacterScreenLeftPanelHeaderModule.prototype.createDIV = function (_parentDiv)
 {
@@ -192,35 +44,9 @@ CharacterScreenLeftPanelHeaderModule.prototype.createDIV = function (_parentDiv)
 
 	var layout = $('<div class="l-button is-dismiss"/>');
     portraitContainer.append(layout);
-    this.mDismissButton = layout.createImageButton(Path.GFX + Asset.BUTTON_DISMISS_CHARACTER, function (_event)
-    {
-    	self.mPayDismissalWage = false;
-    	self.mDataSource.notifyBackendPopupDialogIsVisible(true);
-        self.mCurrentPopupDialog = $('.character-screen').createPopupDialog('Dismiss', null, null, 'dismiss-popup');
-
-        self.mCurrentPopupDialog.addPopupDialogOkButton(function (_dialog)
-        {
-        	self.mDataSource.notifyBackendDismissCharacter(self.mPayDismissalWage);
-            self.mCurrentPopupDialog = null;
-            _dialog.destroyPopupDialog();
-            self.mDataSource.notifyBackendPopupDialogIsVisible(false);
-        });
-        
-        self.mCurrentPopupDialog.addPopupDialogCancelButton(function (_dialog)
-        {
-            self.mCurrentPopupDialog = null;
-            _dialog.destroyPopupDialog();
-            self.mDataSource.notifyBackendPopupDialogIsVisible(false);
-        });
-
-        self.mCurrentPopupDialog.addPopupDialogContent(self.createDismissDialogContent(self.mCurrentPopupDialog));
-    }, 'display-none', 6);
 
     this.mNameContainer = $('<div class="name-container"/>');
     this.mContainer.append(this.mNameContainer);
-    //var editNameimage = $('<img class="display-none"/>');
-    ///editNameimage.attr('src', Path.GFX + Asset.ICON_EDIT_NAME_AND_TITLE);
-    //this.mNameContainer.append(editNameimage);
 
     var nameLabel = $('<div class="label title-font-big font-bold font-color-brother-name"/>');
     this.mNameContainer.append(nameLabel);
@@ -241,7 +67,7 @@ CharacterScreenLeftPanelHeaderModule.prototype.createDIV = function (_parentDiv)
             _dialog.destroyPopupDialog();
             self.mDataSource.notifyBackendPopupDialogIsVisible(false);
         });
-        
+
         self.mCurrentPopupDialog.addPopupDialogCancelButton(function (_dialog)
         {
             self.mCurrentPopupDialog = null;
@@ -258,7 +84,7 @@ CharacterScreenLeftPanelHeaderModule.prototype.createDIV = function (_parentDiv)
 
 	this.mLevelContainer = $('<div class="level-container"/>');
 	this.mContainer.append(this.mLevelContainer);
-        
+
     this.mLevelContainer.click(function ()
 	{
         if ($(this).hasClass('is-clickable') === false)
@@ -406,7 +232,7 @@ CharacterScreenLeftPanelHeaderModule.prototype.createChangeNameAndTitleDialogCon
 		if(button.isEnabled())
 			button.click();
 	});
-    
+
 	if(CharacterScreenIdentifier.Entity.Character.Title in selectedBrother)
         inputField.setInputText(selectedBrother[CharacterScreenIdentifier.Entity.Character.Title]);
 
@@ -724,7 +550,6 @@ CharacterScreenLeftPanelHeaderModule.prototype.bindTooltips = function ()
 
     this.mXPProgressbar.bindProgressbarTooltip(TooltipIdentifier.CharacterScreen.LeftPanelHeaderModule.Experience);
     this.mLevelContainer.bindTooltip({ contentType: 'ui-element', elementId: TooltipIdentifier.CharacterScreen.LeftPanelHeaderModule.Level });
-	this.mDismissButton.bindTooltip({ contentType: 'ui-element', elementId: TooltipIdentifier.CharacterScreen.LeftPanelHeaderModule.Dismiss });
 };
 
 CharacterScreenLeftPanelHeaderModule.prototype.unbindTooltips = function ()
@@ -736,7 +561,6 @@ CharacterScreenLeftPanelHeaderModule.prototype.unbindTooltips = function ()
 
     this.mXPProgressbar.bindProgressbarTooltip();
     this.mLevelContainer.unbindTooltip();
-	this.mDismissButton.unbindTooltip();
 };
 
 
@@ -867,7 +691,7 @@ CharacterScreenLeftPanelHeaderModule.prototype.setLevel = function(_levelValue, 
             image.removeClass('display-block').addClass('display-none');
         }
     }
-    /*else 
+    /*else
     {
         this.mLevelContainer.stop();
     }*/
@@ -935,16 +759,6 @@ CharacterScreenLeftPanelHeaderModule.prototype.updateControls = function(_data)
 	{
 		this.setXP(_data[CharacterScreenIdentifier.Entity.Character.XPValue], _data[CharacterScreenIdentifier.Entity.Character.XPValueMax], _data[CharacterScreenIdentifier.Entity.Character.Level], _data[CharacterScreenIdentifier.Entity.Character.LevelUp.Key] !== null);
 	}
-
-	// update dismiss button
-    if (this.mDataSource.getNumBrothers() > 1 && !this.mDataSource.isTacticalMode() && !_data[CharacterScreenIdentifier.Entity.Character.IsPlayerCharacter])
-	{
-		this.mDismissButton.removeClass('display-none').addClass('display-block');
-	}
-	else
-	{
-		this.mDismissButton.addClass('display-none').removeClass('display-block');
-	}
 };
 
 
@@ -952,7 +766,7 @@ CharacterScreenLeftPanelHeaderModule.prototype.onBrotherUpdated = function (_dat
 {
     /*this.mLevelContainer.css('backgroundColor', 'transparent');
     this.mLevelContainer.stop();*/
-    
+
 	if (this.mDataSource.isSelectedBrother(_brother) && CharacterScreenIdentifier.Entity.Character.Key in _brother)
 	{
 		this.updateControls(_brother[CharacterScreenIdentifier.Entity.Character.Key]);
@@ -963,7 +777,7 @@ CharacterScreenLeftPanelHeaderModule.prototype.onBrotherSelected = function (_da
 {
     /*this.mLevelContainer.css('backgroundColor', 'transparent');
     this.mLevelContainer.stop();*/
-    
+
 	if (_brother !== null && (CharacterScreenIdentifier.Entity.Id in _brother && CharacterScreenIdentifier.Entity.Character.Key in _brother))
 	{
 		this.updateControls(_brother[CharacterScreenIdentifier.Entity.Character.Key]);

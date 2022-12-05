@@ -40,5 +40,6 @@
     ::mods_registerJS("mod_TQUA/roster_manager/roster_manager_screen.js");
 
     ::mods_registerJS("mod_TQUA/roster_manager/character_screen_left_panel/character_screen_paperdoll_module.js");
+	::mods_registerJS("mod_TQUA/roster_manager/character_screen_left_panel/character_screen_left_panel_header_module.js");
 
 });

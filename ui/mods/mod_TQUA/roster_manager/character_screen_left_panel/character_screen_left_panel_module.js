@@ -1,13 +1,4 @@
-/*
- *  @Project:		Battle Brothers
- *	@Company:		Overhype Studios
- *
- *	@Copyright:		(c) Overhype Studios | 2013 - 2020
- * 
- *  @Author:		Overhype Studios
- *  @Date:			24.05.2017 / Reworked: 26.11.2017
- *  @Description:	Left Panel Module JS
- */
+
 "use strict";
 
 
@@ -65,28 +56,6 @@ CharacterScreenLeftPanelModule.prototype.unregisterModules = function ()
     this.mSkillsModule.unregister();
     this.mStatsModule.unregister();
 };
-
-
-/*
-CharacterScreenLeftPanelModule.prototype.setupEventHandler = function ()
-{
-	this.removeEventHandler();
-
-	this.mCharacterPanelHeaderModule.setupEventHandler();
-	this.mPaperdollModule.setupEventHandler();
-	this.mSkillsModule.setupEventHandler();
-	this.mStatsModule.setupEventHandler();
-};
-
-CharacterScreenLeftPanelModule.prototype.removeEventHandler = function ()
-{
-	this.mCharacterPanelHeaderModule.removeEventHandler();
-	this.mPaperdollModule.removeEventHandler();
-	this.mSkillsModule.removeEventHandler();
-	this.mStatsModule.removeEventHandler();
-};
-*/
-
 
 CharacterScreenLeftPanelModule.prototype.create = function(_parentDiv)
 {
