@@ -138,8 +138,8 @@ this.world_obituary_screen <- {
 			Roster = convertedRoster,
 			BrotherCount = reserveCount,
 			BrotherMin = 0,
-			BrotherMax = 9,
-			SlotLimit = 9
+			BrotherMax = 5,
+			SlotLimit = 27
 		}
 	}
 

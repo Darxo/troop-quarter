@@ -16,12 +16,15 @@ var BrotherContainer = function( _containerID )
     this.mSlotLimit = null;       // Maximum slots on this list
 
     // Dynamic Variables
-    this.mBrotherCurrent = null;     // Current amount of brothers in this container
+    this.mBrotherCurrent = 0;     // Current amount of brothers in this container
     this.mSelectedBrother = -1;   // Index of the currently selected brother; negative = none
 
+    // Optional DIVs
+    this.mListContainer = null;     // Contains all Slots created by this class
+    this.mRosterCountLabel = null;  // Will be updated with current/max brothers
+    this.mRosterNameLabel = null;   // Will be updated with name (type)
+
     // Config
-    this.mRosterCountLabel = null;  // If this is not null it will be updated
-    this.mRosterNameLabel = null;  // If this is not null it will be updated
     this.IsMoodVisible = true;
     this.mCanSelect = true;
     this.mCanRemove = true;

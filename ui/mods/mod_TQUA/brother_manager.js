@@ -123,9 +123,13 @@ BrotherManager.prototype.createBrotherSlots = function ( _ownerID )
     var self = this;
 
     var parent = this.get(_ownerID);
-    if (parent.mListScrollContainer === undefined) return;
+    if (parent.mListContainer === null)
+    {
+        console.error("mListContainer was never initialised. Can't create Slots for it");
+        return;
+    }
     if (parent.mSlots.length >= parent.mSlotLimit) return;
-    parent.mListScrollContainer.empty();
+    parent.mListContainer.empty();
     parent.createBrotherSlots();
 
     // event listener when dragging then drop bro to an empty slot
@@ -159,7 +163,7 @@ BrotherManager.prototype.createBrotherSlots = function ( _ownerID )
 
     for (var i = 0; i < parent.mSlots.length; ++i)
     {
-        parent.mListScrollContainer.append(parent.mSlots[i]);
+        parent.mListContainer.append(parent.mSlots[i]);
         parent.mSlots[i].drop("end", dropHandler);
     }
 };
@@ -444,8 +448,8 @@ BrotherManager.prototype.destroyDIV = function()
 {
     for(var i = 0; i < this.mBrotherContainer.length; i++)
     {
-        this.mBrotherContainer[i].mListScrollContainer.empty();
-        this.mBrotherContainer[i].mListScrollContainer = null;
+        this.mBrotherContainer[i].mListContainer.empty();
+        this.mBrotherContainer[i].mListContainer = null;
     }
 }
 

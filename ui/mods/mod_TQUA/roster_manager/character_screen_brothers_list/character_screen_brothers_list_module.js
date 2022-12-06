@@ -9,15 +9,6 @@ var RosterManagerBrothersListModule = function(_parent, _dataSource)
     // container
     this.mContainer = null;
 
-    // header
-
-    this.mDataSource.getPlayerRoster().mListScrollContainer                 = null;
-    this.mDataSource.mRosterManager.get(Owner.Reserve).mListScrollContainer = null;
-
-    this.mFormationCountContainer          = null;     // could be used for shake left right
-    this.mGuestsCountContainer         = null;
-    this.mReserveCountContainer          = null;     // could be used for shake left right
-
     this.registerDatasourceListener();
 };
 
@@ -45,8 +36,9 @@ RosterManagerBrothersListModule.prototype.createDIV = function (_parentDiv)
     // Secondary (Top) Container
     var secondaryContainer = $('<div class="secondary-container"/>');
     this.mContainer.append(secondaryContainer);
-    this.createRosterDIV(secondaryContainer, Owner.Reserve);
-    this.createRosterDIV(secondaryContainer, Owner.Guests);
+    secondaryContainer.createList(1.24, null, true);
+    this.createRosterDIV(secondaryContainer.findListScrollContainer(), Owner.Reserve);
+    this.createRosterDIV(secondaryContainer.findListScrollContainer(), Owner.Guests);
 
     // Primary (Bottom) Container
     var primaryContainer = $('<div class="primary-container"/>');
@@ -83,7 +75,7 @@ RosterManagerBrothersListModule.prototype.createRosterDIV = function (_parentDiv
 
         var listContainerLayout = $('<div class="l-list-container"/>');
         rosterContainer.append(listContainerLayout);
-        this.mDataSource.mRosterManager.get(_rosterID).mListScrollContainer = listContainerLayout;
+        this.mDataSource.mRosterManager.get(_rosterID).mListContainer = listContainerLayout;
 };
 
 
@@ -196,13 +188,13 @@ RosterManagerBrothersListModule.prototype.updateBlockedSlots = function ()
 {
     var self = this;
 
-    this.mDataSource.getPlayerRoster().mListScrollContainer.find('.is-blocked-slot').each(function (index, element)
+    this.mDataSource.getPlayerRoster().mListContainer.find('.is-blocked-slot').each(function (index, element)
     {
         var slot = $(element);
         slot.removeClass('is-blocked-slot');
     });
 
-    this.mDataSource.getPlayerRoster().mListScrollContainer.find('.is-roster-slot').each(function (index, element)
+    this.mDataSource.getPlayerRoster().mListContainer.find('.is-roster-slot').each(function (index, element)
     {
         var slot = $(element);
 
@@ -212,7 +204,7 @@ RosterManagerBrothersListModule.prototype.updateBlockedSlots = function ()
         }
     });
 
-    this.mDataSource.getPlayerRoster().mListScrollContainer.find('.is-reserve-slot').each(function (index, element)
+    this.mDataSource.getPlayerRoster().mListContainer.find('.is-reserve-slot').each(function (index, element)
     {
         var slot = $(element);
 
@@ -243,7 +235,7 @@ RosterManagerBrothersListModule.prototype.updateBrotherSlot = function (_data)
 
 /*RosterManagerBrothersListModule.prototype.showBrotherSlotLock = function(_brotherId, _showLock)
 {
-	var slot = this.mDataSource.getPlayerRoster().mListScrollContainer.find('#slot-index_' + _brotherId + ':first');
+	var slot = this.mDataSource.getPlayerRoster().mListContainer.find('#slot-index_' + _brotherId + ':first');
 	if (slot.length === 0)
 	{
 		return;
