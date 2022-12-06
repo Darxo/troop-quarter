@@ -36,7 +36,17 @@ RosterManagerBrothersListModule.prototype.createDIV = function (_parentDiv)
     // Secondary (Top) Container
     var secondaryContainer = $('<div class="secondary-container"/>');
     this.mContainer.append(secondaryContainer);
-    secondaryContainer.createList(1.24, null, true);
+    secondaryContainer.createListWithCustomOption({
+        delta: 1.24,
+        lineDelay: 0,
+        lineTimer: 0,
+        pageDelay: 0,
+        pageTimer: 0,
+        bindKeyboard: false,
+        smoothScroll: false,
+        resizable: false, // to hide the horizontal scroll
+        horizontalBar: 'none', // to hide the horizontal scroll
+    });
     this.createRosterDIV(secondaryContainer.findListScrollContainer(), Owner.Reserve);
     this.createRosterDIV(secondaryContainer.findListScrollContainer(), Owner.Guests);
 
@@ -298,4 +308,35 @@ RosterManagerBrothersListModule.prototype.onBrotherUpdated = function (_dataSour
 RosterManagerBrothersListModule.prototype.onInventoryModeUpdated = function (_dataSource, _mode)
 {
 	this.updateBrotherSlotLocks(_mode);
+};
+
+
+
+// List with custom options to be able to remove the horizontal scroll bar
+$.fn.createListWithCustomOption = function(_options, _classes,_withoutFrame)
+ {
+    var result = $('<div class="ui-control list has-frame"/>');
+    if (_withoutFrame !== undefined && _withoutFrame === true)
+    {
+        result.removeClass('has-frame');
+    }
+
+    if (_classes !== undefined && _classes !== null && typeof(_classes) === 'string')
+    {
+        result.addClass(_classes);
+    }
+
+    var scrollContainer = $('<div class="scroll-container"/>');
+    result.append(scrollContainer);
+
+    this.append(result);
+
+    if (_options.delta === null || _options.delta === undefined)
+    {
+        _options.delta = 8;
+    }
+
+    // NOTE: create scrollbar (must be after the list was appended to the DOM!)
+    result.aciScrollBar(_options);
+    return result;
 };

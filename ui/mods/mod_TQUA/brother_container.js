@@ -25,7 +25,9 @@ var BrotherContainer = function( _containerID )
     this.mRosterNameLabel = null;   // Will be updated with name (type)
 
     // Config
-    this.IsMoodVisible = true;
+    this.mMoodVisible = true;      // Show the Mood Symbol on the character?
+    this.mInjuriesVisible = true;   // List all injuries on top of the character?
+    this.mLostHPVisible = true;     // Draw Icon that indicates character is not at full HP?
     this.mCanSelect = true;
     this.mCanRemove = true;
     this.mCanImport = true;
@@ -45,7 +47,7 @@ BrotherContainer.prototype.loadFromData = function( _data )
     this.updateCountLabel();
 }
 
-{   // Getter and Setter
+{   // Basic Getter and Setter
     BrotherContainer.prototype.attachCountLabel = function( _countLabel )
     {
         this.mRosterCountLabel = _countLabel;
@@ -296,15 +298,18 @@ BrotherContainer.prototype.loadFromData = function( _data )
 
         if('moodIcon' in character)
         {
-            result.showListBrotherMoodImage(this.IsMoodVisible, character['moodIcon']);
+            result.showListBrotherMoodImage(this.mMoodVisible, character['moodIcon']);
         }
 
-        for(var i = 0; i != _brotherData['injuries'].length && i < 3; ++i)
+        if (this.mInjuriesVisible)
         {
-            result.assignListBrotherStatusEffect(_brotherData['injuries'][i].imagePath, _brotherData[CharacterScreenIdentifier.Entity.Id], _brotherData['injuries'][i].id)
+            for(var i = 0; i != _brotherData['injuries'].length && i < 3; ++i)
+            {
+                result.assignListBrotherStatusEffect(_brotherData['injuries'][i].imagePath, _brotherData[CharacterScreenIdentifier.Entity.Id], _brotherData['injuries'][i].id)
+            }
         }
 
-        if(_brotherData['injuries'].length <= 2 && _brotherData['stats'].hitpoints < _brotherData['stats'].hitpointsMax)
+        if(this.mLostHPVisible && _brotherData['injuries'].length <= 2 && _brotherData['stats'].hitpoints < _brotherData['stats'].hitpointsMax)
         {
             result.assignListBrotherDaysWounded();
         }
@@ -334,7 +339,7 @@ BrotherContainer.prototype.loadFromData = function( _data )
         slotDIV.assignListBrotherName(character[CharacterScreenIdentifier.Entity.Character.Name]);
         slotDIV.assignListBrotherDailyMoneyCost(character[CharacterScreenIdentifier.Entity.Character.DailyMoneyCost]);
 
-        slotDIV.showListBrotherMoodImage(this.IsMoodVisible, character['moodIcon']);
+        slotDIV.showListBrotherMoodImage(this.mMoodVisible, character['moodIcon']);
 
         slotDIV.removeListBrotherStatusEffects();
 
@@ -353,6 +358,7 @@ BrotherContainer.prototype.loadFromData = function( _data )
             slotDIV.removeListBrotherLeveledUp();
         }
     }
+
     BrotherContainer.prototype.createBrotherSlots = function()
     {
         this.mSlots = [];

@@ -94,30 +94,28 @@
             outline: 3px solid red;
         }
 
-        .character-screen-container .roster-count-container
+        .character-screen-container .roster-container .roster-count-container
         {
             right: 0;
             width: 10.0rem;
             height: 100%;
             position: absolute;
             outline: 3px solid red;
-            display: inline-block;
         }
 
-            .character-screen-container .roster-count-container img
+            .character-screen-container .roster-container .roster-count-container img
             {
                 outline: 1px solid rgb(122, 20, 63);
                 width: auto;
-                top:10%;
+                top: 10%;
                 height: 80%;
                 position: relative;
                 margin: auto;
             }
 
-            .character-screen-container .roster-count-container .label
+            .character-screen-container .roster-container .roster-count-container .label
             {
-                top: 0;
-                left: 3.0rem;
+                left: 3.5rem;
                 bottom: 0;
                 width: 7.6rem;
                 height: 100%;
