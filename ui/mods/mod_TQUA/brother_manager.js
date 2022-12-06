@@ -96,6 +96,7 @@ BrotherManager.prototype.createBrotherSlots = function ( _ownerID )
     var self = this;
 
     var parent = this.get(_ownerID);
+    if (parent.mListScrollContainer === undefined) return;
     if (parent.mSlots.length >= parent.mSlotLimit) return;
     parent.mListScrollContainer.empty();
     parent.createBrotherSlots();

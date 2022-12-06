@@ -7,7 +7,8 @@ var Owner =
     Player: 'Player',
 
     Formation: 'Formation',
-    Reserve: 'Reserve'
+    Reserve: 'Reserve',
+    Guests: 'Guests'
 };
 
 var TroopQuarterDialogModule = function(_parent)

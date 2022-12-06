@@ -8,6 +8,7 @@ var BrotherContainer = function( _containerID )
 
     // Load From Data
     this.mName = null;
+    this.mType = null;      // Secondary name-like string
     this.mSlots = [];            // Array of DIVs that a brother can fit in
     this.mBrotherList = [];      // Array of BrotherObject objects
     this.mBrotherMin = null;       // minimum allowed brothers in a contaner (player roster can never have less than 1)
@@ -55,26 +56,21 @@ var BrotherContainer = function( _containerID )
 {   // Little helper functions
     BrotherContainer.prototype.updateCountLabel = function()
     {
-        if (this.mRosterCountLabel === null)
-        {
-            this.mRosterCountLabel.html('');
-        }
-        else
-        {
-            this.mRosterCountLabel.html('' + this.mBrotherCurrent + '/' + this.mBrotherMax);
-        }
+        if (this.mRosterCountLabel === null) return;
+
+        this.mRosterCountLabel.html('' + this.mBrotherCurrent + '/' + this.mBrotherMax);
     }
 
     BrotherContainer.prototype.updateNameLabel = function()
     {
-        if (this.mRosterNameLabel === null)
-        {
-            this.mRosterNameLabel.html('');
-        }
-        else
-        {
-            this.mRosterNameLabel.html(this.mName);
-        }
+        if (this.mRosterNameLabel === null) return;
+        var labelString = "";
+        if (this.mName !== null) labelString += this.mName;
+        this.mRosterNameLabel.html(labelString);
+        if (this.mName === null) return;
+        if (this.mType === null) return;
+        labelString += " (" + this.mType + ")";
+        this.mRosterNameLabel.html(labelString);
     }
 
     BrotherContainer.prototype.selectNext = function()

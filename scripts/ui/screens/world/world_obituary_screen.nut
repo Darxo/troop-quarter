@@ -81,6 +81,7 @@ this.world_obituary_screen <- {
 
 		return {
             Name = "Formation",
+            Type = "Player",
 			Roster = convertedRoster,
 			BrotherCount = formationCount,
 			BrotherMin = 1,
@@ -98,11 +99,12 @@ this.world_obituary_screen <- {
         foreach(guest in ::World.getGuestRoster().getAll())
         {
             local slot = guest.getPlaceInFormation();
-            convertedRoster.[slot] = this.UIDataHelper.convertEntityToUIData(guest, null);
+            convertedRoster[slot] = this.UIDataHelper.convertEntityToUIData(guest, null);
         }
 
 		return {
-            Name = "Guests",
+            Name = "Militia",
+            Type = "Guests",
 			Roster = convertedRoster,
 			BrotherCount = ::World.getGuestRoster().getSize(),
 			BrotherMin = 0,
@@ -132,6 +134,7 @@ this.world_obituary_screen <- {
 
 		return {
             Name = "Reserve",
+            Type = "Player",
 			Roster = convertedRoster,
 			BrotherCount = reserveCount,
 			BrotherMin = 0,
@@ -140,32 +143,9 @@ this.world_obituary_screen <- {
 		}
 	}
 
-	function queryPlayerRosterInformation()
-	{
-		local roster = ::World.Assets.getFormation();
-
-		for( local i = 0; i != roster.len(); i = ++i )
-		{
-			if (roster[i] != null)
-			{
-				roster[i] = this.UIDataHelper.convertEntityToUIData(roster[i], null);
-			}
-		}
-
-		return {
-            Name = "Player Roster",
-			Roster = roster,
-			BrotherCount = ::World.getPlayerRoster().getSize(),
-			BrotherMin = this.m.MinPlayerRoster,
-			BrotherMax = ::World.Assets.getBrothersMax(),
-			SlotLimit = this.m.PlayerRosterLimit,
-
-			BrothersMaxInCombat = ::World.Assets.getBrothersMaxInCombat()
-		}
-	}
-
 	function show()
 	{
+		::modTQUA.createGuests();
 		this.setRosterLimit(("State" in this.World) && this.World.State != null ? this.World.Assets.getBrothersMaxInCombat() : 12);
 
 		if (this.m.JSHandle != null)

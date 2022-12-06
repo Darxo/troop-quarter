@@ -1,45 +1,6 @@
 
 "use strict";
 
-var CharacterScreenDatasourceIdentifier =
-{
-	Brother:
-    {
-        ListLoaded: 'brothers.list-loaded',
-        SettingsChanged: 'brothers.settings-changed',
-		Updated: 'brother.updated',
-		Selected: 'brother.selected'
-	},
-
-    Inventory:
-    {
-		ModeUpdated: 'inventory.mode-updated',
-		StashLoaded: 'inventory.stash-loaded',
-        StashItemUpdated:
-        {
-			Key: 'inventory.stash-item-updated',
-            Flag:
-            {
-				Inserted: 'inserted',
-				Removed: 'removed',
-				Updated: 'updated'
-			}
-		}
-	},
-
-    InventoryMode:
-    {
-        BattlePreparation: 'battle-preparation',
-		Stash: 'stash',
-		Ground: 'ground'
-	},
-
-    Perks:
-    {
-        TreesLoaded: 'perks.list-loaded'
-    }
-};
-
 var RosterManagerDatasource = function()
 {
 	this.mSQHandle = null;
@@ -51,11 +12,10 @@ var RosterManagerDatasource = function()
     this.mRosterManager = new BrotherManager();
     this.mRosterManager.addContainer(new BrotherContainer(Owner.Formation));
     this.mRosterManager.addContainer(new BrotherContainer(Owner.Reserve)).mSlotClasses = '<div class="ui-control is-brother-slot is-reserve-slot"/>';
+    var guests = this.mRosterManager.addContainer(new BrotherContainer(Owner.Guests));
+    guests.mCanRemove = false;
+    guests.mCanImport = false;
 
-    // this.mRosterManager.addContainer(troopQuarter);
-    // this.mRosterManager.addContainer(playerRoster);
-
-	// fucking bullshit
     this.mIsPopupOpen = false;
 
 	// init the datasource

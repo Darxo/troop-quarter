@@ -23,10 +23,10 @@ var RosterManagerBrothersListModule = function(_parent, _dataSource)
     this.mDataSource.getPlayerRoster().mListScrollContainer                 = null;
     this.mDataSource.mRosterManager.get(Owner.Reserve).mListScrollContainer = null;
 
-    this.mFormationCountLabel              = null;
     this.mFormationCountContainer          = null;     // could be used for shake left right
 
-    this.mReserveCountLabel              = null;
+    this.mGuestsCountContainer         = null;
+
     this.mReserveCountContainer          = null;     // could be used for shake left right
 
     this.registerDatasourceListener();
@@ -34,23 +34,24 @@ var RosterManagerBrothersListModule = function(_parent, _dataSource)
 
 RosterManagerBrothersListModule.prototype.createDIV = function (_parentDiv)
 {
+    var self = this;
+
     // create: containers
-    this.mContainer = $('<div class="roster-manager right-panel"/>');
+    this.mContainer = $('<div class="right-panel"/>');
     _parentDiv.append(this.mContainer);
 
     this.mHeaderContainer = $('<div class="header-module"/>');
     this.mContainer.append(this.mHeaderContainer);
 
-        var rightButtonContainer = $('<div class="buttons-container is-right"/>');
+        var rightButtonContainer = $('<div class="buttons-container"/>');
         this.mHeaderContainer.append(rightButtonContainer);
 
-        var layout = $('<div class="l-button is-close"/>');
-        rightButtonContainer.append(layout);
-        var self = this;
-        this.mCloseButton = layout.createImageButton(Path.GFX + Asset.BUTTON_QUIT, function ()
-        {
-            self.mDataSource.notifyBackendCloseButtonClicked();
-        }, '', 6);
+            var layout = $('<div class="l-button is-close"/>');
+            rightButtonContainer.append(layout);
+            this.mCloseButton = layout.createImageButton(Path.GFX + Asset.BUTTON_QUIT, function ()
+            {
+                self.mDataSource.notifyBackendCloseButtonClicked();
+            }, '', 6);
 
     // Secondary (Top) Container
     this.mSecondaryContainer = $('<div class="secondary-container"/>');
@@ -74,14 +75,43 @@ RosterManagerBrothersListModule.prototype.createDIV = function (_parentDiv)
                 var rosterSizeImage = $('<img/>');
                 rosterSizeImage.attr('src', Path.GFX + Asset.ICON_ASSET_BROTHERS); // ICON_DAMAGE_DEALT
                 this.mReserveCountContainer.append(rosterSizeImage);
-                this.mReserveCountLabel = $('<div class="label text-font-small font-bold font-color-value"/>');
-                this.mReserveCountContainer.append(this.mReserveCountLabel);
+                var reserveCountLabel = $('<div class="label text-font-small font-bold font-color-value"/>');
+                this.mReserveCountContainer.append(reserveCountLabel);
                 this.mReserveCountContainer.bindTooltip({ contentType: 'ui-element', elementId: TooltipIdentifier.Stash.ActiveRoster });
+                this.mDataSource.mRosterManager.get(Owner.Reserve).attachCountLabel(reserveCountLabel);
 
             var listContainerLayoutTwo = $('<div class="l-list-container"/>');
             rosterContainer.append(listContainerLayoutTwo);
             this.mDataSource.mRosterManager.get(Owner.Reserve).mListScrollContainer = listContainerLayoutTwo;
-            this.mDataSource.mRosterManager.get(Owner.Reserve).attachCountLabel(this.mReserveCountLabel);
+
+        var rosterContainer = $('<div class="roster-container"/>');
+        this.mSecondaryContainer.append(rosterContainer);
+
+            var headerBar = $('<div class="header-bar"/>');
+            rosterContainer.append(headerBar);
+
+                var mNameContainer = $('<div class="name-container"/>');
+                headerBar.append(mNameContainer);
+
+                    var nameLabel = $('<div class="label title-font-big font-bold font-color-brother-name"/>');
+                    mNameContainer.append(nameLabel);
+                    this.mDataSource.mRosterManager.get(Owner.Guests).attachNameLabel(nameLabel);
+
+                this.mGuestsCountContainer = $('<div class="roster-count-container"/>');
+                headerBar.append(this.mGuestsCountContainer);
+                var rosterSizeImage = $('<img/>');
+                rosterSizeImage.attr('src', Path.GFX + Asset.ICON_ASSET_BROTHERS); // ICON_DAMAGE_DEALT
+                this.mGuestsCountContainer.append(rosterSizeImage);
+                var guestsCountLabel = $('<div class="label text-font-small font-bold font-color-value"/>');
+                this.mGuestsCountContainer.append(guestsCountLabel);
+                this.mGuestsCountContainer.bindTooltip({ contentType: 'ui-element', elementId: TooltipIdentifier.Stash.ActiveRoster });
+                this.mDataSource.mRosterManager.get(Owner.Guests).attachCountLabel(guestsCountLabel);
+
+            var listContainerLayoutTwo = $('<div class="l-list-container"/>');
+            rosterContainer.append(listContainerLayoutTwo);
+            this.mDataSource.mRosterManager.get(Owner.Guests).mListScrollContainer = listContainerLayoutTwo;
+
+
 
     // Primary /Bottom) Container
     this.mPrimaryContainer = $('<div class="primary-container"/>');
@@ -113,6 +143,7 @@ RosterManagerBrothersListModule.prototype.createDIV = function (_parentDiv)
             rosterContainer.append(listContainerLayout);
             this.mDataSource.mRosterManager.get(Owner.Formation).mListScrollContainer = listContainerLayout;
             this.mDataSource.mRosterManager.get(Owner.Formation).attachCountLabel(this.mFormationCountLabel);
+
 };
 
 RosterManagerBrothersListModule.prototype.destroyDIV = function ()
