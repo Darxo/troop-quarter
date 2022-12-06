@@ -5,150 +5,125 @@
     top: 0;
 	width: 100%;
 	height: 100%;
-	position: absolute;
+	position: static;
     /* works */
 }
 
 /* HEADER */
 .character-screen-container .right-panel .header-module
 {
-	top: 0;
-	left: 0;
-	right: 0;
 	height: 3.5rem;
-	position: absolute;
+	position: relative; /* I wish I could put static here. But otherwise the child elements dont know what 100% height means*/
+    outline: 2px solid rgb(205, 160, 226);
     /* works */
 }
 
-.character-screen-container .right-panel .header-module .buttons-container
-{
-	right: 0;
-	height: 100%;
-	width: 4.8rem;
-	position: absolute;
-    outline: 1px solid green;
-}
+    .character-screen-container .right-panel .header-module .buttons-container
+    {
+        right: 0;
+        height: 100%;
+        width: 4.8rem;
+        position: absolute;
+    }
 
-.character-screen-container .right-panel .header-module .buttons-container .l-button.is-close
-{
-    right: 0;
-    top: 0.2rem;
-    width: 4.5rem;
-	height: 4.1rem;
-	position: absolute;
-}
-
-.character-screen-container .right-panel .name-container
-{
-	top: 0;
-	left: 0.2rem;
-	height: 100%;
-
-	position: absolute;
-	overflow: hidden;
-
-    /*border-bottom: 1px rgba(130, 130, 130, 1) solid;*/
-}
+    .character-screen-container .right-panel .header-module .buttons-container .l-button.is-close
+    {
+        right: 0;
+        top: 0.2rem;
+        width: 4.5rem;
+        height: 3.1rem;
+        position: absolute;
+    }
 
 /* SECONDARY - TOP */
 .character-screen-container .right-panel .secondary-container
 {
-    top: 3.5rem;
 	width: 100%;
 	height: 45.3rem;
-	position: absolute;
-    /* works*/
-    outline: 3px solid green;
-}
+	position: relative;
+    outline: 2px solid green;
+/* 	overflow: hidden;
+ */}
 
 /* PRIMARY - BOTTOM */
 .character-screen-container .right-panel .primary-container
 {
-    bottom: 0;
+    /*top: auto;*/
 	width: 100%;
 	height: 29.3rem;
-	position: absolute;
-    outline: 2px solid blue;
+	position: relative;
+    outline: 2px solid rgb(205, 160, 226);
 }
 
 .character-screen-container .right-panel .roster-container
 {
-	height: 100%;
-    /* outline: 1px solid greenyellow; */
-	position: relative;
     /* works */
+    outline: 5px solid rgb(243, 128, 74);
+    height: auto;
+	width: 100%;
+
+    position: relative;
+    display: inline-block
 }
 
-.character-screen-container .roster-container .header-bar
-{
-    outline: 1px solid red;
-    top: 0;
-    left: 0;
-    right: 0;
-	height: 3.5rem;
-	position: absolute;
-}
+    .character-screen-container .roster-container .l-list-container
+    {
+        outline: 4px solid rgb(46, 105, 182);
+        position: relative;
+        width: 100%;
+        display: inline-block;
+    }
 
-.character-screen-container .right-panel .l-list-container
-{
-    outline: 1px solid rgb(46, 105, 182);
-    top: 3.5rem;
-	left: 0.5rem;
-    right: 0.5rem;
-	height: 23.5rem;
-	position: absolute;
-}
+        .character-screen-container .right-panel .roster-container .l-list-container .scroll-container
+        {
+            margin-bottom: 0.4rem;
+        }
 
-.character-screen-container .right-panel .l-list-container .scroll-container
-{
-    margin-bottom: 0.4rem;
-}
+    .character-screen-container .roster-container .header-bar
+    {
+        height: 3.5rem;
+        position: relative;
+    }
 
-.character-screen-container .right-panel .roster-count-container
-{
-    outline: 1px solid yellow;
-    top: 0rem;
-    right: 1.0rem;
-    width: 4.6rem;
-    height: 2.4rem;
-    position: absolute;
+        .character-screen-container .right-panel .name-container
+        {
+            top: 0;
+            left: 0.2rem;
+            height: 100%;
+            position: absolute;
+            outline: 3px solid red;
+        }
 
-    z-index: 10;
-}
+        .character-screen-container .roster-count-container
+        {
+            right: 0;
+            width: 10.0rem;
+            height: 100%;
+            position: absolute;
+            outline: 3px solid red;
+            display: inline-block;
+        }
 
-.character-screen-container .right-panel .roster-count-container
-{
-    outline: 2px solid yellow;
-    top: 0;
-    right: 0;
-    width: 8.0rem;
-    height: 100%;
-    position: absolute;
+            .character-screen-container .roster-count-container img
+            {
+                outline: 1px solid rgb(122, 20, 63);
+                width: auto;
+                top:10%;
+                height: 80%;
+                position: relative;
+                margin: auto;
+            }
 
-    z-index: 10;
-}
+            .character-screen-container .roster-count-container .label
+            {
+                top: 0;
+                left: 3.0rem;
+                bottom: 0;
+                width: 7.6rem;
+                height: 100%;
+                position: absolute;
+                margin: auto;
 
-.character-screen-container .right-panel .roster-count-container img
-{
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 2.4rem;
-    height: 2.4rem;
-    position: absolute;
-    margin: auto;
-}
-
-.character-screen-container .primary-container .roster-count-container .label
-{
-    top: 0;
-    left: 3.0rem;
-    bottom: 0;
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    margin: auto;
-
-    line-height: 3.0rem;
-    text-align: left;
-}
+                line-height: 3.0rem;
+                text-align: left;
+            }

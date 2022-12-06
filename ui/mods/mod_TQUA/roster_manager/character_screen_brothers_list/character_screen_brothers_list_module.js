@@ -71,13 +71,15 @@ RosterManagerBrothersListModule.prototype.createRosterDIV = function (_parentDiv
 
             var countContainer = $('<div class="roster-count-container"/>');
             headerBar.append(countContainer);
-            var rosterSizeImage = $('<img/>');
-            rosterSizeImage.attr('src', Path.GFX + Asset.ICON_ASSET_BROTHERS); // ICON_DAMAGE_DEALT
-            countContainer.append(rosterSizeImage);
-            var reserveCountLabel = $('<div class="label text-font-small font-bold font-color-value"/>');
-            countContainer.append(reserveCountLabel);
-            countContainer.bindTooltip({ contentType: 'ui-element', elementId: TooltipIdentifier.Stash.ActiveRoster });
-            this.mDataSource.mRosterManager.get(_rosterID).attachCountLabel(reserveCountLabel);
+
+                var rosterSizeImage = $('<img/>');
+                rosterSizeImage.attr('src', Path.GFX + Asset.ICON_ASSET_BROTHERS); // ICON_DAMAGE_DEALT
+                countContainer.append(rosterSizeImage);
+
+                var reserveCountLabel = $('<div class="label text-font-small font-bold font-color-value"/>');
+                countContainer.append(reserveCountLabel);
+                countContainer.bindTooltip({ contentType: 'ui-element', elementId: TooltipIdentifier.Stash.ActiveRoster });
+                this.mDataSource.mRosterManager.get(_rosterID).attachCountLabel(reserveCountLabel);
 
         var listContainerLayout = $('<div class="l-list-container"/>');
         rosterContainer.append(listContainerLayout);
