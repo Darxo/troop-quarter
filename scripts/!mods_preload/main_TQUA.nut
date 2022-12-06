@@ -29,8 +29,8 @@
     // ::mods_registerCSS("mod_TQUA/original/mod_stronghold_pokebro_pc_dialog_module.css");
 
 
-    ::mods_registerJS("mod_TQUA/brother_container.js");
-    ::mods_registerJS("mod_TQUA/brother_manager.js");
+    ::mods_registerJS("mod_TQUA/roster_container.js");
+    ::mods_registerJS("mod_TQUA/roster_manager.js");
 
     ::mods_registerJS("mod_TQUA/troop_quarter_dialog_module.js");
     ::mods_registerCSS("mod_TQUA/troop_quarter_dialog_module.css");

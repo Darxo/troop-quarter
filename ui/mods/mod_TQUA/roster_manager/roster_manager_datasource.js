@@ -9,12 +9,13 @@ var RosterManagerDatasource = function()
 	this.mEventListener = { };
 
 	// Caches
-    this.mRosterManager = new BrotherManager();
-    this.mRosterManager.addContainer(new BrotherContainer(Owner.Formation));
-    this.mRosterManager.addContainer(new BrotherContainer(Owner.Reserve)).mSlotClasses = '<div class="ui-control is-brother-slot is-reserve-slot"/>';
-    var guests = this.mRosterManager.addContainer(new BrotherContainer(Owner.Guests));
+    this.mRosterManager = new RosterManager();
+    this.mRosterManager.addContainer(new RosterContainer(Owner.Formation));
+    this.mRosterManager.addContainer(new RosterContainer(Owner.Reserve)).mSlotClasses = '<div class="ui-control is-brother-slot is-reserve-slot"/>';
+    var guests = this.mRosterManager.addContainer(new RosterContainer(Owner.Guests));
     guests.mCanRemove = false;
     guests.mCanImport = false;
+    guests.mMoodVisible = false;
 
     this.mIsPopupOpen = false;
 

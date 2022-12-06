@@ -1,4 +1,4 @@
-var BrotherContainer = function( _containerID )
+var RosterContainer = function( _containerID )
 {
     // this.mSQHandle = null;
     this.mEventListener = null;
@@ -20,7 +20,7 @@ var BrotherContainer = function( _containerID )
     this.mSelectedBrother = -1;   // Index of the currently selected brother; negative = none
 
     // Optional DIVs
-    this.mListContainer = null;     // Contains all Slots created by this class
+    this.mListContainer = null;     // Contains all Slots created by this class. Is only used externally from RosterManager
     this.mRosterCountLabel = null;  // Will be updated with current/max brothers
     this.mRosterNameLabel = null;   // Will be updated with name (type)
 
@@ -36,7 +36,7 @@ var BrotherContainer = function( _containerID )
     this.mSlotClasses = '<div class="ui-control is-brother-slot is-roster-slot"/>';     // Classes that are assigned to slot DIVs of this container
 }
 
-BrotherContainer.prototype.loadFromData = function( _data )
+RosterContainer.prototype.loadFromData = function( _data )
 {
     if ('Name' in _data && _data.Name !== null) this.mName = _data.Name;
     this.updateNameLabel();
@@ -48,31 +48,31 @@ BrotherContainer.prototype.loadFromData = function( _data )
 }
 
 {   // Basic Getter and Setter
-    BrotherContainer.prototype.attachCountLabel = function( _countLabel )
+    RosterContainer.prototype.attachCountLabel = function( _countLabel )
     {
         this.mRosterCountLabel = _countLabel;
     }
 
-    BrotherContainer.prototype.attachNameLabel = function( _nameLabel )
+    RosterContainer.prototype.attachNameLabel = function( _nameLabel )
     {
         this.mRosterNameLabel = _nameLabel;
     }
 
-    BrotherContainer.prototype.getSlots = function()
+    RosterContainer.prototype.getSlots = function()
     {
         return this.mSlots;
     }
 
-    BrotherContainer.prototype.getBrothers = function()
+    RosterContainer.prototype.getBrothers = function()
     {
         return this.mBrotherList;
     }
-    BrotherContainer.prototype.getBrotherByIndex = function (_index)
+    RosterContainer.prototype.getBrotherByIndex = function (_index)
     {
         if (_index < this.mBrotherList.length) return this.mBrotherList[_index];
         return null;
     };
-    BrotherContainer.prototype.isEmpty = function(_slotIndex)
+    RosterContainer.prototype.isEmpty = function(_slotIndex)
     {
         return (this.mBrotherList[_slotIndex] === null);
     };
@@ -81,7 +81,7 @@ BrotherContainer.prototype.loadFromData = function( _data )
 {   // Smart Getter
 
     // Returns a data object with 'Index' and 'Brother' object
-    BrotherContainer.prototype.getBrotherByID = function (_brotherId)
+    RosterContainer.prototype.getBrotherByID = function (_brotherId)
     {
         var data =
         {
@@ -112,7 +112,7 @@ BrotherContainer.prototype.loadFromData = function( _data )
     };
 
     // Returns the first empty slot
-    BrotherContainer.prototype.getIndexOfFirstEmptySlot = function()
+    RosterContainer.prototype.getIndexOfFirstEmptySlot = function()
     {
         for (var i = 0; i < this.mSlots.length; i++)
         {
@@ -125,7 +125,7 @@ BrotherContainer.prototype.loadFromData = function( _data )
     }
 
     // Returns the first empty slot
-    BrotherContainer.prototype.getFirstEmptySlot = function()
+    RosterContainer.prototype.getFirstEmptySlot = function()
     {
         for (var i = 0; i < this.mSlots.length; i++)
         {
@@ -140,14 +140,14 @@ BrotherContainer.prototype.loadFromData = function( _data )
 }
 
 {   // Little helper functions
-    BrotherContainer.prototype.updateCountLabel = function()
+    RosterContainer.prototype.updateCountLabel = function()
     {
         if (this.mRosterCountLabel === null) return;
 
         this.mRosterCountLabel.html('' + this.mBrotherCurrent + '/' + this.mBrotherMax);
     }
 
-    BrotherContainer.prototype.updateNameLabel = function()
+    RosterContainer.prototype.updateNameLabel = function()
     {
         if (this.mRosterNameLabel === null) return;
         var labelString = "";
@@ -159,7 +159,7 @@ BrotherContainer.prototype.loadFromData = function( _data )
         this.mRosterNameLabel.html(labelString);
     }
 
-    BrotherContainer.prototype.selectNext = function()
+    RosterContainer.prototype.selectNext = function()
     {
         if (this.mSelectedBrother < 0) return false;
         for (var i = this.mSelectedBrother + 1; i < this.mBrotherList.length; i++)
@@ -170,7 +170,7 @@ BrotherContainer.prototype.loadFromData = function( _data )
         return this.selectFirst();
     }
 
-    BrotherContainer.prototype.selectFirst = function()
+    RosterContainer.prototype.selectFirst = function()
     {
         for (var i = 0; i < this.mBrotherList.length; ++i)
         {
@@ -180,7 +180,7 @@ BrotherContainer.prototype.loadFromData = function( _data )
         return false;
     }
 
-    BrotherContainer.prototype.selectPrev = function()
+    RosterContainer.prototype.selectPrev = function()
     {
         if (this.mSelectedBrother < 0) return false;
         for (var i = this.mSelectedBrother - 1; i >= 0; i--)
@@ -191,7 +191,7 @@ BrotherContainer.prototype.loadFromData = function( _data )
         return this.selectLast();
     }
 
-    BrotherContainer.prototype.selectLast = function()
+    RosterContainer.prototype.selectLast = function()
     {
         for (var i = (this.mBrotherList.length - 1); i >= 0; i--)
         {
@@ -203,7 +203,7 @@ BrotherContainer.prototype.loadFromData = function( _data )
 }
 
 {   // Selection
-    BrotherContainer.prototype.deselectCurrent = function()
+    RosterContainer.prototype.deselectCurrent = function()
     {
         if (this.mSelectedBrother < 0) return;
         var slot = this.mSlots[this.mSelectedBrother];
@@ -212,7 +212,7 @@ BrotherContainer.prototype.loadFromData = function( _data )
         this.mSelectedBrother = -1;
     }
 
-    BrotherContainer.prototype.selectBrother = function (_brotherID)
+    RosterContainer.prototype.selectBrother = function (_brotherID)
     {
         if (this.mCanSelect === false) return false;
         for (var i = 0; i < this.mBrotherList.length; ++i)
@@ -227,13 +227,13 @@ BrotherContainer.prototype.loadFromData = function( _data )
         return false;
     };
 
-    BrotherContainer.prototype.hasSelected = function()     // Maybe make this function a bit smarter to detect/correct errors?
+    RosterContainer.prototype.hasSelected = function()     // Maybe make this function a bit smarter to detect/correct errors?
     {
         return (this.mSelectedBrother >= 0);
     }
 
     // SAFE - Selects the slot on the index
-    BrotherContainer.prototype.selectSlot = function(_slotIndex)    // todo add default value -1
+    RosterContainer.prototype.selectSlot = function(_slotIndex)    // todo add default value -1
     {
         // console.error("_slotIndex " + _slotIndex);
         if (this.mCanSelect === false) return false;
@@ -250,7 +250,7 @@ BrotherContainer.prototype.loadFromData = function( _data )
         return true;
     };
     // Returns the brother objects that is currently selected. Returns null if no one was selected or if the selection was invalid
-    BrotherContainer.prototype.getSelected = function()
+    RosterContainer.prototype.getSelected = function()
     {
         if (this.mSelectedBrother < 0) return null;         // Not brother was selected
         var selectedBrother = this.mBrotherList[this.mSelectedBrother];
@@ -262,7 +262,7 @@ BrotherContainer.prototype.loadFromData = function( _data )
 
 {   // DIV stuff
     // Create a new DIV object out of a brother object to assign to a slot
-    BrotherContainer.prototype.addBrotherSlotDIV = function(_brotherData, _index)
+    RosterContainer.prototype.addBrotherSlotDIV = function(_brotherData, _index)
     {
         // console.error(this.mSlots.length + " " + _index);
         var parentDiv = this.mSlots[_index];
@@ -317,7 +317,7 @@ BrotherContainer.prototype.loadFromData = function( _data )
         return result;
     }
 
-    BrotherContainer.prototype.updateBrotherDIV = function(_brotherData)
+    RosterContainer.prototype.updateBrotherDIV = function(_brotherData)
     {
         var brotherID = _brotherData[CharacterScreenIdentifier.Entity.Id];
         var brother = this.getBrotherByID(brotherID);
@@ -359,7 +359,7 @@ BrotherContainer.prototype.loadFromData = function( _data )
         }
     }
 
-    BrotherContainer.prototype.createBrotherSlots = function()
+    RosterContainer.prototype.createBrotherSlots = function()
     {
         this.mSlots = [];
         for (var i = 0 ; i < this.mSlotLimit; i++)
@@ -370,7 +370,6 @@ BrotherContainer.prototype.loadFromData = function( _data )
             this.mSlots[i].data('tag', this.mContainerID);
             this.mSlots[i].data('child', null);
         }
-        console.error("this.mSlots.length: " + this.mSlots.length);
         return this.mSlots;
     }
 
@@ -378,7 +377,7 @@ BrotherContainer.prototype.loadFromData = function( _data )
 
 {   // Moving Brothers around
     // Insert Slot and Brother data that are coming from another slot into a new slot
-    BrotherContainer.prototype.importBrother = function ( _slotIdx, _data )
+    RosterContainer.prototype.importBrother = function ( _slotIdx, _data )
     {
         if (this.mCanImport === false) return false;
         if (this.isEmpty(_slotIdx) === false) return false;
@@ -402,7 +401,7 @@ BrotherContainer.prototype.loadFromData = function( _data )
 
     // Removes the brother related div data from a slot and the brother data from the brother array
     // Returns an object with the removed slotData, playerData and a bool indicating whether this slot was highlighted
-    BrotherContainer.prototype.removeBrother = function ( _slotIdx )
+    RosterContainer.prototype.removeBrother = function ( _slotIdx )
     {
         if (this.mCanRemove === false) return null;
         if (this.isEmpty(_slotIdx)) return null;
@@ -426,7 +425,7 @@ BrotherContainer.prototype.loadFromData = function( _data )
     }
 
     // This is bring called from outside. The contents of two slots are being swapped
-    BrotherContainer.prototype.swapSlots = function ( _firstIdx, _secondIdx )
+    RosterContainer.prototype.swapSlots = function ( _firstIdx, _secondIdx )
     {
         if (this.mCanReposition === false) return false;
         if (_firstIdx === null || _secondIdx === null) return false;
@@ -441,7 +440,7 @@ BrotherContainer.prototype.loadFromData = function( _data )
     // Switch the positions of two brothers in this container
     // _sourceIdx is an unsigned integer
     // _targetIdx is an unsigned integer
-    BrotherContainer.prototype.swapBrothers = function ( _firstIdx, _secondIdx )
+    RosterContainer.prototype.swapBrothers = function ( _firstIdx, _secondIdx )
     {
         console.error("swapBrothers");
         var sourceSlot = this.mSlots[_firstIdx];
@@ -484,7 +483,7 @@ BrotherContainer.prototype.loadFromData = function( _data )
     // Removes a brother from one slot and move them to another slot within this container
     // _sourceIdx is an unsigned integer
     // _targetIdx is an unsigned integer
-    BrotherContainer.prototype.relocateBrother = function ( _sourceIdx, _targetIdx )
+    RosterContainer.prototype.relocateBrother = function ( _sourceIdx, _targetIdx )
     {
         console.error("relocateBrother");
         var sourceSlot = this.mSlots[_sourceIdx];

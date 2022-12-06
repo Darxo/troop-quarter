@@ -1,4 +1,4 @@
-var BrotherManager = function(_dataSource)
+var RosterManager = function(_dataSource)
 {
     this.mDataSource = null;
     this.mSQHandle        = null;
@@ -6,13 +6,13 @@ var BrotherManager = function(_dataSource)
     this.mBrotherContainer = [];        // Array of BrotherContainer
 }
 
-BrotherManager.prototype.addContainer = function( _container )
+RosterManager.prototype.addContainer = function( _container )
 {
     this.mBrotherContainer.push(_container);
     return _container;
 }
 
-BrotherManager.prototype.get = function( _containerID )
+RosterManager.prototype.get = function( _containerID )
 {
     for(var i = 0; i < this.mBrotherContainer.length; i++)
     {
@@ -23,7 +23,7 @@ BrotherManager.prototype.get = function( _containerID )
 
 // Returns the next container in line that comes after this one. Useful for quickMove features
 // Returns null is this ID doesn't exists or this is the only container in the manager
-BrotherManager.prototype.getNext = function( _containerID )
+RosterManager.prototype.getNext = function( _containerID )
 {
     if (this.mBrotherContainer.length === 1) return null;
     for(var i = 0; i < this.mBrotherContainer.length; i++)
@@ -46,7 +46,7 @@ BrotherManager.prototype.getNext = function( _containerID )
 
 // Returns the next container in line that comes after this one. Useful for quickMove features
 // Returns null is this ID doesn't exists or this is the only container in the manager
-BrotherManager.prototype.getNextForInsert = function( _containerID )
+RosterManager.prototype.getNextForInsert = function( _containerID )
 {
     if (this.mBrotherContainer.length === 1) return null;
 
@@ -72,7 +72,7 @@ BrotherManager.prototype.getNextForInsert = function( _containerID )
 }
 
 // When we don't know in which roster he is
-BrotherManager.prototype.getBrotherByID = function (_brotherID)
+RosterManager.prototype.getBrotherByID = function (_brotherID)
 {
     for(var i = 0; i < this.mBrotherContainer.length; i++)
     {
@@ -84,7 +84,7 @@ BrotherManager.prototype.getBrotherByID = function (_brotherID)
 
 // Returns the slot that is currently selected. This should usually have a brother inside
 // Returns null if no slot is selected
-BrotherManager.prototype.getSelected = function()
+RosterManager.prototype.getSelected = function()
 {
     for(var i = 0; i < this.mBrotherContainer.length; i++)
     {
@@ -103,7 +103,7 @@ BrotherManager.prototype.getSelected = function()
     return null;
 }
 
-BrotherManager.prototype.loadFromData = function( _data )
+RosterManager.prototype.loadFromData = function( _data )
 {
     for(var i = 0; i < this.mBrotherContainer.length; i++)
     {
@@ -118,7 +118,7 @@ BrotherManager.prototype.loadFromData = function( _data )
 }
 
 // create empty slots
-BrotherManager.prototype.createBrotherSlots = function ( _ownerID )
+RosterManager.prototype.createBrotherSlots = function ( _ownerID )
 {
     var self = this;
 
@@ -168,7 +168,7 @@ BrotherManager.prototype.createBrotherSlots = function ( _ownerID )
     }
 };
 
-BrotherManager.prototype.onBrothersListLoaded = function ( _ownerID )
+RosterManager.prototype.onBrothersListLoaded = function ( _ownerID )
 {
     var parent = this.get(_ownerID);
     for(var i = 0; i != parent.mSlots.length; ++i)
@@ -196,7 +196,7 @@ BrotherManager.prototype.onBrothersListLoaded = function ( _ownerID )
 };
 
 // add brother to empty slot
-BrotherManager.prototype.addBrotherSlotDIV = function(_parent, _data, _index)
+RosterManager.prototype.addBrotherSlotDIV = function(_parent, _data, _index)
 {
     var self = this;
 
@@ -271,13 +271,13 @@ BrotherManager.prototype.addBrotherSlotDIV = function(_parent, _data, _index)
     return result;
 };
 
-BrotherManager.prototype.notifyDataSourceSelection = function( _brotherID )
+RosterManager.prototype.notifyDataSourceSelection = function( _brotherID )
 {
     // if (this.mDataSource !== null)
     this.mDataSource.selectedBrotherById(_brotherID);
 }
 
-BrotherManager.prototype.setBrotherSelectedByID = function (_brotherID)
+RosterManager.prototype.setBrotherSelectedByID = function (_brotherID)
 {
     for(var i = 0; i < this.mBrotherContainer.length; i++)
     {
@@ -288,7 +288,7 @@ BrotherManager.prototype.setBrotherSelectedByID = function (_brotherID)
     }
 };
 
-BrotherManager.prototype.selectAnything = function()
+RosterManager.prototype.selectAnything = function()
 {
     for(var i = 0; i < this.mBrotherContainer.length; i++)
     {
@@ -304,7 +304,7 @@ BrotherManager.prototype.selectAnything = function()
     return false;
 }
 
-BrotherManager.prototype.switchToPreviousBrother = function()
+RosterManager.prototype.switchToPreviousBrother = function()
 {
     var currentSelection = this.getSelected();
     if (currentSelection === null) return;
@@ -316,7 +316,7 @@ BrotherManager.prototype.switchToPreviousBrother = function()
     }
 }
 
-BrotherManager.prototype.switchToNextBrother = function()
+RosterManager.prototype.switchToNextBrother = function()
 {
     var currentSelection = this.getSelected();
     if (currentSelection === null) return;
@@ -334,7 +334,7 @@ BrotherManager.prototype.switchToNextBrother = function()
 // _sourceIdx is an unsigned integer
 // _targetIdx is an unsigned integer
 // _sourceOwner, _targetOwner are BrotherContainer and not null
-BrotherManager.prototype.transferBrother = function ( _sourceIdx, _sourceOwnerID, _targetIdx, _targetOwnerID )
+RosterManager.prototype.transferBrother = function ( _sourceIdx, _sourceOwnerID, _targetIdx, _targetOwnerID )
 {
     var sourceOwner = this.get(_sourceOwnerID);
     var targetOwner = this.get(_targetOwnerID);
@@ -356,7 +356,7 @@ BrotherManager.prototype.transferBrother = function ( _sourceIdx, _sourceOwnerID
 }
 
 // Swap the contents of two slots no matter where they are or what their state is
-BrotherManager.prototype.swapSlots = function (_firstIdx, _tagA, _secondIdx, _tagB)
+RosterManager.prototype.swapSlots = function (_firstIdx, _tagA, _secondIdx, _tagB)
 {
     // console.error("_firstIdx " + _firstIdx + " _secondIdx " + _secondIdx);
     // console.error("_tagA " + _tagA + " _tagB " + _tagB);
@@ -405,7 +405,7 @@ BrotherManager.prototype.swapSlots = function (_firstIdx, _tagA, _secondIdx, _ta
 }
 
 // move brother to the other roster on right-click
-BrotherManager.prototype.quickMoveBrother = function (_clickedSlot)
+RosterManager.prototype.quickMoveBrother = function (_clickedSlot)
 {
     var _brother = _clickedSlot.data('brother');
 
@@ -432,19 +432,19 @@ BrotherManager.prototype.quickMoveBrother = function (_clickedSlot)
 };
 
 //- Call Squirrel backend function
-BrotherManager.prototype.notifyBackendRelocateBrother = function (_brotherID, _placeInFormation)
+RosterManager.prototype.notifyBackendRelocateBrother = function (_brotherID, _placeInFormation)
 {
     SQ.call(this.mSQHandle, 'onRelocateBrother', [ _brotherID, _placeInFormation ]);
 };
 
-BrotherManager.prototype.notifyBackendMoveAtoB = function (_id, _tagA, _pos, _tagB)
+RosterManager.prototype.notifyBackendMoveAtoB = function (_id, _tagA, _pos, _tagB)
 {
     SQ.call(this.mSQHandle, 'MoveAtoB', [ _id, _tagA, _pos, _tagB ]);
     this.mDataSource.setRosterLimit(this.get(_tagA).mBrotherMax);
 };
 
 
-BrotherManager.prototype.destroyDIV = function()
+RosterManager.prototype.destroyDIV = function()
 {
     for(var i = 0; i < this.mBrotherContainer.length; i++)
     {
@@ -456,11 +456,11 @@ BrotherManager.prototype.destroyDIV = function()
 
 // Generic Stuff
 
-BrotherManager.prototype.isConnected = function ()
+RosterManager.prototype.isConnected = function ()
 {
     return this.mSQHandle !== null;
 };
-BrotherManager.prototype.onConnection = function (_handle)
+RosterManager.prototype.onConnection = function (_handle)
 {
     this.mSQHandle = _handle;
 
@@ -471,7 +471,7 @@ BrotherManager.prototype.onConnection = function (_handle)
     }
 };
 
-BrotherManager.prototype.onDisconnection = function ()
+RosterManager.prototype.onDisconnection = function ()
 {
     this.mSQHandle = null;
 
@@ -482,7 +482,7 @@ BrotherManager.prototype.onDisconnection = function ()
     }
 };
 
-BrotherManager.prototype.registerEventListener = function(_listener)
+RosterManager.prototype.registerEventListener = function(_listener)
 {
     this.mEventListener = _listener;
 };
