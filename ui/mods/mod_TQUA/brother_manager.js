@@ -412,7 +412,7 @@ BrotherManager.prototype.quickMoveBrother = function (_clickedSlot)
     var sourceOwner = this.get(data.Tag);
     if (sourceOwner.mCanRemove === false) return false;
 
-    var targetOwner = this.getNextForInsert(sourceOwner.mContainerID);;
+    var targetOwner = this.getNextForInsert(sourceOwner.mContainerID);
 
     // Source roster is at minimum
     if (sourceOwner.mBrotherCurrent <= sourceOwner.mBrotherMin) return false;
@@ -421,7 +421,7 @@ BrotherManager.prototype.quickMoveBrother = function (_clickedSlot)
     if (targetOwner.mBrotherCurrent >= targetOwner.mBrotherMax) return false;
 
     // transfer brother from source roster to target roster
-    var firstEmptySlot = this.get(targetOwner.mContainerID).getIndexOfFirstEmptySlot();
+    var firstEmptySlot = targetOwner.getIndexOfFirstEmptySlot();
     this.swapSlots(data.Index, data.Tag, firstEmptySlot, targetOwner.mContainerID);
 
     return true;

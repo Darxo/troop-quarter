@@ -105,8 +105,6 @@ RosterManagerDatasource.prototype.init = function()
 
 RosterManagerDatasource.prototype.reset = function()
 {
-	// Caches
-	this.getBrothersList() = null;
 };
 
 RosterManagerDatasource.prototype.isInStashMode = function()
