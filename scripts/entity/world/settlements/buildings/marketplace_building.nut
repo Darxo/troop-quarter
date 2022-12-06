@@ -27,7 +27,7 @@ this.marketplace_building <- this.inherit("scripts/entity/world/settlements/buil
 
 	function onClicked( _townScreen )
 	{
-
+		::mod_TQUA.createGuests();
 		_townScreen.getTroopQuarterModule().m.TroopQuarter = this;
 		_townScreen.showQuarterDialog();
 		this.pushUIMenuStack();

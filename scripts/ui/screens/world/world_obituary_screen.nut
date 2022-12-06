@@ -1,4 +1,4 @@
-this.character_screen <- {
+this.world_obituary_screen <- {
 	m = {
 		JSHandle = null,
 		JSDataSourceHandle = null,
@@ -6,7 +6,11 @@ this.character_screen <- {
 		Visible = null,
 		PopupDialogVisible = null,
 		Animating = null,
+
+
 		OnCloseButtonClickedListener = null,
+
+
 		PlayerID = "Player",
 		QuarterID = "Quarter",
 
@@ -28,7 +32,7 @@ this.character_screen <- {
 		return this.m.InventoryMode;
 	}
 
-	function setOnCloseButtonClickedListener( _listener )
+	function setOnClosePressedListener( _listener )
 	{
 		this.m.OnCloseButtonClickedListener = _listener;
 	}
@@ -76,11 +80,34 @@ this.character_screen <- {
 		}
 
 		return {
+            Name = "Formation",
 			Roster = convertedRoster,
 			BrotherCount = formationCount,
 			BrotherMin = 1,
 			BrotherMax = 12,
 			SlotLimit = 18
+		}
+	}
+
+	function queryGuestInformation()
+	{
+		local convertedRoster = [];
+        convertedRoster.resize(27, null);
+
+		local reserveCount = 0;
+        foreach(guest in ::World.getGuestRoster().getAll())
+        {
+            local slot = guest.getPlaceInFormation();
+            convertedRoster.[slot] = this.UIDataHelper.convertEntityToUIData(guest, null);
+        }
+
+		return {
+            Name = "Guests",
+			Roster = convertedRoster,
+			BrotherCount = ::World.getGuestRoster().getSize(),
+			BrotherMin = 0,
+			BrotherMax = 18,
+			SlotLimit = 27
 		}
 	}
 
@@ -104,6 +131,7 @@ this.character_screen <- {
 		}
 
 		return {
+            Name = "Reserve",
 			Roster = convertedRoster,
 			BrotherCount = reserveCount,
 			BrotherMin = 0,
@@ -125,6 +153,7 @@ this.character_screen <- {
 		}
 
 		return {
+            Name = "Player Roster",
 			Roster = roster,
 			BrotherCount = ::World.getPlayerRoster().getSize(),
 			BrotherMin = this.m.MinPlayerRoster,
@@ -250,14 +279,11 @@ this.character_screen <- {
 	{
 		local result = {
 			Formation = this.queryPlayerFormationInformation(),
-			Reserve = this.queryPlayerReserveInformation()
+			Reserve = this.queryPlayerReserveInformation(),
+            Guests = this.queryGuestInformation()
 		};
 
 		return result;
-	}
-
-	function setStashMode()		// Is called from outside
-	{
 	}
 
 	function onQueryBrothersList()
@@ -273,26 +299,6 @@ this.character_screen <- {
 	function onUpdateRosterPosition( _data )
 	{
 		this.Tactical.getEntityByID(_data[0]).setPlaceInFormation(_data[1]);
-	}
-
-	function tactical_onQueryBrothersList()
-	{
-		local entities = this.Tactical.Entities.getInstancesOfFaction(this.Const.Faction.Player);
-
-		if (entities != null && entities.len() > 0)
-		{
-			local activeEntity = this.Tactical.TurnSequenceBar.getActiveEntity();
-			local result = [];
-
-			foreach( entity in entities )
-			{
-				result.push(this.UIDataHelper.convertEntityToUIData(entity, activeEntity));
-			}
-
-			return result;
-		}
-
-		return null;
 	}
 
 	function strategic_onQueryBrothersList()
@@ -551,17 +557,14 @@ this.character_screen <- {
 		};
 	}
 
-	// THis is getting called from outside. delete later
-	function resetInventoryFilter()
-	{
-	}
-
 	// Changes the place in formation of a single brother only within their roster
 	function onRelocateBrother( _data )	// [0] == brotherID, [1] = place in formation
 	{
+		local roster = this.World.Assets.getFormation();
 		local newPosition = _data[1];
-		foreach (i, bro in this.World.getPlayerRoster().getAll())
+		foreach (i, bro in roster)
 		{
+            if (bro == null) continue;
 		 	if (bro.getID() != _data[0]) continue;
 
 			if (i >= 18) newPosition += 18;
@@ -574,28 +577,19 @@ this.character_screen <- {
 	function MoveAtoB( _data )
 	{
 		this.onRelocateBrother([_data[0], _data[2]]);
-		/*
-		local isMovingToPlayerRoster = _data[3] == this.m.PlayerID;
-		local rosterA = this.getRoster(_data[1]);
-		local rosterB = this.getRoster(_data[3]);
 
-		foreach(i, bro in rosterA.getAll())
+		local newPosition = _data[2];
+        if (_data[3] == "Reserve") newPosition += 18;
+
+		local roster = this.World.Assets.getFormation();
+		foreach(i, bro in roster)
 		{
-			if (bro.getID() == _data[0])
-			{
-				rosterB.add(bro);
-				rosterA.remove(bro);
+            if (bro == null) continue;
+			if (bro.getID() != _data[0]) continue;
 
-				bro.setPlaceInFormation(_data[2]);
-				break;
-			}
+            bro.setPlaceInFormation(newPosition);
+            return;
 		}
-
-		local ret = {
-			Assets = {}
-		};
-		this.queryAssetsInformation(ret.Assets);
-		this.m.JSHandle.asyncCall("loadFromData", ret);*/
 	}
 
 };

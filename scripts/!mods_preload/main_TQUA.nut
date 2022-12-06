@@ -44,6 +44,37 @@
 
     ::mods_registerJS("mod_TQUA/roster_manager/character_screen_left_panel/character_screen_paperdoll_module.js");
 	::mods_registerJS("mod_TQUA/roster_manager/character_screen_left_panel/character_screen_left_panel_header_module.js");
+	// ::mods_registerJS("mod_TQUA/roster_manager/character_screen_left_panel/roster_manager_header_module.js");
+
+
+	::mod_TQUA.createGuests <- function()
+	{
+		if (::World.getGuestRoster().getSize == 0) return;
+		local militia = ::World.getGuestRoster().create("scripts/entity/tactical/humans/militia_guest");
+		militia.setFaction(1);
+		militia.setPlaceInFormation(19);
+		militia.assignRandomEquipment();
+
+		local militia = ::World.getGuestRoster().create("scripts/entity/tactical/humans/militia_guest_ranged");
+		militia.setFaction(1);
+		militia.setPlaceInFormation(20);
+		militia.assignRandomEquipment();
+
+		local militia = ::World.getGuestRoster().create("scripts/entity/tactical/humans/militia_guest");
+		militia.setFaction(1);
+		militia.setPlaceInFormation(21);
+		militia.assignRandomEquipment();
+
+		local militia = ::World.getGuestRoster().create("scripts/entity/tactical/humans/militia_guest_ranged");
+		militia.setFaction(1);
+		militia.setPlaceInFormation(22);
+		militia.assignRandomEquipment();
+
+		local militia = ::World.getGuestRoster().create("scripts/entity/tactical/humans/militia_guest");
+		militia.setFaction(1);
+		militia.setPlaceInFormation(23);
+		militia.assignRandomEquipment();
+	}
 
 
 });

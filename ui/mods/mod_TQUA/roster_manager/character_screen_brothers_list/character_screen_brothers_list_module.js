@@ -8,49 +8,123 @@ var RosterManagerBrothersListModule = function(_parent, _dataSource)
 
     // container
     this.mContainer                     = null;
-    this.mListContainer                 = null;
+
+    // header
+    this.mHeaderContainer   = null;
+    this.mCloseButton       = null;
+
+    // secondary container
+    this.mSecondaryContainer = null;
+
+    // primary container
+    this.mPrimaryContainer = null;
+
+
     this.mDataSource.getPlayerRoster().mListScrollContainer                 = null;
     this.mDataSource.mRosterManager.get(Owner.Reserve).mListScrollContainer = null;
 
-    this.mRosterCountLabel              = null;
-    this.mRosterCountContainer          = null;
+    this.mFormationCountLabel              = null;
+    this.mFormationCountContainer          = null;     // could be used for shake left right
 
-
+    this.mReserveCountLabel              = null;
+    this.mReserveCountContainer          = null;     // could be used for shake left right
 
     this.registerDatasourceListener();
 };
 
 RosterManagerBrothersListModule.prototype.createDIV = function (_parentDiv)
 {
-    var self = this;
-
     // create: containers
-    this.mContainer = $('<div class="brothers-list-module"/>');
+    this.mContainer = $('<div class="roster-manager right-panel"/>');
     _parentDiv.append(this.mContainer);
 
-    var listContainerLayout = $('<div class="l-list-container"/>');
-    this.mContainer.append(listContainerLayout);
-    this.mDataSource.getPlayerRoster().mListScrollContainer = listContainerLayout;
+    this.mHeaderContainer = $('<div class="header-module"/>');
+    this.mContainer.append(this.mHeaderContainer);
 
-    this.mRosterCountContainer = $('<div class="roster-count-container"/>');
-    this.mContainer.append(this.mRosterCountContainer);
-    var rosterSizeImage = $('<img/>');
-    rosterSizeImage.attr('src', Path.GFX + Asset.ICON_ASSET_BROTHERS); // ICON_DAMAGE_DEALT
-    this.mRosterCountContainer.append(rosterSizeImage);
-    this.mRosterCountLabel = $('<div class="label text-font-small font-bold font-color-value"/>');
-    this.mRosterCountContainer.append(this.mRosterCountLabel);
-    this.mRosterCountContainer.bindTooltip({ contentType: 'ui-element', elementId: TooltipIdentifier.Stash.ActiveRoster });
+        var rightButtonContainer = $('<div class="buttons-container is-right"/>');
+        this.mHeaderContainer.append(rightButtonContainer);
 
+        var layout = $('<div class="l-button is-close"/>');
+        rightButtonContainer.append(layout);
+        var self = this;
+        this.mCloseButton = layout.createImageButton(Path.GFX + Asset.BUTTON_QUIT, function ()
+        {
+            self.mDataSource.notifyBackendCloseButtonClicked();
+        }, '', 6);
 
-    var listContainerLayoutTWo = $('<div class="l-list-container"/>');
-    this.mContainer.append(listContainerLayoutTWo);
-    this.mDataSource.mRosterManager.get(Owner.Reserve).mListScrollContainer = listContainerLayoutTWo;
+    // Secondary (Top) Container
+    this.mSecondaryContainer = $('<div class="secondary-container"/>');
+    this.mContainer.append(this.mSecondaryContainer);
 
+        var rosterContainer = $('<div class="roster-container"/>');
+        this.mSecondaryContainer.append(rosterContainer);
+
+            var headerBar = $('<div class="header-bar"/>');
+            rosterContainer.append(headerBar);
+
+                var mNameContainer = $('<div class="name-container"/>');
+                headerBar.append(mNameContainer);
+
+                    var nameLabel = $('<div class="label title-font-big font-bold font-color-brother-name"/>');
+                    mNameContainer.append(nameLabel);
+                    this.mDataSource.mRosterManager.get(Owner.Reserve).attachNameLabel(nameLabel);
+
+                this.mReserveCountContainer = $('<div class="roster-count-container"/>');
+                headerBar.append(this.mReserveCountContainer);
+                var rosterSizeImage = $('<img/>');
+                rosterSizeImage.attr('src', Path.GFX + Asset.ICON_ASSET_BROTHERS); // ICON_DAMAGE_DEALT
+                this.mReserveCountContainer.append(rosterSizeImage);
+                this.mReserveCountLabel = $('<div class="label text-font-small font-bold font-color-value"/>');
+                this.mReserveCountContainer.append(this.mReserveCountLabel);
+                this.mReserveCountContainer.bindTooltip({ contentType: 'ui-element', elementId: TooltipIdentifier.Stash.ActiveRoster });
+
+            var listContainerLayoutTwo = $('<div class="l-list-container"/>');
+            rosterContainer.append(listContainerLayoutTwo);
+            this.mDataSource.mRosterManager.get(Owner.Reserve).mListScrollContainer = listContainerLayoutTwo;
+            this.mDataSource.mRosterManager.get(Owner.Reserve).attachCountLabel(this.mReserveCountLabel);
+
+    // Primary /Bottom) Container
+    this.mPrimaryContainer = $('<div class="primary-container"/>');
+    this.mContainer.append(this.mPrimaryContainer);
+
+        var rosterContainer = $('<div class="roster-container"/>');
+        this.mPrimaryContainer.append(rosterContainer);
+
+            var headerBar = $('<div class="header-bar"/>');
+            rosterContainer.append(headerBar);
+
+                var mNameContainer = $('<div class="name-container"/>');
+                headerBar.append(mNameContainer);
+
+                    var nameLabel = $('<div class="label title-font-big font-bold font-color-brother-name"/>');
+                    mNameContainer.append(nameLabel);
+                    this.mDataSource.mRosterManager.get(Owner.Formation).attachNameLabel(nameLabel);
+
+                this.mFormationCountContainer = $('<div class="roster-count-container"/>');
+                headerBar.append(this.mFormationCountContainer);
+                var rosterSizeImage = $('<img/>');
+                rosterSizeImage.attr('src', Path.GFX + Asset.ICON_ASSET_BROTHERS); // ICON_DAMAGE_DEALT
+                this.mFormationCountContainer.append(rosterSizeImage);
+                this.mFormationCountLabel = $('<div class="label text-font-small font-bold font-color-value"/>');
+                this.mFormationCountContainer.append(this.mFormationCountLabel);
+                this.mFormationCountContainer.bindTooltip({ contentType: 'ui-element', elementId: TooltipIdentifier.Stash.ActiveRoster });
+
+            var listContainerLayout = $('<div class="l-list-container"/>');
+            rosterContainer.append(listContainerLayout);
+            this.mDataSource.mRosterManager.get(Owner.Formation).mListScrollContainer = listContainerLayout;
+            this.mDataSource.mRosterManager.get(Owner.Formation).attachCountLabel(this.mFormationCountLabel);
 };
 
 RosterManagerBrothersListModule.prototype.destroyDIV = function ()
 {
     this.mDataSource.mRosterManager.destroyDIV();
+
+    this.mCloseButton.remove();
+    this.mCloseButton = null;
+
+    this.mHeaderContainer.empty();
+    this.mHeaderContainer.remove();
+    this.mHeaderContainer = null;
 
     // this.mSlots = null;      // dont forget this!
 
@@ -58,12 +132,6 @@ RosterManagerBrothersListModule.prototype.destroyDIV = function ()
     this.mContainer.remove();
     this.mContainer = null;
 };
-
-RosterManagerBrothersListModule.prototype.updateRosterLabel = function ()
-{
-    this.mRosterCountLabel.html('' + this.mDataSource.getPlayerRoster().mBrotherCurrent + '/' + this.mDataSource.getPlayerRoster().mBrotherMax);
-};
-
 
 RosterManagerBrothersListModule.prototype.bindTooltips = function ()
 {
@@ -244,7 +312,7 @@ RosterManagerBrothersListModule.prototype.updateBrotherSlotLocks = function(_inv
 
 RosterManagerBrothersListModule.prototype.onBrothersSettingsChanged = function (_dataSource, _brothers)
 {
-    this.updateRosterLabel();
+
 };
 
 RosterManagerBrothersListModule.prototype.onBrotherSelected = function (_dataSource, _brothers)
@@ -254,38 +322,6 @@ RosterManagerBrothersListModule.prototype.onBrotherSelected = function (_dataSou
 
 RosterManagerBrothersListModule.prototype.onBrothersListLoaded = function (_dataSource, _brothers)
 {
-	// this.clearBrothersList();
-
-    // this.mDataSource.mRosterManager.createBrotherSlots(Owner.Formation);
-    // this.mDataSource.mRosterManager.onBrothersListLoaded(Owner.Formation);
-
-
-	/*if (!allowReordering)
-	{
-	    this.mDataSource.getPlayerRoster().mListScrollContainer.find('.is-brother-slot').each(function (index, element)
-	    {
-	        var slot = $(element);
-
-	        if (slot.data('child') == null)
-	        {
-	            slot.removeClass('display-block');
-	            slot.addClass('display-none');
-	        }
-	        else
-	        {
-	            slot.addClass('is-blocked-slot');
-	        }
-	    });
-	}
-	else*/
-	/*{
-	    this.updateBlockedSlots();
-	}
-
-	var inventoryMode  = _dataSource.getInventoryMode();
-	this.updateBrotherSlotLocks(inventoryMode);*/
-
-	this.updateRosterLabel();
 };
 
 RosterManagerBrothersListModule.prototype.onBrotherUpdated = function (_dataSource, _brother)

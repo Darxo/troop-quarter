@@ -19,6 +19,8 @@ var BrotherContainer = function( _containerID )
     this.mSelectedBrother = -1;   // Index of the currently selected brother; negative = none
 
     // Config
+    this.mRosterCountLabel = null;  // If this is not null it will be updated
+    this.mRosterNameLabel = null;  // If this is not null it will be updated
     this.IsMoodVisible = true;
     this.mCanSelect = true;
     this.mCanRemove = true;
@@ -28,23 +30,107 @@ var BrotherContainer = function( _containerID )
     this.mSlotClasses = '<div class="ui-control is-brother-slot is-roster-slot"/>';     // Classes that are assigned to slot DIVs of this container
 }
 
-BrotherContainer.prototype.getSlots = function()
-{
-    return this.mSlots;
+{   // Getter and Setter
+    BrotherContainer.prototype.attachCountLabel = function( _countLabel )
+    {
+        this.mRosterCountLabel = _countLabel;
+    }
+
+    BrotherContainer.prototype.attachNameLabel = function( _nameLabel )
+    {
+        this.mRosterNameLabel = _nameLabel;
+    }
+
+    BrotherContainer.prototype.getSlots = function()
+    {
+        return this.mSlots;
+    }
+
+    BrotherContainer.prototype.getBrothers = function()
+    {
+        return this.mBrotherList;
+    }
 }
 
-BrotherContainer.prototype.getBrothers = function()
-{
-    return this.mBrotherList;
+{   // Little helper functions
+    BrotherContainer.prototype.updateCountLabel = function()
+    {
+        if (this.mRosterCountLabel === null)
+        {
+            this.mRosterCountLabel.html('');
+        }
+        else
+        {
+            this.mRosterCountLabel.html('' + this.mBrotherCurrent + '/' + this.mBrotherMax);
+        }
+    }
+
+    BrotherContainer.prototype.updateNameLabel = function()
+    {
+        if (this.mRosterNameLabel === null)
+        {
+            this.mRosterNameLabel.html('');
+        }
+        else
+        {
+            this.mRosterNameLabel.html(this.mName);
+        }
+    }
+
+    BrotherContainer.prototype.selectNext = function()
+    {
+        if (this.mSelectedBrother < 0) return false;
+        for (var i = this.mSelectedBrother + 1; i < this.mBrotherList.length; i++)
+        {
+            if (this.mBrotherList[i] === null) continue;
+            return this.selectSlot(i);
+        }
+        return this.selectFirst();
+    }
+
+    BrotherContainer.prototype.selectFirst = function()
+    {
+        for (var i = 0; i < this.mBrotherList.length; ++i)
+        {
+            if (this.mBrotherList[i] === null) continue;
+            return this.selectSlot(i);
+        }
+        return false;
+    }
+
+    BrotherContainer.prototype.selectPrev = function()
+    {
+        if (this.mSelectedBrother < 0) return false;
+        for (var i = this.mSelectedBrother - 1; i >= 0; i--)
+        {
+            if (this.mBrotherList[i] === null) continue;
+            return this.selectSlot(i);
+        }
+        return this.selectLast();
+    }
+
+    BrotherContainer.prototype.selectLast = function()
+    {
+        for (var i = (this.mBrotherList.length - 1); i >= 0; i--)
+        {
+            if (this.mBrotherList[i] === null) continue;
+            return this.selectSlot(i);
+        }
+    }
+
 }
+
+
 
 BrotherContainer.prototype.loadFromData = function( _data )
 {
     if ('Name' in _data && _data.Name !== null) this.mName = _data.Name;
+    this.updateNameLabel();
     if ('Roster' in _data && _data.Roster !== null) this.mBrotherList = _data.Roster;
     if ('BrotherMin' in _data && _data.BrotherMin !== null) this.mBrotherMin = _data.BrotherMin;
     if ('BrotherMax' in _data && _data.BrotherMax !== null) this.mBrotherMax = _data.BrotherMax;
-    if ('SlotLimit' in _data && _data.SlotLimit !== null)   this.mSlotLimit = _data.SlotLimit
+    if ('SlotLimit' in _data && _data.SlotLimit !== null)   this.mSlotLimit = _data.SlotLimit;
+    this.updateCountLabel();
 }
 
 BrotherContainer.prototype.deselectCurrent = function()
@@ -70,47 +156,6 @@ BrotherContainer.prototype.selectBrother = function (_brotherID)
     }
     return false;
 };
-
-BrotherContainer.prototype.selectNext = function()
-{
-    if (this.mSelectedBrother < 0) return false;
-    for (var i = this.mSelectedBrother + 1; i < this.mBrotherList.length; i++)
-    {
-        if (this.mBrotherList[i] === null) continue;
-        return this.selectSlot(i);
-    }
-    return this.selectFirst();
-}
-
-BrotherContainer.prototype.selectFirst = function()
-{
-    for (var i = 0; i < this.mBrotherList.length; ++i)
-    {
-        if (this.mBrotherList[i] === null) continue;
-        return this.selectSlot(i);
-    }
-    return false;
-}
-
-BrotherContainer.prototype.selectPrev = function()
-{
-    if (this.mSelectedBrother < 0) return false;
-    for (var i = this.mSelectedBrother - 1; i >= 0; i--)
-    {
-        if (this.mBrotherList[i] === null) continue;
-        return this.selectSlot(i);
-    }
-    return this.selectLast();
-}
-
-BrotherContainer.prototype.selectLast = function()
-{
-    for (var i = (this.mBrotherList.length - 1); i >= 0; i--)
-    {
-        if (this.mBrotherList[i] === null) continue;
-        return this.selectSlot(i);
-    }
-}
 
 BrotherContainer.prototype.hasSelected = function()     // Maybe make this function a bit smarter to detect/correct errors?
 {
@@ -201,6 +246,7 @@ BrotherContainer.prototype.addBrotherSlotDIV = function(_brotherData, _index)
     result.bindTooltip({ contentType: 'ui-element', entityId: brotherID, elementId: 'pokebro.roster' });
     parentDiv.data('child', result);
     this.mBrotherCurrent++;
+    this.updateCountLabel();
 
     // Temporary
     // result.attr('id', 'slot-index_' + _brotherData[CharacterScreenIdentifier.Entity.Id]);
@@ -412,6 +458,7 @@ BrotherContainer.prototype.importBrother = function ( _slotIdx, _data )
     this.mBrotherList[_slotIdx] = _data.BrotherData;     // Insert the Brother Data
 
     this.mBrotherCurrent++;
+    this.updateCountLabel();
     if (_data.IsSelected === true) this.selectSlot(_slotIdx);
 
     return true;
@@ -436,6 +483,7 @@ BrotherContainer.prototype.removeBrother = function ( _slotIdx )
     this.mBrotherList[_slotIdx] = null;         // Make the list entry null
 
     this.mBrotherCurrent--;
+    this.updateCountLabel();
     if (data.IsSelected) this.deselectCurrent();
 
     return data;
