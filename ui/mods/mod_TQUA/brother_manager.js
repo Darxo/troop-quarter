@@ -44,6 +44,33 @@ BrotherManager.prototype.getNext = function( _containerID )
     return null;
 }
 
+// Returns the next container in line that comes after this one. Useful for quickMove features
+// Returns null is this ID doesn't exists or this is the only container in the manager
+BrotherManager.prototype.getNextForInsert = function( _containerID )
+{
+    if (this.mBrotherContainer.length === 1) return null;
+
+    var beforeIndex = null; // if we went full circle we need to return one of the elements before the source
+    var afterIndex = null;
+    var sourceFound = false;
+    for(var i = 0; i < this.mBrotherContainer.length; i++)
+    {
+        if (beforeIndex === null && this.mBrotherContainer[i].mCanInsert === true) beforeIndex = i;
+        if (this.mBrotherContainer[i].mContainerID === _containerID)
+        {
+            sourceFound = true;
+            continue;
+        }
+        if (sourceFound === false) continue;
+
+        if (this.mBrotherContainer[i].mCanInsert === false) continue;
+        var afterIndex = i;
+        break;
+    }
+    if (afterIndex === null) return this.mBrotherContainer[beforeIndex];
+    return this.mBrotherContainer[afterIndex];
+}
+
 // When we don't know in which roster he is
 BrotherManager.prototype.getBrotherByID = function (_brotherID)
 {
@@ -383,9 +410,9 @@ BrotherManager.prototype.quickMoveBrother = function (_clickedSlot)
     if (data.Index === null || data.Tag === null) return false;
 
     var sourceOwner = this.get(data.Tag);
-    var targetOwner = this.getNext(data.Tag);
+    if (sourceOwner.mCanRemove === false) return false;
 
-    if (targetOwner === null) return;   // This happens when there are no or only one container in total
+    var targetOwner = this.getNextForInsert(sourceOwner.mContainerID);;
 
     // Source roster is at minimum
     if (sourceOwner.mBrotherCurrent <= sourceOwner.mBrotherMin) return false;
