@@ -6,16 +6,13 @@
 	width: 100%;
 	height: 100%;
 	position: static;
-    /* works */
 }
 
 /* HEADER */
 .character-screen-container .right-panel .header-module
 {
-	height: 3.5rem;
+	height: 4.3rem;
 	position: relative; /* I wish I could put static here. But otherwise the child elements dont know what 100% height means*/
-    outline: 2px solid rgb(205, 160, 226);
-    /* works */
 }
 
     .character-screen-container .right-panel .header-module .buttons-container
@@ -39,26 +36,21 @@
 .character-screen-container .right-panel .secondary-container
 {
 	width: 100%;
-	height: 45.3rem;
+	height: 44.5rem;
 	position: relative;
-    outline: 2px solid green;
-/* 	overflow: hidden;
- */}
+	overflow: hidden;
+}
 
 /* PRIMARY - BOTTOM */
 .character-screen-container .right-panel .primary-container
 {
-    /*top: auto;*/
 	width: 100%;
 	height: 29.3rem;
 	position: relative;
-    outline: 2px solid rgb(205, 160, 226);
 }
 
 .character-screen-container .right-panel .roster-container
 {
-    /* works */
-    outline: 5px solid rgb(243, 128, 74);
     height: auto;
 	width: 100%;
 
@@ -68,7 +60,6 @@
 
     .character-screen-container .roster-container .l-list-container
     {
-        outline: 4px solid rgb(46, 105, 182);
         position: relative;
         width: 100%;
         display: inline-block;
@@ -87,11 +78,10 @@
 
         .character-screen-container .right-panel .name-container
         {
-            top: 0;
-            left: 0.2rem;
-            height: 100%;
+            top: 20%;
+            left: 0.5rem;
+            height: 80%;
             position: absolute;
-            outline: 3px solid red;
         }
 
         .character-screen-container .roster-container .roster-count-container
@@ -100,12 +90,10 @@
             width: 10.0rem;
             height: 100%;
             position: absolute;
-            outline: 3px solid red;
         }
 
             .character-screen-container .roster-container .roster-count-container img
             {
-                outline: 1px solid rgb(122, 20, 63);
                 width: auto;
                 top: 10%;
                 height: 80%;
