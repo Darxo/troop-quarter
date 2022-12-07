@@ -27,6 +27,7 @@ var RosterContainer = function( _containerID )
     // Config
     this.mDeadZoneElement = null;      // Anything above this element is considered a deadZone for DropHandle
 
+    this.mIsCollapsed = false;
     this.mMoodVisible = true;      // Show the Mood Symbol on the character?
     this.mInjuriesVisible = true;   // List all injuries on top of the character?
     this.mLostHPVisible = true;     // Draw Icon that indicates character is not at full HP?
@@ -38,15 +39,26 @@ var RosterContainer = function( _containerID )
     this.mSlotClasses = '<div class="ui-control is-brother-slot is-roster-slot"/>';     // Classes that are assigned to slot DIVs of this container
 }
 
-RosterContainer.prototype.loadFromData = function( _data )
+RosterContainer.prototype.loadFromData = function( _rosterData )
 {
-    if ('Name' in _data && _data.Name !== null) this.mName = _data.Name;
+    var entries = Object.keys(_rosterData);
+    for(var i = 0; i < entries.length; i++)
+    {
+        if (entries[i] in this)
+        {
+            this[entries[i]] = _rosterData[entries[i]];
+            console.error("loading variable "+ entries[i] + " to value " + _rosterData[entries[i]]);
+        }
+    }
     this.updateNameLabel();
+    this.updateCountLabel();
+    return null;
+
+    if ('Name' in _data && _data.Name !== null) this.mName = _data.Name;
     if ('Roster' in _data && _data.Roster !== null) this.mBrotherList = _data.Roster;
     if ('BrotherMin' in _data && _data.BrotherMin !== null) this.mBrotherMin = _data.BrotherMin;
     if ('BrotherMax' in _data && _data.BrotherMax !== null) this.mBrotherMax = _data.BrotherMax;
     if ('SlotLimit' in _data && _data.SlotLimit !== null)   this.mSlotLimit = _data.SlotLimit;
-    this.updateCountLabel();
 }
 
 {   // Basic Getter and Setter
@@ -76,14 +88,25 @@ RosterContainer.prototype.loadFromData = function( _data )
     };
     RosterContainer.prototype.isEmpty = function(_slotIndex)
     {
-        console.error(this.mContainerID + " " + this.mSlotLimit + " " + this.mBrotherCurrent);
-        console.error("isEmpty of mBrotherList[" + _slotIndex + "] is " + this.mBrotherList[_slotIndex]);
+        // console.error(this.mContainerID + " " + this.mSlotLimit + " " + this.mBrotherCurrent);
+        // console.error("isEmpty of mBrotherList[" + _slotIndex + "] is " + this.mBrotherList[_slotIndex]);
         if (this.mBrotherList[_slotIndex] === undefined)
         {
             console.error("mBrotherList[" + _slotIndex + "] is undefined! The arraysize is " + this.mBrotherList.length);
         }
         return (this.mBrotherList[_slotIndex] === null);
     };
+
+    RosterContainer.prototype.setCollapsed = function( _collapsed )
+    {
+        this.mIsCollapsed = _collapsed;
+        this.setSlotVisibility(!this.mIsCollapsed);
+    }
+
+    RosterContainer.prototype.toggleCollapse = function()
+    {
+        this.setCollapsed(!this.mIsCollapsed);
+    }
 }
 
 {   // Smart Getter and Isser
@@ -138,6 +161,26 @@ RosterContainer.prototype.loadFromData = function( _data )
         if (_offsetY < this.mDeadZoneElement.offset().top) return true;
         return false;
     }
+
+    RosterContainer.prototype.setSlotVisibility = function( _isVisible )
+    {
+        if (_isVisible === true) return this.showElement(this.mListContainer);
+        if (_isVisible === false) return this.hideElement(this.mListContainer);
+    }
+
+    RosterContainer.prototype.hideElement = function(_element)
+    {
+        _element.css('position', 'absolute');
+        _element.css('top', '-3000');
+        _element.css('pointer-events', 'none');
+    },
+
+    RosterContainer.prototype.showElement = function(_element)
+    {
+        _element.css('position', 'relative');
+        _element.css('top', '0');
+        _element.css('pointer-events', 'auto');
+    }
 }
 
 {   // Little helper functions
@@ -156,8 +199,11 @@ RosterContainer.prototype.loadFromData = function( _data )
         this.mRosterNameLabel.html(labelString);
         if (this.mName === null) return;
         if (this.mType === null) return;
-        labelString += " (" + this.mType + ")";
+        labelString = '<span class="label text-font-medium font-color-label">' + labelString + '</span>';
+        // labelString += " (" + this.mType + ")";
         this.mRosterNameLabel.html(labelString);
+
+
     }
 
     RosterContainer.prototype.selectNext = function()

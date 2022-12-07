@@ -11,18 +11,12 @@ var RosterManagerDatasource = function()
 	// Caches
     this.mRosterManager = new RosterManager();
     this.mRosterManager.addContainer(new RosterContainer(Owner.Formation));
-    this.mRosterManager.addContainer(new RosterContainer(Owner.Reserve)).mSlotClasses = '<div class="ui-control is-brother-slot is-reserve-slot"/>';
-    var guests = this.mRosterManager.addContainer(new RosterContainer(Owner.Guests));
-    guests.mCanRemove = false;
-    guests.mCanImport = false;
-    guests.mMoodVisible = false;
-    var caravan = this.mRosterManager.addContainer(new RosterContainer(Owner.Caravan));
-    caravan.mCanRemove = false;
-    caravan.mCanImport = false;
+    this.mRosterManager.addContainer(new RosterContainer(Owner.Reserve));
+    this.mRosterManager.addContainer(new RosterContainer(Owner.Guests));
+    this.mRosterManager.addContainer(new RosterContainer(Owner.Caravan));
 
     this.mIsPopupOpen = false;
 
-	// init the datasource
 	this.init();
 };
 
@@ -145,7 +139,18 @@ RosterManagerDatasource.prototype.loadFromData = function(_data)
         return;
     }
 
-    this.mRosterManager.loadFromData(_data);
+/*     if ('RostersData' in _data && _data.RostersData !== null)
+    {
+        var entries = Object.keys(_data.RostersData);
+        for(var i = 0; i < entries.length; i++)
+        {
+            console.error(entries[i])
+            this.mRosterManager.addContainer(new RosterContainer(entries[i]))
+        }
+ */
+        this.mRosterManager.loadFromData(_data.RostersData);
+    //}
+
     this.mRosterManager.selectAnything();
     this.loadBrothersList();
 };

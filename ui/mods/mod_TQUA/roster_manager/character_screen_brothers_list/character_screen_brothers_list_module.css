@@ -55,7 +55,7 @@
 	width: 100%;
 
     position: relative;
-    display: inline-block
+    display: inline-block;
 }
 
     .character-screen-container .roster-container .l-list-container
@@ -78,9 +78,10 @@
 
         .character-screen-container .right-panel .name-container
         {
-            top: 20%;
-            left: 0.5rem;
-            height: 80%;
+            top: 0;
+            left: 30%;
+            width: 50%;
+            height: 100%;
             position: absolute;
         }
 

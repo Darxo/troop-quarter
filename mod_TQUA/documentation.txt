@@ -19,22 +19,22 @@ Examples:
 
 ### Known Issues: ###
 
-- Use this as an unsorted list of all the major or minor problems/issues that this mod has
-- This can be everything from bugs, crashes and exploits to missing content or realism issues
-- This list will help users of your mod to quickly find out whether a issue they encountered with your mod is already known to you
+- If two BrotherSlots are on top of each other then only one of them receives the click event (e.g. when scroll list is so big that lower part clips out of the window)
 
 ### Compatibility ###
 
-- Are there versions of the vanilla game that this mod is not compatible with?
-- Is this mod save to add/remove from running games?
-- Are there known problems with other mods?
+
 Examples:
 - Should be safe to remove from- and add to running games and should not corrupt anything upon removal
 - Should be safe to remove from- and add to any existing savegames
 
 ### Future Plans: ###
 
+- Combine with Troop Quarter Building
+- Combine with Caravans from missions and other types of escorts
+- Better UI
 - Better implementation of Guests and Allies concept
+- System for converting not-yet-player-like entities inti player-like for the purpose of displaying them/their stats That means generating equipment for them
 
 ### Changes: ###
 

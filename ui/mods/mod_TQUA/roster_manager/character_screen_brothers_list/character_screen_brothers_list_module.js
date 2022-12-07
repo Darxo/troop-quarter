@@ -52,7 +52,7 @@ RosterManagerBrothersListModule.prototype.createDIV = function (_parentDiv)
 
     this.createRosterDIV(secondaryContainer.findListScrollContainer(), Owner.Reserve);
     this.createRosterDIV(secondaryContainer.findListScrollContainer(), Owner.Guests);
-    // this.createRosterDIV(secondaryContainer.findListScrollContainer(), Owner.Caravan);
+    this.createRosterDIV(secondaryContainer.findListScrollContainer(), Owner.Caravan);
 
     // Primary (Bottom) Container
     var primaryContainer = $('<div class="primary-container"/>');
@@ -74,11 +74,28 @@ RosterManagerBrothersListModule.prototype.createRosterDIV = function (_parentDiv
 
             var mNameContainer = $('<div class="name-container"/>');
             headerBar.append(mNameContainer);
-
+                var entry = $('<div class="ui-control list-entry list-entry-small"/>');
+                // entry.data('resolution', _index);
+                entry.click(this, function (_event)
+                {
+                    var self = _event.data;
+                    self.mDataSource.mRosterManager.get(_rosterID).toggleCollapse();
+                });
+                mNameContainer.append(entry);
+                this.mDataSource.mRosterManager.get(_rosterID).attachNameLabel(entry);
+/*
                 var nameLabel = $('<div class="label title-font-big font-bold font-color-brother-name"/>');
                 mNameContainer.append(nameLabel);
                 this.mDataSource.mRosterManager.get(_rosterID).attachNameLabel(nameLabel);
+*/
 
+
+
+/*
+                var nameLabel = $('<div class="label title-font-big font-bold font-color-brother-name"/>');
+                mNameContainer.append(nameLabel);
+                this.mDataSource.mRosterManager.get(_rosterID).attachNameLabel(nameLabel);
+*/
             var countContainer = $('<div class="roster-count-container"/>');
             headerBar.append(countContainer);
 
@@ -94,6 +111,8 @@ RosterManagerBrothersListModule.prototype.createRosterDIV = function (_parentDiv
         var listContainerLayout = $('<div class="l-list-container"/>');
         rosterContainer.append(listContainerLayout);
         this.mDataSource.mRosterManager.get(_rosterID).mListContainer = listContainerLayout;
+
+
 };
 
 

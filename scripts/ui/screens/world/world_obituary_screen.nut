@@ -84,13 +84,12 @@ this.world_obituary_screen <- {
 		}
 
 		return {
-            Name = "Formation",
-            Type = "Player",
-			Roster = convertedRoster,
-			BrotherCount = formationCount,
-			BrotherMin = 1,
-			BrotherMax = 12,
-			SlotLimit = 18
+            mName = "Formation",
+            mType = "Player",
+			mBrotherList = convertedRoster,
+			mBrotherMin = 1,
+			mBrotherMax = 12,
+			mSlotLimit = 18
 		}
 	}
 
@@ -107,13 +106,15 @@ this.world_obituary_screen <- {
         }
 
 		return {
-            Name = "Militia",
-            Type = "Guests",
-			Roster = convertedRoster,
-			BrotherCount = ::World.getGuestRoster().getSize(),
-			BrotherMin = 0,
-			BrotherMax = 18,
-			SlotLimit = 27
+            mName = "Militia",
+            mType = "Guests",
+			mBrotherList = convertedRoster,
+			mBrotherMin = 0,
+			mBrotherMax = 18,
+			mSlotLimit = 27,
+            mCanRemove = false,
+            mCanImport = false,
+            mMoodVisible = false
 		}
 	}
 
@@ -138,13 +139,15 @@ this.world_obituary_screen <- {
 		}*/
 
 		return {
-            Name = "Caravan",
-            Type = "Escort",
-			Roster = convertedRoster.resize(27, null),
-			BrotherCount = 0,
-			BrotherMin = 0,
-			BrotherMax = 17,
-			SlotLimit = 27
+            mName = "Caravan",
+            mType = "Escort",
+			mBrotherList = convertedRoster.resize(27, null),
+			mBrotherMin = 0,
+			mBrotherMax = 17,
+			mSlotLimit = 27,
+            mCanRemove = false,
+            mCanImport = false,
+            mMoodVisible = false
 		}
 	}
 
@@ -168,13 +171,13 @@ this.world_obituary_screen <- {
 		}
 
 		return {
-            Name = "Reserve",
-            Type = "Player",
-			Roster = convertedRoster,
-			BrotherCount = reserveCount,
-			BrotherMin = 0,
-			BrotherMax = 5,
-			SlotLimit = 9
+            mName = "Reserve",
+            mType = "Player",
+			mBrotherList = convertedRoster,
+			mBrotherMin = 0,
+			mBrotherMax = 5,
+			mSlotLimit = 9,
+            mSlotClasses = "<div class=\"ui-control is-brother-slot is-reserve-slot\"/>"
 		}
 	}
 
@@ -301,10 +304,12 @@ this.world_obituary_screen <- {
 	function queryData()
 	{
 		local result = {
-			Formation = this.queryPlayerFormationInformation(),
-			Reserve = this.queryPlayerReserveInformation(),
-            Guests = this.queryGuestInformation(),
-            Caravan = this.queryCaravanInformation()
+            RostersData = {
+                Formation = this.queryPlayerFormationInformation(),
+                Reserve = this.queryPlayerReserveInformation(),
+                Guests = this.queryGuestInformation(),
+                Caravan = this.queryCaravanInformation()
+            }
 		};
 
 		return result;
