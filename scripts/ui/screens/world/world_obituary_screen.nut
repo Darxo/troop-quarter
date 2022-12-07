@@ -14,6 +14,10 @@ this.world_obituary_screen <- {
 		PlayerID = "Player",
 		QuarterID = "Quarter",
 
+        Formation = "Formation",
+        Reserve = "Reserve",
+        Guests = "Guests",
+
 		MinPlayerRoster = 1,
 		PlayerRosterLimit = 27,
 	},
@@ -113,6 +117,37 @@ this.world_obituary_screen <- {
 		}
 	}
 
+	function queryCaravanInformation()
+	{
+		// local fullRoster = ::World.Assets.getFormation();
+
+		local convertedRoster = [];
+        convertedRoster.resize(27, null)
+/*
+		local reserveCount = 0;
+		for( local i = 0; i != fullRoster.len(); i = ++i )
+		{
+			if (i < 18) continue;
+			if (fullRoster[i] == null)
+			{
+				convertedRoster.push(null);
+				continue;
+			}
+			convertedRoster.push(this.UIDataHelper.convertEntityToUIData(fullRoster[i], null));
+			reserveCount++;
+		}*/
+
+		return {
+            Name = "Caravan",
+            Type = "Escort",
+			Roster = convertedRoster.resize(27, null),
+			BrotherCount = 0,
+			BrotherMin = 0,
+			BrotherMax = 17,
+			SlotLimit = 27
+		}
+	}
+
 	function queryPlayerReserveInformation()
 	{
 		local fullRoster = ::World.Assets.getFormation();
@@ -139,7 +174,7 @@ this.world_obituary_screen <- {
 			BrotherCount = reserveCount,
 			BrotherMin = 0,
 			BrotherMax = 5,
-			SlotLimit = 27
+			SlotLimit = 9
 		}
 	}
 
@@ -250,6 +285,14 @@ this.world_obituary_screen <- {
 		}
 	}
 
+	function onClose()
+	{
+		if (this.m.OnCloseButtonClickedListener != null)
+		{
+			this.m.OnCloseButtonClickedListener();
+		}
+	}
+
 	function onPopupDialogIsVisible( _data )
 	{
 		this.m.PopupDialogVisible = _data[0];
@@ -260,7 +303,8 @@ this.world_obituary_screen <- {
 		local result = {
 			Formation = this.queryPlayerFormationInformation(),
 			Reserve = this.queryPlayerReserveInformation(),
-            Guests = this.queryGuestInformation()
+            Guests = this.queryGuestInformation(),
+            Caravan = this.queryCaravanInformation()
 		};
 
 		return result;
@@ -537,39 +581,70 @@ this.world_obituary_screen <- {
 		};
 	}
 
+    function getRosterFromID( _rosterID )
+    {
+        local roster = ::World.Assets.getFormation();
+        if ( _rosterID == this.m.Formation ) return roster.slice(0, 18);
+        if ( _rosterID == this.m.Reserve ) return roster.slice(18);
+        ::logWarning("getRosterFromID returned nothing");
+    }
+
 	// Changes the place in formation of a single brother only within their roster
-	function onRelocateBrother( _data )	// [0] == brotherID, [1] = place in formation
+    // [0] = rosterID,
+    // [1] = brotherID,
+    // [2] = place in formation
+	function onRelocateBrother( _data )
 	{
-		local roster = this.World.Assets.getFormation();
-		local newPosition = _data[1];
-		foreach (i, bro in roster)
+		local roster = this.getRosterFromID(_data[0]);
+        ::MSU.Log.printData(roster);
+        ::logWarning("getRosterFromID " + _data[0]);
+		foreach (bro in roster)
 		{
             if (bro == null) continue;
-		 	if (bro.getID() != _data[0]) continue;
-
-			if (i >= 18) newPosition += 18;
-
-			bro.setPlaceInFormation(newPosition);
-			return;
+		 	if (bro.getID() != _data[1]) continue;
+            local newPosition = _data[2];
+            if (roster[newPosition] != null) ::logError("Tried relocating a brother into position " + newPosition + " but a brother already is here");
+            if (_data[0] == "Reserve")
+            {
+                newPosition += 18;
+                local fullRoster = ::World.Assets.getFormation();
+                if (fullRoster[newPosition] != null) ::logError("Tried relocating a brother into position " + newPosition + " but a brother already is here");
+            }
+            return bro.setPlaceInFormation(newPosition);
 		}
+        return;
 	}
 
-	function MoveAtoB( _data )
+	// Changes the place in formation of a single brother only within their roster
+    // [0] = rosterID,
+    // [1] = brotherID,
+    // [2] = place in formation
+	function onRelocateBrother( _data )
 	{
-		this.onRelocateBrother([_data[0], _data[2]]);
-
-		local newPosition = _data[2];
-        if (_data[3] == "Reserve") newPosition += 18;
-
-		local roster = this.World.Assets.getFormation();
-		foreach(i, bro in roster)
+		local roster = ::World.Assets.getFormation();
+		foreach (bro in roster)
 		{
             if (bro == null) continue;
-			if (bro.getID() != _data[0]) continue;
-
-            bro.setPlaceInFormation(newPosition);
-            return;
+		 	if (bro.getID() != _data[1]) continue;
+            if (roster[_data[2]] != null)
+            {
+                ::logError("Tried relocating a brother into position " + _data[2] + " but a brother already is here");
+                return;
+            }
+            return bro.setPlaceInFormation(_data[2]);
 		}
+        return;
+	}
+
+    // _data[0] = brotherID
+    // _data[1] = tagA
+    // _data[2] = targetIndex
+    // _data[3] = tagB
+	function MoveAtoB( _data )
+	{
+        if (_data[1] == this.m.Formation && _data[3] == this.m.Reserve) return this.onRelocateBrother([_data[1], _data[0], _data[2] + 18]);
+		this.onRelocateBrother([_data[1], _data[0], _data[2]]);
+        return;
 	}
 
 };

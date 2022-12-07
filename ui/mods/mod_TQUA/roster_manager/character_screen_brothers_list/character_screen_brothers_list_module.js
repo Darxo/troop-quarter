@@ -10,6 +10,8 @@ var RosterManagerBrothersListModule = function(_parent, _dataSource)
     this.mContainer = null;
 
     this.registerDatasourceListener();
+
+    this.mDeadZoneElement = null;
 };
 
 RosterManagerBrothersListModule.prototype.createDIV = function (_parentDiv)
@@ -47,13 +49,19 @@ RosterManagerBrothersListModule.prototype.createDIV = function (_parentDiv)
         resizable: false, // to hide the horizontal scroll
         horizontalBar: 'none', // to hide the horizontal scroll
     });
+
     this.createRosterDIV(secondaryContainer.findListScrollContainer(), Owner.Reserve);
     this.createRosterDIV(secondaryContainer.findListScrollContainer(), Owner.Guests);
+    // this.createRosterDIV(secondaryContainer.findListScrollContainer(), Owner.Caravan);
 
     // Primary (Bottom) Container
     var primaryContainer = $('<div class="primary-container"/>');
     this.mContainer.append(primaryContainer);
     this.createRosterDIV(primaryContainer, Owner.Formation);
+
+
+    // DeadZones
+    this.mDataSource.mRosterManager.setDeadZoneElement(primaryContainer);
 };
 
 RosterManagerBrothersListModule.prototype.createRosterDIV = function (_parentDiv, _rosterID)
@@ -95,8 +103,6 @@ RosterManagerBrothersListModule.prototype.destroyDIV = function ()
 {
     this.mDataSource.mRosterManager.destroyDIV();
 
-    // this.mSlots = null;      // dont forget this!
-
     this.mContainer.empty();
     this.mContainer.remove();
     this.mContainer = null;
@@ -115,14 +121,7 @@ RosterManagerBrothersListModule.prototype.unbindTooltips = function ()
 
 RosterManagerBrothersListModule.prototype.registerDatasourceListener = function()
 {
-    //this.mDataSource.addListener(ErrorCode.Key, jQuery.proxy(this.onDataSourceError, this));
-
-    this.mDataSource.addListener(CharacterScreenDatasourceIdentifier.Brother.ListLoaded, jQuery.proxy(this.onBrothersListLoaded, this));
-    this.mDataSource.addListener(CharacterScreenDatasourceIdentifier.Brother.SettingsChanged, jQuery.proxy(this.onBrothersSettingsChanged, this));
 	this.mDataSource.addListener(CharacterScreenDatasourceIdentifier.Brother.Updated, jQuery.proxy(this.onBrotherUpdated, this));
-	this.mDataSource.addListener(CharacterScreenDatasourceIdentifier.Brother.Selected, jQuery.proxy(this.onBrotherSelected, this));
-
-	this.mDataSource.addListener(CharacterScreenDatasourceIdentifier.Inventory.ModeUpdated, jQuery.proxy(this.onInventoryModeUpdated, this));
 };
 
 
@@ -228,12 +227,12 @@ RosterManagerBrothersListModule.prototype.updateBlockedSlots = function ()
 
 RosterManagerBrothersListModule.prototype.clearBrothersList = function ()
 {
-    for(var i=0; i != this.mDataSource.getPlayerRoster().mSlots.length; ++i)
+    /* for(var i=0; i != this.mDataSource.getPlayerRoster().mSlots.length; ++i)
     {
         this.mDataSource.getPlayerRoster().mSlots[i].empty();
         this.mDataSource.getPlayerRoster().mSlots[i].data('child', null);
     }
-
+*/
     // this.mNumActive = 0;
 };
 
@@ -279,20 +278,6 @@ RosterManagerBrothersListModule.prototype.updateBrotherSlotLocks = function(_inv
 	}*/
 };
 
-RosterManagerBrothersListModule.prototype.onBrothersSettingsChanged = function (_dataSource, _brothers)
-{
-
-};
-
-RosterManagerBrothersListModule.prototype.onBrotherSelected = function (_dataSource, _brothers)
-{
-    // just in case I need this later on
-};
-
-RosterManagerBrothersListModule.prototype.onBrothersListLoaded = function (_dataSource, _brothers)
-{
-};
-
 RosterManagerBrothersListModule.prototype.onBrotherUpdated = function (_dataSource, _brother)
 {
 	if (_brother !== null &&
@@ -303,11 +288,6 @@ RosterManagerBrothersListModule.prototype.onBrotherUpdated = function (_dataSour
 	{
 		this.updateBrotherSlot(_brother);
 	}
-};
-
-RosterManagerBrothersListModule.prototype.onInventoryModeUpdated = function (_dataSource, _mode)
-{
-	this.updateBrotherSlotLocks(_mode);
 };
 
 

@@ -8,7 +8,8 @@ var Owner =
 
     Formation: 'Formation',
     Reserve: 'Reserve',
-    Guests: 'Guests'
+    Guests: 'Guests',
+    Caravan: 'Caravan'
 };
 
 var TroopQuarterDialogModule = function(_parent)
@@ -19,10 +20,10 @@ var TroopQuarterDialogModule = function(_parent)
     // assets labels
     this.mAssets = new WorldTownScreenAssets(_parent);
 
-    var troopQuarter = new BrotherContainer(Owner.Quarter);
-    var playerRoster = new BrotherContainer(Owner.Player);
+    var troopQuarter = new RosterContainer(Owner.Quarter);
+    var playerRoster = new RosterContainer(Owner.Player);
 
-    this.mBrotherManager = new BrotherManager();
+    this.mBrotherManager = new RosterManager();
     this.mBrotherManager.addContainer(troopQuarter);
     this.mBrotherManager.addContainer(playerRoster);
 

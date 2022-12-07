@@ -16,6 +16,9 @@ var RosterManagerDatasource = function()
     guests.mCanRemove = false;
     guests.mCanImport = false;
     guests.mMoodVisible = false;
+    var caravan = this.mRosterManager.addContainer(new RosterContainer(Owner.Caravan));
+    caravan.mCanRemove = false;
+    caravan.mCanImport = false;
 
     this.mIsPopupOpen = false;
 

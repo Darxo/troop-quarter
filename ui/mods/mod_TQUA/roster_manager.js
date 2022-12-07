@@ -55,19 +55,23 @@ RosterManager.prototype.getNextForInsert = function( _containerID )
     var sourceFound = false;
     for(var i = 0; i < this.mBrotherContainer.length; i++)
     {
-        if (beforeIndex === null && this.mBrotherContainer[i].mCanInsert === true) beforeIndex = i;
         if (this.mBrotherContainer[i].mContainerID === _containerID)
         {
             sourceFound = true;
             continue;
         }
-        if (sourceFound === false) continue;
+        if (this.mBrotherContainer[i].mCanImport === false) continue;   // skip all container that cant be imported
+        if (sourceFound === false)
+        {
+            if (beforeIndex === null) beforeIndex = i;
+            continue;
+        }
 
-        if (this.mBrotherContainer[i].mCanInsert === false) continue;
         var afterIndex = i;
         break;
     }
     if (afterIndex === null) return this.mBrotherContainer[beforeIndex];
+    console.error("getNextForInsert returns " + this.mBrotherContainer[afterIndex].mContainerID);
     return this.mBrotherContainer[afterIndex];
 }
 
@@ -117,6 +121,16 @@ RosterManager.prototype.loadFromData = function( _data )
     }
 }
 
+RosterManager.prototype.setDeadZoneElement = function ( _deadZoneElement )
+{
+    for(var i = 0; i < this.mBrotherContainer.length; i++)
+    {
+        if (this.mBrotherContainer[i].mContainerID === "Formation") continue;
+        this.mBrotherContainer[i].mDeadZoneElement = _deadZoneElement;
+    }
+}
+
+
 // create empty slots
 RosterManager.prototype.createBrotherSlots = function ( _ownerID )
 {
@@ -145,6 +159,12 @@ RosterManager.prototype.createBrotherSlots = function ( _ownerID )
         }
 
         drag.removeClass('is-dragged');
+
+        // Some Drophandler should only be active while they are in the visible area. Each container decides that for themselves
+
+        // this.get(identifier).mDeadZoneBottom = this.mDeadZoneElement.offset().top;
+
+        if (self.get(drop.data('tag')).isInDeadZone(dd.offsetX, dd.offsetY)) return false;
 
         if (drag.data('tag') == drop.data('tag'))
         {
@@ -336,6 +356,7 @@ RosterManager.prototype.switchToNextBrother = function()
 // _sourceOwner, _targetOwner are BrotherContainer and not null
 RosterManager.prototype.transferBrother = function ( _sourceIdx, _sourceOwnerID, _targetIdx, _targetOwnerID )
 {
+    console.error("transferBrother _targetIdx: " + _targetIdx);
     var sourceOwner = this.get(_sourceOwnerID);
     var targetOwner = this.get(_targetOwnerID);
 
@@ -365,32 +386,35 @@ RosterManager.prototype.swapSlots = function (_firstIdx, _tagA, _secondIdx, _tag
     var targetOwner = this.get(_tagB);
     if (sourceOwner.isEmpty(_firstIdx) && targetOwner.isEmpty(_secondIdx)) return false;
 
-    var slotA = sourceOwner.mSlots[_firstIdx];
-    var slotB = targetOwner.mSlots[_secondIdx];
-
     if (_tagA === _tagB)
     {
+        var slotA = sourceOwner.mSlots[_firstIdx];
+        var slotB = targetOwner.mSlots[_secondIdx];
         if(slotB.data('child') === null)
         {
             var sourceBrotherID = slotA.data('child').data('ID');
             if (sourceOwner.swapSlots(_firstIdx, _secondIdx) === false) return false
-            this.notifyBackendRelocateBrother(sourceBrotherID, _secondIdx);
+            this.notifyBackendRelocateBrother(_tagA, sourceBrotherID, _secondIdx);
         }
         else
         {
             var sourceBrotherID = slotA.data('child').data('ID');
             var targetBrotherID = slotB.data('child').data('ID');
             if (sourceOwner.swapSlots(_firstIdx, _secondIdx) === false) return false;
-            this.notifyBackendRelocateBrother(sourceBrotherID, _secondIdx);
-            this.notifyBackendRelocateBrother(targetBrotherID, _firstIdx);
+            this.notifyBackendRelocateBrother(_tagA, sourceBrotherID, _secondIdx);
+            this.notifyBackendRelocateBrother(_tagB, targetBrotherID, _firstIdx);
         }
         return true;
     }
+
+    if (targetOwner.mCanImport === false) return false;
+    if (sourceOwner.mCanRemove === false) return false;
 
     // A brother is moved from one container into another:
     if (sourceOwner.isEmpty(_firstIdx))    return this.transferBrother(_secondIdx, _tagB, _firstIdx, _tagA);
     if (targetOwner.isEmpty(_secondIdx))   return this.transferBrother(_firstIdx, _tagA, _secondIdx, _tagB);
 
+    console.error("_firstIdx " + _firstIdx + " _secondIdx " + _secondIdx);
     var firstBrotherID = sourceOwner.mSlots[_firstIdx].data('child').data('ID');
     var secondBrotherID = targetOwner.mSlots[_secondIdx].data('child').data('ID');
 
@@ -432,9 +456,9 @@ RosterManager.prototype.quickMoveBrother = function (_clickedSlot)
 };
 
 //- Call Squirrel backend function
-RosterManager.prototype.notifyBackendRelocateBrother = function (_brotherID, _placeInFormation)
+RosterManager.prototype.notifyBackendRelocateBrother = function (_rosterID, _brotherID, _placeInFormation)
 {
-    SQ.call(this.mSQHandle, 'onRelocateBrother', [ _brotherID, _placeInFormation ]);
+    SQ.call(this.mSQHandle, 'onRelocateBrother', [ _rosterID, _brotherID, _placeInFormation ]);
 };
 
 RosterManager.prototype.notifyBackendMoveAtoB = function (_id, _tagA, _pos, _tagB)

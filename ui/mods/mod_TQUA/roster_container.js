@@ -25,6 +25,8 @@ var RosterContainer = function( _containerID )
     this.mRosterNameLabel = null;   // Will be updated with name (type)
 
     // Config
+    this.mDeadZoneElement = null;      // Anything above this element is considered a deadZone for DropHandle
+
     this.mMoodVisible = true;      // Show the Mood Symbol on the character?
     this.mInjuriesVisible = true;   // List all injuries on top of the character?
     this.mLostHPVisible = true;     // Draw Icon that indicates character is not at full HP?
@@ -74,11 +76,17 @@ RosterContainer.prototype.loadFromData = function( _data )
     };
     RosterContainer.prototype.isEmpty = function(_slotIndex)
     {
+        console.error(this.mContainerID + " " + this.mSlotLimit + " " + this.mBrotherCurrent);
+        console.error("isEmpty of mBrotherList[" + _slotIndex + "] is " + this.mBrotherList[_slotIndex]);
+        if (this.mBrotherList[_slotIndex] === undefined)
+        {
+            console.error("mBrotherList[" + _slotIndex + "] is undefined! The arraysize is " + this.mBrotherList.length);
+        }
         return (this.mBrotherList[_slotIndex] === null);
     };
 }
 
-{   // Smart Getter
+{   // Smart Getter and Isser
 
     // Returns a data object with 'Index' and 'Brother' object
     RosterContainer.prototype.getBrotherByID = function (_brotherId)
@@ -116,27 +124,20 @@ RosterContainer.prototype.loadFromData = function( _data )
     {
         for (var i = 0; i < this.mSlots.length; i++)
         {
-            if (this.mSlots[i].data('child') === null)
-            {
-                return i;
-            }
+            if (this.isEmpty(i)) return i;
         }
         return null
     }
 
-    // Returns the first empty slot
-    RosterContainer.prototype.getFirstEmptySlot = function()
+    RosterContainer.prototype.isInDeadZone = function( _offsetX, _offsetY)
     {
-        for (var i = 0; i < this.mSlots.length; i++)
-        {
-            if (this.mSlots[i].data('child') === null)
-            {
-                return this.mSlots[i];
-            }
-        }
-        return null
+        return false;
+        if (this.mDeadZoneElement === null) return false;
+        console.error("mDeadZoneElement-Y " + this.mDeadZoneElement.offset().top);
+        console.error("_offsetY " + _offsetY);
+        if (_offsetY < this.mDeadZoneElement.offset().top) return true;
+        return false;
     }
-
 }
 
 {   // Little helper functions
@@ -357,6 +358,8 @@ RosterContainer.prototype.loadFromData = function( _data )
         {
             slotDIV.removeListBrotherLeveledUp();
         }
+
+        // slotDIV.showListBrotherLockImage(!this.mCanRemove);
     }
 
     RosterContainer.prototype.createBrotherSlots = function()
@@ -495,6 +498,8 @@ RosterContainer.prototype.loadFromData = function( _data )
 
         targetSlot.data('child', sourceData);
         sourceSlot.data('child', null);
+
+        if (this.mSelectedBrother === _sourceIdx) this.mSelectedBrother = _targetIdx;
 
         var tmp = this.mBrotherList[_sourceIdx];
         this.mBrotherList[_sourceIdx] = this.mBrotherList[_targetIdx];
