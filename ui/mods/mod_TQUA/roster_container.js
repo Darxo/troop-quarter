@@ -41,13 +41,14 @@ var RosterContainer = function( _containerID )
 
 RosterContainer.prototype.loadFromData = function( _rosterData )
 {
+    console.error("loading new container from Data");
     var entries = Object.keys(_rosterData);
     for(var i = 0; i < entries.length; i++)
     {
         if (entries[i] in this)
         {
             this[entries[i]] = _rosterData[entries[i]];
-            console.error("loading variable "+ entries[i] + " to value " + _rosterData[entries[i]]);
+            // console.error("loading variable "+ entries[i] + " to value " + _rosterData[entries[i]]);
         }
     }
     this.updateNameLabel();

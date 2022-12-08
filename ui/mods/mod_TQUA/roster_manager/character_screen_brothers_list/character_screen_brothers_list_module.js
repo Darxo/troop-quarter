@@ -50,14 +50,14 @@ RosterManagerBrothersListModule.prototype.createDIV = function (_parentDiv)
         horizontalBar: 'none', // to hide the horizontal scroll
     });
 
-    this.createRosterDIV(secondaryContainer.findListScrollContainer(), Owner.Reserve);
-    this.createRosterDIV(secondaryContainer.findListScrollContainer(), Owner.Guests);
-    this.createRosterDIV(secondaryContainer.findListScrollContainer(), Owner.Caravan);
-
     // Primary (Bottom) Container
     var primaryContainer = $('<div class="primary-container"/>');
     this.mContainer.append(primaryContainer);
     this.createRosterDIV(primaryContainer, Owner.Formation);
+
+    this.createRosterDIV(secondaryContainer.findListScrollContainer(), Owner.Reserve);
+    this.createRosterDIV(secondaryContainer.findListScrollContainer(), Owner.Guests);
+    this.createRosterDIV(secondaryContainer.findListScrollContainer(), Owner.Caravan);
 
 
     // DeadZones

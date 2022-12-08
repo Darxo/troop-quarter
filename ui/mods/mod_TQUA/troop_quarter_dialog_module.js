@@ -6,10 +6,10 @@ var Owner =
     Quarter: 'Quarter',
     Player: 'Player',
 
-    Formation: 'Formation',
-    Reserve: 'Reserve',
-    Guests: 'Guests',
-    Caravan: 'Caravan'
+    Formation:  'Formation',
+    Reserve:    'Reserve',
+    Guests:     'Guests',
+    Caravan:    'Caravan'
 };
 
 var TroopQuarterDialogModule = function(_parent)
@@ -73,9 +73,6 @@ TroopQuarterDialogModule.prototype.createDIV = function (_parentDiv)
     this.mAssets.mAmmoAsset.removeClass('display-block').addClass('display-none');
     this.mAssets.mSuppliesAsset.removeClass('display-block').addClass('display-none');
     this.mAssets.mMedicineAsset.removeClass('display-block').addClass('display-none');
-
-    // give this the stronghold icon, i'll change this button so it will display roster num of stronghold
-    this.mAssets.mBrothersAsset.changeButtonImage(Path.GFX + 'ui/icons/stronghold_icon.png');
 
     // create content
     var content = this.mDialogContainer.findDialogContentContainer();
