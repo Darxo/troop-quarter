@@ -54,22 +54,21 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
 
         this.addManagedRoster("Guests", {
 			queryData = function( _this ) {
-				local dummyArray = [];
-				dummyArray.resize(27, null);
 				return {
 					mName = "Militia",
 					mType = "Guests",
-					mBrotherList = _this.convertActorsToUIData(dummyArray),
-					mBrotherMax = 27,
+					mBrotherList = _this.convertActorsToUIData(::World.getGuestRoster().getAll(), false, 27),
 					// mCanRemove = false,
 					// mCanImport = false,
 					// mMoodVisible = false
 				}},
-			getAll = function() {return this.World.getPlayerRoster().getAll();},
+			getAll = function() {return ::World.getGuestRoster().getAll();},
 			insertActor = function(_actor) {
+				::World.getGuestRoster().add(_actor);
 				return true;
 			},
-			removeActor = function(_actorID) {
+			removeActor = function(_actor) {
+				::World.getGuestRoster().remove(_actor);
 				return true;
 			}
         });
@@ -108,23 +107,11 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
 				}},
 			getAll = function() {return this.World.getPlayerRoster().getAll();},
 			insertActor = function(_actor) {	// Maybe add Position?
-				if (::World.getPlayerRoster().getSize() >= ::World.Assets.getBrothersMax())
-				{
-					::logError("Can't insert into PlayerRoster: MaxBrothers reached");
-					return false;
-				}
 				::World.getPlayerRoster().add(_actor);
 				return true;
 			},
-			removeActor = function(_actorID) {
-				foreach(bro in ::World.getPlayerRoster().getAll())
-				{
-					if (bro.getID() != _actorID) continue;
-					::World.getPlayerRoster().remove(bro);
-					return true;
-				}
-				::logError("Failed to removeActor: Actor with ID '" + _actorID "' not found.");
-				return false;
+			removeActor = function(_actor) {
+				::World.getPlayerRoster().remove(_actor);
 			}
         });
 
@@ -143,22 +130,11 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
 			},
 			getAll = function() {return this.World.getPlayerRoster().getAll();},
 			insertActor = function(_actor) {
-				if (::World.getPlayerRoster().getSize() >= ::World.Assets.getBrothersMax())		// Can be removed probably
-				{
-					return false;
-				}
 				::World.getPlayerRoster().add(_actor);
 				return true;
 			},
-			removeActor = function(_actorID) {
-				foreach(bro in ::World.getPlayerRoster().getAll())
-				{
-					if (bro.getID() != _actorID) continue;
-					::World.getPlayerRoster().remove(bro);
-					return true;
-				}
-				::logError("Failed to removeActor: Actor with ID '" + _actorID "' not found.");
-				return false;
+			removeActor = function(_actor) {
+				::World.getPlayerRoster().remove(_actor);
 			}
         });
 
@@ -220,14 +196,18 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
 	}
 
 	// Converts non-null actors from a passed array into UI Data and returns the newly generated Array
-	function convertActorsToUIData( _brotherArray )
+	function convertActorsToUIData( _brotherArray, _isFormationAlready = true, _slotLimit = 27 )
 	{
+		local arraySize = _isFormationAlready ? _brotherArray.len() : _slotLimit;
+
 		local result = [];
-		result.resize(_brotherArray.len(), null);
+		result.resize(arraySize, null);
+
 		foreach(i, _brother in _brotherArray)
 		{
 			if (_brother == null) continue;
-			result[i] = ::UIDataHelper.convertEntityToUIData(_brother, null);
+			if (_isFormationAlready == true) result[i] = ::UIDataHelper.convertEntityToUIData(_brother, null);
+			if (_isFormationAlready == false) result[_brother.getPlaceInFormation()] = ::UIDataHelper.convertEntityToUIData(_brother, null);
 		}
 		return result;
 	}
@@ -318,18 +298,16 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
 		local sourceRoster = this.getManagedRoster(_sourceID);
 		local targetRoster = this.getManagedRoster(_targetID);
 
-		local removedActor = null;
+		local actorToRemove = null;
 		foreach(actor in sourceRoster.getAll())
 		{
-			if (actor.getID() == _actorID) removedActor = actor;
+			if (actor.getID() == _actorID) actorToRemove = actor;
 		}
-		if (removedActor == null) return;
+		if (actorToRemove == null) return;
 
-		if (targetRoster.insertActor(removedActor) == false) return;	// Must be last because you can't insert a brother into the player roster if the same is already present there
-		if (sourceRoster.removeActor(removedActor.getID()) == false) return;
-		local brothers = ::World.getPlayerRoster().getAll();
-
-		removedActor.setPlaceInFormation(_newPosition);
+		targetRoster.insertActor(actorToRemove);	// Insert needs to happen first or there may be critical exception
+		sourceRoster.removeActor(actorToRemove);
+		actorToRemove.setPlaceInFormation(_newPosition);
     }
 
     // Called from JavaScript
@@ -357,10 +335,12 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
 	{
 		// Todo do some input validation
 
-        if (_data[1] == this.m.Formation && _data[3] == this.m.Reserve) return this.relocateActor(_data[1], _data[0], _data[2] + 18);
-        if (_data[1] == this.m.Reserve && _data[3] == this.m.Formation) return this.relocateActor(_data[1], _data[0], _data[2]);
+		local newPosition = _data[2];
+		if (_data[3] == this.m.Reserve) newPosition += 18;
+        if (_data[1] == this.m.Formation && _data[3] == this.m.Reserve) return this.relocateActor(_data[1], _data[0], newPosition);
+        if (_data[1] == this.m.Reserve && _data[3] == this.m.Formation) return this.relocateActor(_data[1], _data[0], newPosition);
 
-		this.transferBrother(_data[0], _data[1], _data[2], _data[3]);
+		this.transferBrother(_data[0], _data[1], newPosition, _data[3]);
 	}
 
 });
