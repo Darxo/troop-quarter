@@ -1,15 +1,11 @@
-this.world_obituary_screen <- {
+this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_screen", {
 	m = {
-		JSHandle = null,
 		JSDataSourceHandle = null,
-		InventoryMode = null,
 		Visible = null,
 		PopupDialogVisible = null,
 		Animating = null,
 
-
 		OnCloseButtonClickedListener = null,
-
 
 		PlayerID = "Player",
 		QuarterID = "Quarter",
@@ -19,21 +15,184 @@ this.world_obituary_screen <- {
         Guests = "Guests",
 
 		MinPlayerRoster = 1,
-		PlayerRosterLimit = 27,
+		DefaultSlotLimit = 27,
+
+        ManagedRosters = {/*
+            ID = {
+				queryData = function()
+				{
+                    return = {
+                        mBrotherList = ,
+
+                        mName = "Caravan",
+                        mType = "Escort",
+                        mBrotherMin = 0,
+                        mBrotherMax = 17,
+                        mSlotLimit = 27,
+                        mCanRemove = false,
+                        mCanImport = false,
+                        mMoodVisible = false
+                    }
+				},
+				// Inserts an Actor into this roster. Returns true if successfull
+				insertActor = function(_actor, _position),
+				// Removes an Actor from this roster. Returns true if successfull
+				removeActor = function(_actorID)
+            }*/
+        }
+
 	},
-	function isVisible()
+
+	function create()
 	{
-		return this.m.Visible != null && this.m.Visible == true;
+		::logWarning("Create()");
+		this.world_base_screen.create();
+
+		this.m.PopupDialogVisible = false;
+		this.m.JSHandle = this.UI.connect("RosterManagerScreen", this);
+		this.m.JSDataSourceHandle = this.m.JSHandle.connectToModule("DataSource", this);
+
+        this.addManagedRoster("Guests", {
+			queryData = function( _this ) {
+				local dummyArray = [];
+				dummyArray.resize(27, null);
+				return {
+					mName = "Militia",
+					mType = "Guests",
+					mBrotherList = _this.convertActorsToUIData(dummyArray),
+					mBrotherMax = 27,
+					// mCanRemove = false,
+					// mCanImport = false,
+					// mMoodVisible = false
+				}},
+			getAll = function() {return this.World.getPlayerRoster().getAll();},
+			insertActor = function(_actor) {
+				return true;
+			},
+			removeActor = function(_actorID) {
+				return true;
+			}
+        });
+
+        this.addManagedRoster("Caravan", {
+			queryData = function( _this ) {
+				local dummyArray = [];
+				dummyArray.resize(27, null);
+				return {
+					mName = "Caravan",
+					mType = "Escort",
+					mBrotherList = _this.convertActorsToUIData(dummyArray),
+					mBrotherMax = 12,
+					mCanRemove = false,
+					mCanImport = false,
+					mMoodVisible = false
+				}},
+			getAll = function() {return this.World.getPlayerRoster().getAll();},
+			insertActor = function(_actor) {
+				return true;
+			},
+			removeActor = function(_actorID) {
+				return true;
+			}
+		});
+
+        this.addManagedRoster("Formation", {
+            queryData = function( _this ) {
+				return {
+					mName = "Formation",
+					mType = "Player",
+					mBrotherList = _this.convertActorsToUIData(::World.Assets.getFormation().slice(0, 18)),		// Only pass the first 18 slots of the player roster
+					mBrotherMin = 1,
+					mBrotherMax = 12,
+					mSlotLimit = 18
+				}},
+			getAll = function() {return this.World.getPlayerRoster().getAll();},
+			insertActor = function(_actor) {	// Maybe add Position?
+				if (::World.getPlayerRoster().getSize() >= ::World.Assets.getBrothersMax())
+				{
+					::logError("Can't insert into PlayerRoster: MaxBrothers reached");
+					return false;
+				}
+				::World.getPlayerRoster().add(_actor);
+				return true;
+			},
+			removeActor = function(_actorID) {
+				foreach(bro in ::World.getPlayerRoster().getAll())
+				{
+					if (bro.getID() != _actorID) continue;
+					::World.getPlayerRoster().remove(bro);
+					return true;
+				}
+				::logError("Failed to removeActor: Actor with ID '" + _actorID "' not found.");
+				return false;
+			}
+        });
+
+        this.addManagedRoster("Reserve", {
+            queryData = function( _this ) {
+				local convertedRoster = _this.convertActorsToUIData(::World.Assets.getFormation().slice(18));	// Only pass the last 9 slots of the player roster for vanilla
+				return {
+					mName = "Reserve",
+					mType = "Player",
+					mBrotherList = convertedRoster,
+					mBrotherMin = 0,
+					mBrotherMax = 9,
+					mSlotLimit = 9,
+					mSlotClasses = "<div class=\"ui-control is-brother-slot is-reserve-slot\"/>"
+				}
+			},
+			getAll = function() {return this.World.getPlayerRoster().getAll();},
+			insertActor = function(_actor) {
+				if (::World.getPlayerRoster().getSize() >= ::World.Assets.getBrothersMax())		// Can be removed probably
+				{
+					return false;
+				}
+				::World.getPlayerRoster().add(_actor);
+				return true;
+			},
+			removeActor = function(_actorID) {
+				foreach(bro in ::World.getPlayerRoster().getAll())
+				{
+					if (bro.getID() != _actorID) continue;
+					::World.getPlayerRoster().remove(bro);
+					return true;
+				}
+				::logError("Failed to removeActor: Actor with ID '" + _actorID "' not found.");
+				return false;
+			}
+        });
+
+		// ::modTQUA.createGuests();
+
 	}
+
+    function addManagedRoster(_rosterID, _getDataFunction)
+    {
+        this.m.ManagedRosters[_rosterID] <- _getDataFunction;
+    }
+
+    // Returns a table that's generated from the 'getData()' function for a given ID
+    function getManagedRoster( _rosterID )
+    {
+        if (_rosterID in this.m.ManagedRosters) return this.m.ManagedRosters[_rosterID];
+        return null;
+    }
+
+    function queryRosterData( _rosterID )
+    {
+        local rosterData = this.getManagedRoster(_rosterID);
+        local slotLimit = ("mSlotLimit" in rosterData) ? rosterData.mSlotLimit : this.m.DefaultSlotLimit;
+        local positionedList = [];
+        positionedList.resize(slotLimit, null);
+        foreach( _entity in rosterData.mBrotherList )
+        {
+            positionedList[_entity.getPlaceInFormation()] = _entity
+        }
+    }
 
 	function isAnimating()
 	{
 		return this.m.Animating != null && this.m.Animating == true || this.m.PopupDialogVisible != null && this.m.PopupDialogVisible == true;
-	}
-
-	function getInventoryMode()
-	{
-		return this.m.InventoryMode;
 	}
 
 	function setOnClosePressedListener( _listener )
@@ -43,163 +202,40 @@ this.world_obituary_screen <- {
 
 	function clearEventListener()
 	{
+		this.world_base_screen.clearEventListener();
 		this.m.OnCloseButtonClickedListener = null;
 	}
 
-	function create()
+	// Returns a Table with one entry for each managed roster in this class. Key = RosterID and Value is a table of all its data
+	function queryData()
 	{
-		this.m.InventoryMode = this.Const.CharacterScreen.InventoryMode.Ground;
-		this.m.Visible = false;
-		this.m.PopupDialogVisible = false;
-		this.m.Animating = false;
+		local rosterData = {};
+		foreach(id, managedRoster in this.m.ManagedRosters)
+		{
+			rosterData[id] <- managedRoster.queryData(this);
+		}
+		local result = {};
+		result.RostersData <- rosterData;
+		return result;
+	}
 
-		this.m.JSHandle = this.UI.connect("RosterManagerScreen", this);
-		this.m.JSDataSourceHandle = this.m.JSHandle.connectToModule("DataSource", this);
+	// Converts non-null actors from a passed array into UI Data and returns the newly generated Array
+	function convertActorsToUIData( _brotherArray )
+	{
+		local result = [];
+		result.resize(_brotherArray.len(), null);
+		foreach(i, _brother in _brotherArray)
+		{
+			if (_brother == null) continue;
+			result[i] = ::UIDataHelper.convertEntityToUIData(_brother, null);
+		}
+		return result;
 	}
 
 	function destroy()
 	{
-		this.clearEventListener();
-		this.m.JSDataSourceHandle = this.UI.disconnect(this.m.JSDataSourceHandle);
-		this.m.JSHandle = this.UI.disconnect(this.m.JSHandle);
-	}
-
-	function queryPlayerFormationInformation()
-	{
-		local fullRoster = ::World.Assets.getFormation();
-
-		local convertedRoster = [];
-
-		local formationCount = 0;
-		for( local i = 0; i != fullRoster.len(); i = ++i )
-		{
-			if (i >= 18) break;
-			if (fullRoster[i] == null)
-			{
-				convertedRoster.push(null);
-				continue;
-			}
-			convertedRoster.push(this.UIDataHelper.convertEntityToUIData(fullRoster[i], null));
-			formationCount++;
-		}
-
-		return {
-            mName = "Formation",
-            mType = "Player",
-			mBrotherList = convertedRoster,
-			mBrotherMin = 1,
-			mBrotherMax = 12,
-			mSlotLimit = 18
-		}
-	}
-
-	function queryGuestInformation()
-	{
-		local convertedRoster = [];
-        convertedRoster.resize(27, null);
-
-		local reserveCount = 0;
-        foreach(guest in ::World.getGuestRoster().getAll())
-        {
-            local slot = guest.getPlaceInFormation();
-            convertedRoster[slot] = this.UIDataHelper.convertEntityToUIData(guest, null);
-        }
-
-		return {
-            mName = "Militia",
-            mType = "Guests",
-			mBrotherList = convertedRoster,
-			mBrotherMin = 0,
-			mBrotherMax = 18,
-			mSlotLimit = 27,
-            mCanRemove = false,
-            mCanImport = false,
-            mMoodVisible = false
-		}
-	}
-
-	function queryCaravanInformation()
-	{
-		// local fullRoster = ::World.Assets.getFormation();
-
-		local convertedRoster = [];
-        convertedRoster.resize(27, null)
-/*
-		local reserveCount = 0;
-		for( local i = 0; i != fullRoster.len(); i = ++i )
-		{
-			if (i < 18) continue;
-			if (fullRoster[i] == null)
-			{
-				convertedRoster.push(null);
-				continue;
-			}
-			convertedRoster.push(this.UIDataHelper.convertEntityToUIData(fullRoster[i], null));
-			reserveCount++;
-		}*/
-
-		return {
-            mName = "Caravan",
-            mType = "Escort",
-			mBrotherList = convertedRoster.resize(27, null),
-			mBrotherMin = 0,
-			mBrotherMax = 17,
-			mSlotLimit = 27,
-            mCanRemove = false,
-            mCanImport = false,
-            mMoodVisible = false
-		}
-	}
-
-	function queryPlayerReserveInformation()
-	{
-		local fullRoster = ::World.Assets.getFormation();
-
-		local convertedRoster = [];
-
-		local reserveCount = 0;
-		for( local i = 0; i != fullRoster.len(); i = ++i )
-		{
-			if (i < 18) continue;
-			if (fullRoster[i] == null)
-			{
-				convertedRoster.push(null);
-				continue;
-			}
-			convertedRoster.push(this.UIDataHelper.convertEntityToUIData(fullRoster[i], null));
-			reserveCount++;
-		}
-
-		return {
-            mName = "Reserve",
-            mType = "Player",
-			mBrotherList = convertedRoster,
-			mBrotherMin = 0,
-			mBrotherMax = 5,
-			mSlotLimit = 9,
-            mSlotClasses = "<div class=\"ui-control is-brother-slot is-reserve-slot\"/>"
-		}
-	}
-
-	function show()
-	{
-		::modTQUA.createGuests();
-		this.setRosterLimit(("State" in this.World) && this.World.State != null ? this.World.Assets.getBrothersMaxInCombat() : 12);
-
-		if (this.m.JSHandle != null)
-		{
-			this.Tooltip.hide();
-			this.m.JSHandle.asyncCall("show", this.queryData());
-		}
-	}
-
-	function hide()
-	{
-		if (this.m.JSHandle != null)
-		{
-			this.Tooltip.hide();
-			this.m.JSHandle.asyncCall("hide", null);
-		}
+		this.world_base_screen.destroy();
+		this.m.JSDataSourceHandle = ::UI.disconnect(this.m.JSDataSourceHandle);
 	}
 
 	function toggle()
@@ -217,24 +253,16 @@ this.world_obituary_screen <- {
 		}
 	}
 
-	function switchToNextBrother()
+	function switchToNextBrother()	// Used via hotkey, TODO implement this with MSU
 	{
 		this.Tooltip.hide();
 		this.m.JSDataSourceHandle.asyncCall("switchToNextBrother", null);
 	}
 
-	function switchToPreviousBrother()
+	function switchToPreviousBrother()	// Used via hotkey TODO implement this with MSU
 	{
 		this.Tooltip.hide();
 		this.m.JSDataSourceHandle.asyncCall("switchToPreviousBrother", null);
-	}
-
-	function loadBrothersList()
-	{
-		if (this.m.JSDataSourceHandle != null)
-		{
-			this.m.JSDataSourceHandle.asyncCall("loadBrothersList", this.onQueryBrothersList());
-		}
 	}
 
 	function loadData()
@@ -243,41 +271,6 @@ this.world_obituary_screen <- {
 		{
 			this.m.JSDataSourceHandle.asyncCall("loadFromData", this.queryData());
 		}
-	}
-
-	function setRosterLimit( _limit )
-	{
-		if (this.m.JSDataSourceHandle != null)
-		{
-			this.m.JSDataSourceHandle.asyncCall("setRosterLimit", _limit);
-		}
-	}
-
-	function onScreenConnected()
-	{
-	}
-
-	function onScreenDisconnected()
-	{
-	}
-
-	function onScreenShown()
-	{
-		this.m.Visible = true;
-		this.m.Animating = false;
-		this.m.PopupDialogVisible = false;
-	}
-
-	function onScreenHidden()
-	{
-		this.m.Visible = false;
-		this.m.Animating = false;
-		this.m.PopupDialogVisible = false;
-	}
-
-	function onScreenAnimating()
-	{
-		this.m.Animating = true;
 	}
 
 	function onCloseButtonClicked()
@@ -296,361 +289,79 @@ this.world_obituary_screen <- {
 		}
 	}
 
-	function onPopupDialogIsVisible( _data )
-	{
-		this.m.PopupDialogVisible = _data[0];
-	}
-
-	function queryData()
-	{
-		local result = {
-            RostersData = {
-                Formation = this.queryPlayerFormationInformation(),
-                Reserve = this.queryPlayerReserveInformation(),
-                Guests = this.queryGuestInformation(),
-                Caravan = this.queryCaravanInformation()
-            }
-		};
-
-		return result;
-	}
-
-	function onQueryBrothersList()
-	{
-		return this.strategic_onQueryBrothersList();
-	}
-
-	function onUpdateNameAndTitle( _data )
-	{
-		return this.general_onUpdateNameAndTitle(_data);
-	}
-
-	function onUpdateRosterPosition( _data )
-	{
-		this.Tactical.getEntityByID(_data[0]).setPlaceInFormation(_data[1]);
-	}
-
-	function strategic_onQueryBrothersList()
-	{
-		local roster = this.World.Assets.getFormation();
-
-		for( local i = 0; i != roster.len(); i = ++i )
-		{
-			if (roster[i] != null)
-			{
-				roster[i] = this.UIDataHelper.convertEntityToUIData(roster[i], null);
-			}
-		}
-
-		return roster;
-	}
-
-	function general_onUpdateNameAndTitle( _data )
-	{
-		local entity = this.Tactical.getEntityByID(_data[0]);
-
-		if (entity == null || !entity.isPlayerControlled())
-		{
-			return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.FailedToFindEntity);
-		}
-
-		if (_data[1].len() >= 1)
-		{
-			entity.setName(_data[1]);
-		}
-
-		entity.setTitle(_data[2]);
-		return this.UIDataHelper.convertEntityToUIData(entity, null);
-	}
-
-	function helper_queryEntityItemData( _data, _withStash = false )
-	{
-		local entity = this.Tactical.getEntityByID(_data[0]);
-
-		if (entity == null || !entity.isPlayerControlled())
-		{
-			return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.FailedToFindEntity);
-		}
-
-		local inventory = entity.getItems();
-
-		if (inventory == null)
-		{
-			return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.FailedToAcquireInventory);
-		}
-
-		local sourceItem = inventory.getItemByInstanceID(_data[1]);
-
-		if (sourceItem == null)
-		{
-			return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.FailedToFindBagItem);
-		}
-
-		local stash = this.Stash;
-		local targetItem;
-		local targetItemIdx = _data.len() >= 3 && _data[2] != null ? _data[2] : null;
-
-		if (this.m.InventoryMode == this.Const.CharacterScreen.InventoryMode.Ground)
-		{
-			stash = entity.getTile() != null ? entity.getTile().Items : null;
-
-			if (stash != null && targetItemIdx != null && targetItemIdx >= 0 && targetItemIdx < stash.len())
-			{
-				targetItem = stash[targetItemIdx];
-			}
-		}
-		else
-		{
-			local item = stash.getItemAtIndex(targetItemIdx);
-
-			if (item != null)
-			{
-				targetItem = item.item;
-			}
-		}
-
-		return {
-			entity = entity,
-			stash = stash,
-			inventory = inventory,
-			sourceItem = sourceItem,
-			targetItem = targetItem,
-			targetItemIdx = targetItemIdx
-		};
-	}
-
-	function helper_queryEntityBackpackItemData( _data )
-	{
-		local entity = this.Tactical.getEntityByID(_data[0]);
-
-		if (entity == null || !entity.isPlayerControlled())
-		{
-			return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.FailedToFindEntity);
-		}
-
-		local inventory = entity.getItems();
-
-		if (inventory == null)
-		{
-			return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.FailedToAcquireInventory);
-		}
-
-		local sourceItemIdx = _data[1];
-		local sourceItem = inventory.getItemAtBagSlot(sourceItemIdx);
-
-		if (sourceItem == null)
-		{
-			return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.FailedToFindBagItem);
-		}
-
-		local targetItemIdx = _data[2];
-		local targetItem = inventory.getItemAtBagSlot(targetItemIdx);
-		return {
-			entity = entity,
-			inventory = inventory,
-			sourceItem = sourceItem,
-			sourceItemIdx = sourceItemIdx,
-			targetItem = targetItem,
-			targetItemIdx = targetItemIdx
-		};
-	}
-
-	function helper_queryBagItemDataToInventory( _data )
-	{
-		local entity = this.Tactical.getEntityByID(_data[0]);
-
-		if (entity == null || !entity.isPlayerControlled())
-		{
-			return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.FailedToFindEntity);
-		}
-
-		local inventory = entity.getItems();
-
-		if (inventory == null)
-		{
-			return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.FailedToAcquireInventory);
-		}
-
-		local stash;
-		local sourceItemIdx = _data.len() >= 3 && _data[2] != null ? _data[2] : null;
-		local targetItemIdx = _data.len() >= 4 && _data[3] != null ? _data[3] : null;
-		local sourceItem = inventory.getItemAtBagSlot(sourceItemIdx);
-		local targetItem;
-
-		if (this.m.InventoryMode == this.Const.CharacterScreen.InventoryMode.Ground)
-		{
-			local ground = entity.getTile() != null ? entity.getTile().Items : null;
-
-			if (ground != null && targetItemIdx != null && targetItemIdx >= 0 && targetItemIdx < ground.len())
-			{
-				targetItem = ground[targetItemIdx];
-			}
-		}
-		else
-		{
-			if (this.Stash == null)
-			{
-				return this.helper_convertErrorToUIData(this.Const.CharacterScreen.ErrorCode.FailedToAcquireStash);
-			}
-
-			stash = this.Stash;
-		}
-
-		return {
-			entity = entity,
-			stash = stash,
-			inventory = inventory,
-			sourceItem = sourceItem,
-			sourceItemIdx = sourceItemIdx,
-			targetItem = targetItem,
-			targetItemIdx = targetItemIdx,
-			swapItem = sourceItemIdx != null
-		};
-	}
-
-	function helper_queryEquipmentTargetItems( _inventory, _sourceItem )
-	{
-		local ret = {
-			firstItem = null,
-			secondItem = null,
-			slotsNeeded = 0
-		};
-		local sourceSlotType = _sourceItem.getSlotType();
-
-		if (sourceSlotType == this.Const.ItemSlot.Offhand && _inventory.hasBlockedSlot(this.Const.ItemSlot.Offhand) == true)
-		{
-			ret.firstItem = _inventory.getItemAtSlot(this.Const.ItemSlot.Mainhand);
-		}
-		else if (sourceSlotType == this.Const.ItemSlot.Mainhand && _sourceItem.getBlockedSlotType() == this.Const.ItemSlot.Offhand)
-		{
-			ret.firstItem = _inventory.getItemAtSlot(this.Const.ItemSlot.Mainhand);
-			ret.secondItem = _inventory.getItemAtSlot(this.Const.ItemSlot.Offhand);
-
-			if (ret.firstItem == null)
-			{
-				ret.firstItem = ret.secondItem;
-				ret.secondItem = null;
-			}
-		}
-		else if (sourceSlotType == this.Const.ItemSlot.Bag)
-		{
-			if (_inventory.hasEmptySlot(this.Const.ItemSlot.Bag))
-			{
-				ret.firstItem = null;
-			}
-			else
-			{
-				ret.firstItem = _inventory.getItemAtBagSlot(0);
-			}
-		}
-		else
-		{
-			ret.firstItem = _inventory.getItemAtSlot(sourceSlotType);
-		}
-
-		if (ret.firstItem != null)
-		{
-			++ret.slotsNeeded;
-		}
-
-		if (ret.secondItem != null)
-		{
-			++ret.slotsNeeded;
-		}
-
-		return ret;
-	}
-
-	function helper_convertErrorToUIData( _errorCode )
-	{
-		local errorString = "Undefined error.";
-
-		switch(_errorCode)
-		{
-			case this.Const.CharacterScreen.ErrorCode.FailedToFindEntity:
-				errorString = "Failed to find entity.";
-				break;
-
-			case this.Const.CharacterScreen.ErrorCode.FailedToAcquireInventory:
-				errorString = "Failed to acquire inventory.";
-				break;
-
-			case this.Const.CharacterScreen.ErrorCode.FailedToFindBagItem:
-				errorString = "Failed to find bag item.";
-				break;
-		}
-
-		return {
-			error = errorString,
-			code = _errorCode
-		};
-	}
-
-    function getRosterFromID( _rosterID )
+	// Changes the place in formation of a single brother only within their own roster
+    function relocateActor( _rosterID, _actorID, _newPosition )
     {
-        local roster = ::World.Assets.getFormation();
-        if ( _rosterID == this.m.Formation ) return roster.slice(0, 18);
-        if ( _rosterID == this.m.Reserve ) return roster.slice(18);
-        ::logWarning("getRosterFromID returned nothing");
-    }
+		::logWarning("Relocate the brother '" + _actorID + "' from roster '" + _rosterID + "' into position '" + _newPosition + "'");
+		local sourceRoster = this.getManagedRoster(_rosterID);
 
-	// Changes the place in formation of a single brother only within their roster
-    // [0] = rosterID,
-    // [1] = brotherID,
-    // [2] = place in formation
-	function onRelocateBrother( _data )
-	{
-		local roster = this.getRosterFromID(_data[0]);
-        ::MSU.Log.printData(roster);
-        ::logWarning("getRosterFromID " + _data[0]);
-		foreach (bro in roster)
+		local foundActor = null;
+		foreach (actor in sourceRoster.getAll())
 		{
-            if (bro == null) continue;
-		 	if (bro.getID() != _data[1]) continue;
-            local newPosition = _data[2];
-            if (roster[newPosition] != null) ::logError("Tried relocating a brother into position " + newPosition + " but a brother already is here");
-            if (_data[0] == "Reserve")
+            if (actor == null) continue;
+			if (actor.getID() == _actorID) foundActor = actor;
+		 	if (actor.getPlaceInFormation() == _newPosition)
             {
-                newPosition += 18;
-                local fullRoster = ::World.Assets.getFormation();
-                if (fullRoster[newPosition] != null) ::logError("Tried relocating a brother into position " + newPosition + " but a brother already is here");
-            }
-            return bro.setPlaceInFormation(newPosition);
-		}
-        return;
-	}
-
-	// Changes the place in formation of a single brother only within their roster
-    // [0] = rosterID,
-    // [1] = brotherID,
-    // [2] = place in formation
-	function onRelocateBrother( _data )
-	{
-		local roster = ::World.Assets.getFormation();
-		foreach (bro in roster)
-		{
-            if (bro == null) continue;
-		 	if (bro.getID() != _data[1]) continue;
-            if (roster[_data[2]] != null)
-            {
-                ::logError("Tried relocating a brother into position " + _data[2] + " but a brother already is here");
+                ::logError("Tried relocating a actor into position " + _newPosition + " but an actor already is already here");
                 return;
             }
-            return bro.setPlaceInFormation(_data[2]);
 		}
-        return;
-	}
+		if (foundActor == null) return;
+		foundActor.setPlaceInFormation(_newPosition);
+    }
 
-    // _data[0] = brotherID
-    // _data[1] = tagA
-    // _data[2] = targetIndex
-    // _data[3] = tagB
-	function MoveAtoB( _data )
+	// Moves a brother out of a roster and into another roster
+    function transferBrother( _actorID, _sourceID, _newPosition, _targetID )
+    {
+		::logWarning("Transfer the brother '" + _actorID + "' from sourceRoster '" + _sourceID + "' into targetRoster '" + _targetID + "' into position '" + _newPosition + "'");
+
+		local sourceRoster = this.getManagedRoster(_sourceID);
+		local targetRoster = this.getManagedRoster(_targetID);
+
+		local removedActor = null;
+		foreach(actor in sourceRoster.getAll())
+		{
+			if (actor.getID() == _actorID) removedActor = actor;
+		}
+		if (removedActor == null) return;
+
+		if (targetRoster.insertActor(removedActor) == false) return;	// Must be last because you can't insert a brother into the player roster if the same is already present there
+		if (sourceRoster.removeActor(removedActor.getID()) == false) return;
+		local brothers = ::World.getPlayerRoster().getAll();
+
+		removedActor.setPlaceInFormation(_newPosition);
+    }
+
+    // Called from JavaScript
+    // [0] = rosterID,		[1] = brotherID,		[2] = place in formation
+	function onRelocateBrother( _data )
 	{
-        if (_data[1] == this.m.Formation && _data[3] == this.m.Reserve) return this.onRelocateBrother([_data[1], _data[0], _data[2] + 18]);
-		this.onRelocateBrother([_data[1], _data[0], _data[2]]);
-        return;
+		local rosterData = this.getManagedRoster(_data[0]);
+        if (rosterData == null)
+        {
+            ::logError("Can't find the roster with the ID: " + _data[0]);
+            return;
+        }
+
+		// Todo: more input validation
+
+        local newPosition = _data[2];
+        if (_data[0] == "Reserve") newPosition += 18;	// Hack because Reserve and Formation are the same roster
+
+        this.relocateActor( _data[0], _data[1], newPosition );
 	}
 
-};
+    // Called from JavaScript
+    // _data[0] = brotherID		_data[1] = tagA			_data[2] = targetIndex		_data[3] = tagB
+	function onTransferBrother( _data )
+	{
+		// Todo do some input validation
+
+        if (_data[1] == this.m.Formation && _data[3] == this.m.Reserve) return this.relocateActor(_data[1], _data[0], _data[2] + 18);
+        if (_data[1] == this.m.Reserve && _data[3] == this.m.Formation) return this.relocateActor(_data[1], _data[0], _data[2]);
+
+		this.transferBrother(_data[0], _data[1], _data[2], _data[3]);
+	}
+
+});
 
