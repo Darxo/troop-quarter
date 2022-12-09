@@ -9,19 +9,19 @@ var RosterContainer = function( _containerID )
     // Load From Data
     this.mName = null;
     this.mType = null;      // Secondary name-like string
-    this.mSlots = [];            // Array of DIVs that a brother can fit in
+    this.mSlots = [];            // Array of DIVs that an actor can fit in
     this.mBrotherList = [];      // Array of BrotherObject objects
-    this.mBrotherMin = 0;       // minimum allowed brothers in a contaner (player roster can never have less than 1)
-    this.mBrotherMax = 27;      // Maximum allows brothers in this list
+    this.mBrotherMin = 0;       // minimum allowed actors in a contaner (player roster can never have less than 1)
+    this.mBrotherMax = 27;      // Maximum allows actors in this list
     this.mSlotLimit = 27;       // Maximum slots on this list
 
     // Dynamic Variables
-    this.mBrotherCurrent = 0;     // Current amount of brothers in this container
-    this.mSelectedBrother = -1;   // Index of the currently selected brother; negative = none
+    this.mBrotherCurrent = 0;     // Current amount of actors in this container
+    this.mSelectedBrother = -1;   // Index of the currently selected actor; negative = none
 
     // Optional DIVs
     this.mListContainer = null;     // Contains all Slots created by this class. Is only used externally from RosterManager
-    this.mRosterCountLabel = null;  // Will be updated with current/max brothers
+    this.mRosterCountLabel = null;  // Will be updated with current/max actors
     this.mRosterNameLabel = null;   // Will be updated with name (type)
 
     // Config
@@ -133,7 +133,7 @@ RosterContainer.prototype.loadFromData = function( _rosterData )
     }
 
     // Returns a data object with 'Index' and 'Brother' object
-    RosterContainer.prototype.getBrotherByID = function (_brotherId)
+    RosterContainer.prototype.getBrotherByID = function (_actorId)
     {
         var data =
         {
@@ -147,13 +147,13 @@ RosterContainer.prototype.loadFromData = function( _rosterData )
         {
             for (var i = 0; i < this.mBrotherList.length; ++i)
             {
-                var brother = this.mBrotherList[i];
+                var actor = this.mBrotherList[i];
 
-                if (brother != null && CharacterScreenIdentifier.Entity.Id in brother && brother[CharacterScreenIdentifier.Entity.Id] === _brotherId)
+                if (actor != null && CharacterScreenIdentifier.Entity.Id in actor && actor[CharacterScreenIdentifier.Entity.Id] === _actorId)
                 {
                     data.Index = i;
                     data.Tag = this.mContainerID;
-                    data.Brother = brother;
+                    data.Brother = actor;
                     data.IsNull = false;
                     break;
                 }
@@ -280,15 +280,15 @@ RosterContainer.prototype.loadFromData = function( _rosterData )
         this.mSelectedBrother = -1;
     }
 
-    RosterContainer.prototype.selectBrother = function (_brotherID)
+    RosterContainer.prototype.selectBrother = function (_actorID)
     {
         if (this.mCanSelect === false) return false;
         for (var i = 0; i < this.mBrotherList.length; ++i)
         {
-            var brother = this.mBrotherList[i];
-            if (brother === null) continue;
-            if (CharacterScreenIdentifier.Entity.Id in brother === false) continue;
-            if (brother[CharacterScreenIdentifier.Entity.Id] !== _brotherID) continue;
+            var actor = this.mBrotherList[i];
+            if (actor === null) continue;
+            if (CharacterScreenIdentifier.Entity.Id in actor === false) continue;
+            if (actor[CharacterScreenIdentifier.Entity.Id] !== _actorID) continue;
             this.selectSlot(i);
             return true;
         }
@@ -317,39 +317,39 @@ RosterContainer.prototype.loadFromData = function( _rosterData )
         // console.error("Selected slot: " + _slotIndex);
         return true;
     };
-    // Returns the brother objects that is currently selected. Returns null if no one was selected or if the selection was invalid
+    // Returns the actor objects that is currently selected. Returns null if no one was selected or if the selection was invalid
     RosterContainer.prototype.getSelected = function()
     {
-        if (this.mSelectedBrother < 0) return null;         // Not brother was selected
+        if (this.mSelectedBrother < 0) return null;         // No actor was selected
         var selectedBrother = this.mBrotherList[this.mSelectedBrother];
-        if (selectedBrother === null) this.deselectCurrent();   // For some reason the brother on the selection vanished
+        if (selectedBrother === null) this.deselectCurrent();   // For some reason the actor on the selection vanished
         return selectedBrother;
     }
 
 }
 
 {   // DIV stuff
-    // Create a new DIV object out of a brother object to assign to a slot
-    RosterContainer.prototype.addBrotherSlotDIV = function(_brotherData, _index)
+    // Create a new DIV object out of an actor object to assign to a slot
+    RosterContainer.prototype.addBrotherSlotDIV = function(_actorData, _index)
     {
         // console.error(this.mSlots.length + " " + _index);
         var parentDiv = this.mSlots[_index];
-        var character = _brotherData[CharacterScreenIdentifier.Entity.Character.Key];
-        var brotherID = _brotherData[CharacterScreenIdentifier.Entity.Id];
+        var character = _actorData[CharacterScreenIdentifier.Entity.Character.Key];
+        var actorID = _actorData[CharacterScreenIdentifier.Entity.Id];
 
-        var result = parentDiv.createListBrother(brotherID);
+        var result = parentDiv.createListBrother(actorID);
         result.attr('id', 'slot-index');
-        result.data('ID', brotherID);
+        result.data('ID', actorID);
         result.data('idx', _index);
         result.data('tag', this.mContainerID);
         result.unbindTooltip();
-        result.bindTooltip({ contentType: 'ui-element', entityId: brotherID, elementId: 'pokebro.roster' });
+        result.bindTooltip({ contentType: 'ui-element', entityId: actorID, elementId: 'pokebro.roster' });
         parentDiv.data('child', result);
         this.mBrotherCurrent++;
         this.updateCountLabel();
 
         // Temporary
-        // result.attr('id', 'slot-index_' + _brotherData[CharacterScreenIdentifier.Entity.Id]);
+        // result.attr('id', 'slot-index_' + _actorData[CharacterScreenIdentifier.Entity.Id]);
 
         // update image & name
         var imageOffsetX = (CharacterScreenIdentifier.Entity.Character.ImageOffsetX in character ? character[CharacterScreenIdentifier.Entity.Character.ImageOffsetX] : 0);
@@ -357,7 +357,7 @@ RosterContainer.prototype.loadFromData = function( _rosterData )
 
         result.assignListBrotherImage(Path.PROCEDURAL + character[CharacterScreenIdentifier.Entity.Character.ImagePath], imageOffsetX, imageOffsetY, 0.66);
 
-        var character = _brotherData[CharacterScreenIdentifier.Entity.Character.Key];
+        var character = _actorData[CharacterScreenIdentifier.Entity.Character.Key];
         if(CharacterScreenIdentifier.Entity.Character.LeveledUp in character && character[CharacterScreenIdentifier.Entity.Character.LeveledUp] === true)
         {
             result.assignListBrotherLeveledUp();
@@ -370,13 +370,13 @@ RosterContainer.prototype.loadFromData = function( _rosterData )
 
         if (this.mInjuriesVisible)
         {
-            for(var i = 0; i != _brotherData['injuries'].length && i < 3; ++i)
+            for(var i = 0; i != _actorData['injuries'].length && i < 3; ++i)
             {
-                result.assignListBrotherStatusEffect(_brotherData['injuries'][i].imagePath, _brotherData[CharacterScreenIdentifier.Entity.Id], _brotherData['injuries'][i].id)
+                result.assignListBrotherStatusEffect(_actorData['injuries'][i].imagePath, _actorData[CharacterScreenIdentifier.Entity.Id], _actorData['injuries'][i].id)
             }
         }
 
-        if(this.mLostHPVisible && _brotherData['injuries'].length <= 2 && _brotherData['stats'].hitpoints < _brotherData['stats'].hitpointsMax)
+        if(this.mLostHPVisible && _actorData['injuries'].length <= 2 && _actorData['stats'].hitpoints < _actorData['stats'].hitpointsMax)
         {
             result.assignListBrotherDaysWounded();
         }
@@ -384,13 +384,13 @@ RosterContainer.prototype.loadFromData = function( _rosterData )
         return result;
     }
 
-    RosterContainer.prototype.updateBrotherDIV = function(_brotherData)
+    RosterContainer.prototype.updateBrotherDIV = function(_actorData)
     {
-        var brotherID = _brotherData[CharacterScreenIdentifier.Entity.Id];
-        var brother = this.getBrotherByID(brotherID);
-        if (brother === null) return false;
+        var actorID = _actorData[CharacterScreenIdentifier.Entity.Id];
+        var actor = this.getBrotherByID(actorID);
+        if (actor === null) return false;
 
-        var slotDIV = this.mSlots[brother.Index].find('#slot-index:first');
+        var slotDIV = this.mSlots[actor.Index].find('#slot-index:first');
         if (slotDIV.length === 0)
         {
             console.error("slot.length === 0");
@@ -470,7 +470,7 @@ RosterContainer.prototype.loadFromData = function( _rosterData )
     }
 
     // does not validate conditions
-    // Removes the brother related div data from a slot and the brother data from the brother array
+    // Removes the actor related div data from a slot and the actor data from the actor array
     // Returns an object with the removed slotData, playerData and a bool indicating whether this slot was highlighted
     RosterContainer.prototype.removeBrother = function ( _slotIdx )
     {
@@ -507,7 +507,7 @@ RosterContainer.prototype.loadFromData = function( _rosterData )
         return this.swapBrothers(_firstIdx, _secondIdx);
     }
 
-    // Switch the positions of two brothers in this container
+    // Switch the positions of two actors in this container
     // _sourceIdx is an unsigned integer
     // _targetIdx is an unsigned integer
     RosterContainer.prototype.swapBrothers = function ( _firstIdx, _secondIdx )
@@ -550,7 +550,7 @@ RosterContainer.prototype.loadFromData = function( _rosterData )
         return true;
     }
 
-    // Removes a brother from one slot and move them to another slot within this container
+    // Removes an actor from one slot and move them to another slot within this container
     // _sourceIdx is an unsigned integer
     // _targetIdx is an unsigned integer
     RosterContainer.prototype.relocateBrother = function ( _sourceIdx, _targetIdx )

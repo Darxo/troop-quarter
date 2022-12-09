@@ -220,18 +220,6 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
 		}
 	}
 
-	function switchToNextBrother()	// Used via hotkey, TODO implement this with MSU
-	{
-		this.Tooltip.hide();
-		this.m.JSDataSourceHandle.asyncCall("switchToNextBrother", null);
-	}
-
-	function switchToPreviousBrother()	// Used via hotkey TODO implement this with MSU
-	{
-		this.Tooltip.hide();
-		this.m.JSDataSourceHandle.asyncCall("switchToPreviousBrother", null);
-	}
-
 	function loadData()
 	{
 		if (this.m.JSDataSourceHandle != null)

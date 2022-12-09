@@ -21,7 +21,6 @@ var RosterManagerScreen = function()
     this.createModules();
 };
 
-
 RosterManagerScreen.prototype.isConnected = function ()
 {
     return this.mSQHandle !== null;
@@ -91,6 +90,26 @@ RosterManagerScreen.prototype.createDIV = function (_parentDiv)
     this.mRosterManagerScreen.append(this.mLeftContentContainer);
     this.mRightContentContainer = $('<div class="l-right-content-container"/>');
     this.mRosterManagerScreen.append(this.mRightContentContainer);
+
+    // MSU Hotkeys:
+    var self = this;
+    $(document).on('keyup.' + modTQUA.ID + 'CS', null, this, function (_event)
+    {
+        if (self.isVisible() === false) return false;
+
+        if (MSU.Keybinds.isKeybindPressed(modTQUA.ID, "SwitchToNextSelected", _event))
+        {
+            self.mDataSource.switchToNextBrother();
+            return true;
+        }
+        else if (MSU.Keybinds.isKeybindPressed(modTQUA.ID, "SwitchToPrevSelected", _event))
+        {
+            self.mDataSource.switchToPreviousBrother();
+            return true;
+        }
+
+        return false
+    });
 };
 
 RosterManagerScreen.prototype.destroyDIV = function ()
@@ -171,6 +190,11 @@ RosterManagerScreen.prototype.unregister = function ()
     this.destroy();
 };
 
+RosterManagerScreen.prototype.isVisible = function ()
+{
+	return this.mContainer.hasClass('display-block');
+};
+
 RosterManagerScreen.prototype.show = function (_data)
 {
     var self = this;
@@ -181,9 +205,7 @@ RosterManagerScreen.prototype.show = function (_data)
     }
     else
     {
-        this.mDataSource.loadPerkTreesOnce();
         this.mDataSource.loadBrothersList();
-        this.mDataSource.loadStashList();
     }
 
     this.mContainer.velocity("finish", true).velocity({ opacity: 1 },

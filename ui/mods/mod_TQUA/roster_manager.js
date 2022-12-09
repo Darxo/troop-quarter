@@ -38,17 +38,17 @@ RosterManager.prototype.loadFromData = function( _data )
     }
 
     // When we don't know in which roster he is
-    RosterManager.prototype.getBrotherByID = function (_brotherID)
+    RosterManager.prototype.getBrotherByID = function (_actorID)
     {
         for(var i = 0; i < this.mBrotherContainer.length; i++)
         {
-            var playerBrother = this.mBrotherContainer[i].getBrotherByID(_brotherID);
+            var playerBrother = this.mBrotherContainer[i].getBrotherByID(_actorID);
             if (playerBrother.IsNull === false) return playerBrother;
         }
         return null;
     };
 
-    // Returns the slot that is currently selected. This should usually have a brother inside
+    // Returns the slot that is currently selected. This should usually have an actor inside
     // Returns null if no slot is selected
     RosterManager.prototype.getSelected = function()
     {
@@ -134,14 +134,14 @@ RosterManager.prototype.loadFromData = function( _data )
         return this.mBrotherContainer[afterIndex];
     }
 
-    RosterManager.prototype.setBrotherSelectedByID = function (_brotherID)
+    RosterManager.prototype.setBrotherSelectedByID = function (_actorID)
     {
         for(var i = 0; i < this.mBrotherContainer.length; i++)
         {
             this.mBrotherContainer[i].deselectCurrent();
-            if (this.mBrotherContainer[i].selectBrother(_brotherID) === false) continue;
+            if (this.mBrotherContainer[i].selectBrother(_actorID) === false) continue;
 
-            this.notifyDataSourceSelection(_brotherID);
+            this.notifyDataSourceSelection(_actorID);
         }
     };
 
@@ -164,7 +164,7 @@ RosterManager.prototype.loadFromData = function( _data )
 }
 
 {   // DIV stuff
-    // add brother to empty slot
+    // add actor to empty slot
     RosterManager.prototype.onBrothersListLoaded = function ( _ownerID )
     {
         var parent = this.get(_ownerID);
@@ -183,11 +183,11 @@ RosterManager.prototype.loadFromData = function( _data )
 
         for (var i = 0; i < parent.mBrotherList.length; ++i)
         {
-            var brother = parent.mBrotherList[i];
+            var actor = parent.mBrotherList[i];
 
-            if (brother !== null)
+            if (actor !== null)
             {
-                this.addBrotherSlotDIV(parent, brother, i);
+                this.addBrotherSlotDIV(parent, actor, i);
             }
         }
     };
@@ -235,7 +235,7 @@ RosterManager.prototype.loadFromData = function( _data )
             }
             else
             {
-                // deny when the dragged brother is a player character
+                // deny when the dragged actor is a player character
                 if (drag.data('player') === true)
                     return false;
             }
@@ -256,7 +256,7 @@ RosterManager.prototype.loadFromData = function( _data )
 
         var result = _parent.addBrotherSlotDIV(_data, _index);
 
-        // some event listener for brother slot to drag and drop
+        // some event listener for actor slot to drag and drop
         result.drag("start", function (ev, dd)
         {
 
@@ -306,22 +306,20 @@ RosterManager.prototype.loadFromData = function( _data )
             }
         }, { drop: '.is-brother-slot' });
 
-        // event listener when left-click the brother
-        result.assignListBrotherClickHandler(function (_brother, _event)
+        // event listener when left-click the actor
+        result.assignListBrotherClickHandler(function (_actor, _event)
         {
             if (_event.button !== 0) return;   // We are only interested in LMB clicks
-            var brotherID = _brother.data('brother')[CharacterScreenIdentifier.Entity.Id];
+            var actorID = _actor.data('brother')[CharacterScreenIdentifier.Entity.Id];
 
-            self.setBrotherSelectedByID(brotherID);
+            self.setBrotherSelectedByID(actorID);
         });
 
-        // event listener when right-click the brother
+        // event listener when right-click the actor
         result.mousedown(function (event)
         {
             if (event.which === 3)
             {
-                //var data = $(this).data('brother');
-                //var data = $(this);
                 return self.onQuickMoveActor($(this));
             }
         });
@@ -358,16 +356,16 @@ RosterManager.prototype.loadFromData = function( _data )
 }
 
 {   // Communication with outside (Datasource/Squirrel)
-    RosterManager.prototype.notifyDataSourceSelection = function( _brotherID )
+    RosterManager.prototype.notifyDataSourceSelection = function( _actorID )
     {
         // if (this.mDataSource !== null)
-        this.mDataSource.selectedBrotherById(_brotherID);
+        this.mDataSource.selectedBrotherById(_actorID);
     }
 
     //- Call Squirrel backend function
-    RosterManager.prototype.notifyBackendRelocateBrother = function (_rosterID, _brotherID, _placeInFormation)
+    RosterManager.prototype.notifyBackendRelocateBrother = function (_rosterID, _actorID, _placeInFormation)
     {
-        SQ.call(this.mSQHandle, 'onRelocateBrother', [ _rosterID, _brotherID, _placeInFormation ]);
+        SQ.call(this.mSQHandle, 'onRelocateBrother', [ _rosterID, _actorID, _placeInFormation ]);
     };
 
     RosterManager.prototype.notifyBackendMoveAtoB = function (_id, _tagA, _pos, _tagB)
@@ -379,7 +377,7 @@ RosterManager.prototype.loadFromData = function( _data )
 }
 
 {   // Moving Brothers around
-    // Removes a brother from one brotherContainer and puts them into a different brotherContainer
+    // Removes an actor from one RosterContainer and puts them into a different RosterContainer
     // _sourceIdx is an unsigned integer
     // _targetIdx is an unsigned integer
     // _sourceOwner, _targetOwner are BrotherContainer and not null
@@ -393,12 +391,12 @@ RosterManager.prototype.loadFromData = function( _data )
         // Source roster is at minimum
         if (_sourceOwner.mBrotherCurrent <= _sourceOwner.mBrotherMin) return false;
 
-        var brotherID = _sourceOwner.mSlots[_sourceIdx].data('child').data('ID');
+        var actorID = _sourceOwner.mSlots[_sourceIdx].data('child').data('ID');
 
-        var brotherData = _sourceOwner.removeBrother(_sourceIdx);
-        _targetOwner.importBrother(_targetIdx, brotherData);
+        var actorData = _sourceOwner.removeBrother(_sourceIdx);
+        _targetOwner.importBrother(_targetIdx, actorData);
 
-        this.notifyBackendMoveAtoB(brotherID, _sourceOwner.mContainerID, _targetIdx, _targetOwner.mContainerID);
+        this.notifyBackendMoveAtoB(actorID, _sourceOwner.mContainerID, _targetIdx, _targetOwner.mContainerID);
 
         return true;
     }
@@ -435,7 +433,7 @@ RosterManager.prototype.loadFromData = function( _data )
             return true;
         }
 
-        // A brother is moved from one container into another:
+        // A actor is moved from one container into another:
         if (sourceOwner.isEmpty(_firstIdx))    return this.transferBrother(_secondIdx, targetOwner, _firstIdx, sourceOwner);
         if (targetOwner.isEmpty(_secondIdx))   return this.transferBrother(_firstIdx, sourceOwner, _secondIdx, targetOwner);
 

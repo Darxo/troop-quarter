@@ -51,11 +51,11 @@ RosterManagerRosterModule.prototype.createDIV = function (_parentDiv)
     // Primary (Bottom) Container
     var primaryContainer = $('<div class="primary-container"/>');
     this.mContainer.append(primaryContainer);
-    this.createRosterDIV(primaryContainer, RosterOwner.Formation);
+    this.createRosterDIV(primaryContainer, modTQUA.Owner.Formation);
 
-    this.createRosterDIV(secondaryContainer.findListScrollContainer(), RosterOwner.Reserve);
-    this.createRosterDIV(secondaryContainer.findListScrollContainer(), RosterOwner.Guests);
-    this.createRosterDIV(secondaryContainer.findListScrollContainer(), RosterOwner.Caravan);
+    this.createRosterDIV(secondaryContainer.findListScrollContainer(), modTQUA.Owner.Reserve);
+    this.createRosterDIV(secondaryContainer.findListScrollContainer(), modTQUA.Owner.Guests);
+    this.createRosterDIV(secondaryContainer.findListScrollContainer(), modTQUA.Owner.Caravan);
 
 
     // DeadZones
