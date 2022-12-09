@@ -127,12 +127,12 @@ RosterManagerScreen.prototype.destroyDIV = function ()
 RosterManagerScreen.prototype.createModules = function()
 {
     this.mCharacterPanelModule = new CharacterScreenLeftPanelModule(this, this.mDataSource);
-    this.mBrothersModule = new RosterManagerBrothersListModule(this, this.mDataSource);
+    this.mBrothersModule = new RosterManagerRosterModule(this, this.mDataSource);
 };
 
 RosterManagerScreen.prototype.registerModules = function ()
 {
-    this.mCharacterPanelModule.register(this.mLeftContentContainer);
+    this.mCharacterPanelModule.register(this.mLeftContentContainer);    // These are all vanilla modules with a few hooks to turn off certain features
     this.mBrothersModule.register(this.mRightContentContainer);
 };
 

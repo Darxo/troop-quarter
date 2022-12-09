@@ -1,7 +1,7 @@
 
 "use strict";
 
-var RosterManagerBrothersListModule = function(_parent, _dataSource)
+var RosterManagerRosterModule = function(_parent, _dataSource)
 {
     this.mParent = _parent;
     this.mDataSource = _dataSource;
@@ -14,7 +14,7 @@ var RosterManagerBrothersListModule = function(_parent, _dataSource)
     this.mDeadZoneElement = null;
 };
 
-RosterManagerBrothersListModule.prototype.createDIV = function (_parentDiv)
+RosterManagerRosterModule.prototype.createDIV = function (_parentDiv)
 {
     var self = this;
 
@@ -64,7 +64,7 @@ RosterManagerBrothersListModule.prototype.createDIV = function (_parentDiv)
     this.mDataSource.mRosterManager.setDeadZoneElement(primaryContainer);
 };
 
-RosterManagerBrothersListModule.prototype.createRosterDIV = function (_parentDiv, _rosterID)
+RosterManagerRosterModule.prototype.createRosterDIV = function (_parentDiv, _rosterID)
 {
     var rosterContainer = $('<div class="roster-container"/>');
     _parentDiv.append(rosterContainer);
@@ -118,7 +118,7 @@ RosterManagerBrothersListModule.prototype.createRosterDIV = function (_parentDiv
 
 
 
-RosterManagerBrothersListModule.prototype.destroyDIV = function ()
+RosterManagerRosterModule.prototype.destroyDIV = function ()
 {
     this.mDataSource.mRosterManager.destroyDIV();
 
@@ -127,39 +127,39 @@ RosterManagerBrothersListModule.prototype.destroyDIV = function ()
     this.mContainer = null;
 };
 
-RosterManagerBrothersListModule.prototype.bindTooltips = function ()
+RosterManagerRosterModule.prototype.bindTooltips = function ()
 {
 
 };
 
-RosterManagerBrothersListModule.prototype.unbindTooltips = function ()
+RosterManagerRosterModule.prototype.unbindTooltips = function ()
 {
 
 };
 
 
-RosterManagerBrothersListModule.prototype.registerDatasourceListener = function()
+RosterManagerRosterModule.prototype.registerDatasourceListener = function()
 {
 	this.mDataSource.addListener(CharacterScreenDatasourceIdentifier.Brother.Updated, jQuery.proxy(this.onBrotherUpdated, this));
 };
 
 
-RosterManagerBrothersListModule.prototype.create = function(_parentDiv)
+RosterManagerRosterModule.prototype.create = function(_parentDiv)
 {
     this.createDIV(_parentDiv);
     this.bindTooltips();
 };
 
-RosterManagerBrothersListModule.prototype.destroy = function()
+RosterManagerRosterModule.prototype.destroy = function()
 {
     this.unbindTooltips();
     this.destroyDIV();
 };
 
 
-RosterManagerBrothersListModule.prototype.register = function (_parentDiv)
+RosterManagerRosterModule.prototype.register = function (_parentDiv)
 {
-    console.log('RosterManagerBrothersListModule::REGISTER');
+    console.log('RosterManagerRosterModule::REGISTER');
 
     if (this.mContainer !== null)
     {
@@ -173,7 +173,7 @@ RosterManagerBrothersListModule.prototype.register = function (_parentDiv)
     }
 };
 
-RosterManagerBrothersListModule.prototype.unregister = function ()
+RosterManagerRosterModule.prototype.unregister = function ()
 {
     console.log('CharacterScreenBrothersListModule::UNREGISTER');
 
@@ -186,7 +186,7 @@ RosterManagerBrothersListModule.prototype.unregister = function ()
     this.destroy();
 };
 
-RosterManagerBrothersListModule.prototype.isRegistered = function ()
+RosterManagerRosterModule.prototype.isRegistered = function ()
 {
 	if (this.mContainer !== null)
 	{
@@ -197,22 +197,22 @@ RosterManagerBrothersListModule.prototype.isRegistered = function ()
 };
 
 
-RosterManagerBrothersListModule.prototype.show = function ()
+RosterManagerRosterModule.prototype.show = function ()
 {
 	this.mContainer.removeClass('display-none').addClass('display-block');
 };
 
-RosterManagerBrothersListModule.prototype.hide = function ()
+RosterManagerRosterModule.prototype.hide = function ()
 {
 	this.mContainer.removeClass('display-block').addClass('display-none');
 };
 
-RosterManagerBrothersListModule.prototype.isVisible = function ()
+RosterManagerRosterModule.prototype.isVisible = function ()
 {
 	return this.mContainer.hasClass('display-block');
 };
 
-RosterManagerBrothersListModule.prototype.updateBlockedSlots = function ()
+RosterManagerRosterModule.prototype.updateBlockedSlots = function ()
 {
     var self = this;
 
@@ -244,7 +244,7 @@ RosterManagerBrothersListModule.prototype.updateBlockedSlots = function ()
 }
 
 
-RosterManagerBrothersListModule.prototype.clearBrothersList = function ()
+RosterManagerRosterModule.prototype.clearBrothersList = function ()
 {
     /* for(var i=0; i != this.mDataSource.getPlayerRoster().mSlots.length; ++i)
     {
@@ -255,13 +255,13 @@ RosterManagerBrothersListModule.prototype.clearBrothersList = function ()
     // this.mNumActive = 0;
 };
 
-RosterManagerBrothersListModule.prototype.updateBrotherSlot = function (_data)
+RosterManagerRosterModule.prototype.updateBrotherSlot = function (_data)
 {
 	this.mRosterManager.get(Owner.Formation).updateBrotherDIV(_data);
 	this.mRosterManager.get(Owner.Reserve).updateBrotherDIV(_data);
 };
 
-/*RosterManagerBrothersListModule.prototype.showBrotherSlotLock = function(_brotherId, _showLock)
+/*RosterManagerRosterModule.prototype.showBrotherSlotLock = function(_brotherId, _showLock)
 {
 	var slot = this.mDataSource.getPlayerRoster().mListContainer.find('#slot-index_' + _brotherId + ':first');
 	if (slot.length === 0)
@@ -272,7 +272,7 @@ RosterManagerBrothersListModule.prototype.updateBrotherSlot = function (_data)
     slot.showListBrotherLockImage(_showLock);
 };*/
 
-RosterManagerBrothersListModule.prototype.updateBrotherSlotLocks = function(_inventoryMode)
+RosterManagerRosterModule.prototype.updateBrotherSlotLocks = function(_inventoryMode)
 {
 	/*switch(_inventoryMode)
 	{
@@ -297,7 +297,7 @@ RosterManagerBrothersListModule.prototype.updateBrotherSlotLocks = function(_inv
 	}*/
 };
 
-RosterManagerBrothersListModule.prototype.onBrotherUpdated = function (_dataSource, _brother)
+RosterManagerRosterModule.prototype.onBrotherUpdated = function (_dataSource, _brother)
 {
 	if (_brother !== null &&
 		CharacterScreenIdentifier.Entity.Id in _brother &&
