@@ -62,6 +62,10 @@ RosterManagerRosterModule.prototype.createDIV = function (_parentDiv)
 // RosterDIVs can't be created at this point because the rosters are not yet loadedFromData
 RosterManagerRosterModule.prototype.createDelayedRosterDIVs = function()
 {
+    // Remove all previous slots for all the cases where we re-open the Roster-Screen with different rosters
+    this.PrimaryContainer.empty();
+    this.SecondaryContainer.findListScrollContainer().empty();
+
     var containerArray = this.mDataSource.mRosterManager.mBrotherContainer;
     for(var i = 0; i < containerArray.length; i++)
     {

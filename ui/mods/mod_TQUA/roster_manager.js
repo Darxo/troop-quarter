@@ -8,6 +8,8 @@ var RosterManager = function(_dataSource)
 
 RosterManager.prototype.initializeFromData = function( _data )
 {
+    this.mBrotherContainer = [];    // Makes sure all previous data is wiped
+
     console.error("initializing Roster Manager");
     var entries = Object.keys(_data);
     for(var i = 0; i < entries.length; i++)
