@@ -20,6 +20,7 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
 		this.m.JSDataSourceHandle = this.m.JSHandle.connectToModule("DataSource", this);
 
         this.addManagedRoster("Guests", {
+			isActive = function() {return ::World.getGuestRoster().getSize() != 0},
 			queryData = function( _this ) {
 				return {
 					mName = "Militia",
@@ -41,7 +42,9 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
         });
 
         this.addManagedRoster("Caravan", {
+			isActive = function() {return (::World.State.m.EscortedEntity != null && !::World.State.m.EscortedEntity.isNull());},
 			queryData = function( _this ) {
+
 				local dummyArray = [];
 				dummyArray.resize(27, null);
 				return {
@@ -63,6 +66,7 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
 		});
 
         this.addManagedRoster("Formation", {
+			isActive = function() {return true},
             queryData = function( _this ) {
 				return {
 					mName = "Formation",
@@ -85,6 +89,7 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
         });
 
         this.addManagedRoster("Reserve", {
+			isActive = function() {return true},
             queryData = function( _this ) {
 				local convertedRoster = _this.convertActorsToUIData(::World.Assets.getFormation().slice(18));	// Only pass the last 9 slots of the player roster for vanilla
 				return {
@@ -107,7 +112,7 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
 			}
         });
 
-		// ::modTQUA.createGuests();
+		::modTQUA.createGuests();
 
 	}
 
@@ -152,6 +157,7 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
 		local rosterData = {};
 		foreach(id, managedRoster in this.m.ManagedRosters)
 		{
+			if (managedRoster.isActive() == false) continue;
 			rosterData[id] <- managedRoster.queryData(this);
 		}
 		local result = {};
