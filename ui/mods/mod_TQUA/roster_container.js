@@ -35,6 +35,8 @@ var RosterContainer = function( _containerID )
     this.mCanRemove = true;
     this.mCanImport = true;
     this.mCanReposition = true;
+    this.mAcceptsPlayerCharacters = false;  // Are player characters allowed to be put inside this container? This is only true for Formation and Reserve usually
+
     this.mCanSelectEmptySlots = false;
     this.mSlotClasses = '<div class="ui-control is-brother-slot is-roster-slot"/>';     // Classes that are assigned to slot DIVs of this container
 }
@@ -54,12 +56,6 @@ RosterContainer.prototype.loadFromData = function( _rosterData )
     this.updateNameLabel();
     this.updateCountLabel();
     return null;
-
-    if ('Name' in _data && _data.Name !== null) this.mName = _data.Name;
-    if ('Roster' in _data && _data.Roster !== null) this.mBrotherList = _data.Roster;
-    if ('BrotherMin' in _data && _data.BrotherMin !== null) this.mBrotherMin = _data.BrotherMin;
-    if ('BrotherMax' in _data && _data.BrotherMax !== null) this.mBrotherMax = _data.BrotherMax;
-    if ('SlotLimit' in _data && _data.SlotLimit !== null)   this.mSlotLimit = _data.SlotLimit;
 }
 
 {   // Basic Getter and Setter
@@ -111,6 +107,30 @@ RosterContainer.prototype.loadFromData = function( _rosterData )
 }
 
 {   // Smart Getter and Isser
+
+    RosterContainer.prototype.isPlayerCharacter = function( _slotIndex )
+    {
+        var actorData = this.mBrotherList[_slotIndex];
+        if (!(CharacterScreenIdentifier.Entity.Character.Key in actorData)) return false;
+        var character = actorData[CharacterScreenIdentifier.Entity.Character.Key];
+        return character[CharacterScreenIdentifier.Entity.Character.IsPlayerCharacter];
+    }
+
+    RosterContainer.prototype.canRemoveActor = function()
+    {
+        if (this.mCanRemove === false) return false;
+        if (this.mBrotherCurrent <= this.mBrotherMin) return false;
+        return true;
+    }
+
+    // _isPlayerCharacter is optional parameter with default value of false
+    RosterContainer.prototype.canImportActor = function( _isPlayerCharacter )
+    {
+        if (this.mCanImport === false) return false;
+        if (this.mBrotherCurrent >= this.mBrotherMax) return false;
+        if (_isPlayerCharacter !== undefined && this.mAcceptsPlayerCharacters === false && _isPlayerCharacter === true) return false;
+        return true;
+    }
 
     // Returns a data object with 'Index' and 'Brother' object
     RosterContainer.prototype.getBrotherByID = function (_brotherId)
@@ -320,7 +340,6 @@ RosterContainer.prototype.loadFromData = function( _rosterData )
         var result = parentDiv.createListBrother(brotherID);
         result.attr('id', 'slot-index');
         result.data('ID', brotherID);
-        result.data('avatar', (CharacterScreenIdentifier.Entity.Character.IsPlayerCharacter in character ? character[CharacterScreenIdentifier.Entity.Character.IsPlayerCharacter] : false));
         result.data('idx', _index);
         result.data('tag', this.mContainerID);
         result.unbindTooltip();
@@ -429,7 +448,8 @@ RosterContainer.prototype.loadFromData = function( _rosterData )
     // Insert Slot and Brother data that are coming from another slot into a new slot
     RosterContainer.prototype.importBrother = function ( _slotIdx, _data )
     {
-        if (this.mCanImport === false) return false;
+        // mAcceptsPlayerCharacters 'playerCharacter'
+        if (this.canImportActor(_data['playerCharacter']) === false) return false;
         if (this.isEmpty(_slotIdx) === false) return false;
         if (_data === null) return false;
 
@@ -449,11 +469,11 @@ RosterContainer.prototype.loadFromData = function( _rosterData )
         return true;
     }
 
+    // does not validate conditions
     // Removes the brother related div data from a slot and the brother data from the brother array
     // Returns an object with the removed slotData, playerData and a bool indicating whether this slot was highlighted
     RosterContainer.prototype.removeBrother = function ( _slotIdx )
     {
-        if (this.mCanRemove === false) return null;
         if (this.isEmpty(_slotIdx)) return null;
 
         var slot = this.mSlots[_slotIdx];

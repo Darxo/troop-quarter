@@ -93,7 +93,8 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
 					mBrotherList = _this.convertActorsToUIData(::World.Assets.getFormation().slice(0, 18)),		// Only pass the first 18 slots of the player roster
 					mBrotherMin = 1,
 					mBrotherMax = 12,
-					mSlotLimit = 18
+					mSlotLimit = 18,
+					mAcceptsPlayerCharacters = true
 				}},
 			getAll = function() {return this.World.getPlayerRoster().getAll();},
 			insertActor = function(_actor) {	// Maybe add Position?
@@ -112,10 +113,10 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
 					mName = "Reserve",
 					mType = "Player",
 					mBrotherList = convertedRoster,
-					mBrotherMin = 0,
 					mBrotherMax = 9,
 					mSlotLimit = 9,
-					mSlotClasses = "<div class=\"ui-control is-brother-slot is-reserve-slot\"/>"
+					mSlotClasses = "<div class=\"ui-control is-brother-slot is-reserve-slot\"/>",
+					mAcceptsPlayerCharacters = true
 				}
 			},
 			getAll = function() {return this.World.getPlayerRoster().getAll();},

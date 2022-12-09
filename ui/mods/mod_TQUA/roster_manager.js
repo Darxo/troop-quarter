@@ -80,7 +80,7 @@ RosterManager.prototype.loadFromData = function( _data )
 }
 
 {   // Fancy Getter
-    // Returns the next container in line that comes after this one. Useful for quickMove features
+    // Returns the next container in line that comes after this one, ignoring any conditions for insertion
     // Returns null is this ID doesn't exists or this is the only container in the manager
     RosterManager.prototype.getNext = function( _containerID )
     {
@@ -104,8 +104,9 @@ RosterManager.prototype.loadFromData = function( _data )
     }
 
     // Returns the next container in line that comes after this one. Useful for quickMove features
-    // Returns null is this ID doesn't exists or this is the only container in the manager
-    RosterManager.prototype.getNextForInsert = function( _containerID )
+    // Only returns a container that is able to be inserted into (not full, mCanInsert etc)
+    // Returns null is this ID doesn't exists or no applicable container was found
+    RosterManager.prototype.getNextForInsert = function( _containerID, _isPlayerCharacter )
     {
         if (this.mBrotherContainer.length === 1) return null;
 
@@ -119,7 +120,7 @@ RosterManager.prototype.loadFromData = function( _data )
                 sourceFound = true;
                 continue;
             }
-            if (this.mBrotherContainer[i].mCanImport === false) continue;   // skip all container that cant be imported
+            if (this.mBrotherContainer[i].canImportActor(_isPlayerCharacter) === false) continue;   // skip all container that cant be imported
             if (sourceFound === false)
             {
                 if (beforeIndex === null) beforeIndex = i;
@@ -130,7 +131,6 @@ RosterManager.prototype.loadFromData = function( _data )
             break;
         }
         if (afterIndex === null) return this.mBrotherContainer[beforeIndex];
-        // console.error("getNextForInsert returns " + this.mBrotherContainer[afterIndex].mContainerID);
         return this.mBrotherContainer[afterIndex];
     }
 
@@ -322,7 +322,7 @@ RosterManager.prototype.loadFromData = function( _data )
             {
                 //var data = $(this).data('brother');
                 //var data = $(this);
-                return self.quickMoveBrother($(this));
+                return self.onQuickMoveActor($(this));
             }
         });
         return result;
@@ -383,28 +383,27 @@ RosterManager.prototype.loadFromData = function( _data )
     // _sourceIdx is an unsigned integer
     // _targetIdx is an unsigned integer
     // _sourceOwner, _targetOwner are BrotherContainer and not null
-    RosterManager.prototype.transferBrother = function ( _sourceIdx, _sourceOwnerID, _targetIdx, _targetOwnerID )
+    RosterManager.prototype.transferBrother = function ( _sourceIdx, _sourceOwner, _targetIdx, _targetOwner )
     {
+        if (_sourceOwner.canRemoveActor() === false) return false;
+        if (_targetOwner.canImportActor(_sourceOwner.isPlayerCharacter(_sourceIdx)) === false) return false;
+
         // console.error("transferBrother _targetIdx: " + _targetIdx);
-        var sourceOwner = this.get(_sourceOwnerID);
-        var targetOwner = this.get(_targetOwnerID);
 
         // Source roster is at minimum
-        if (sourceOwner.mBrotherCurrent <= sourceOwner.mBrotherMin) return false;
+        if (_sourceOwner.mBrotherCurrent <= _sourceOwner.mBrotherMin) return false;
 
-        // Targeted Roster is at maximum
-        if (targetOwner.mBrotherCurrent >= targetOwner.mBrotherMax) return false;
+        var brotherID = _sourceOwner.mSlots[_sourceIdx].data('child').data('ID');
 
-        var brotherID = sourceOwner.mSlots[_sourceIdx].data('child').data('ID');
+        var brotherData = _sourceOwner.removeBrother(_sourceIdx);
+        _targetOwner.importBrother(_targetIdx, brotherData);
 
-        var brotherData = sourceOwner.removeBrother(_sourceIdx);
-        targetOwner.importBrother(_targetIdx, brotherData);
-
-        this.notifyBackendMoveAtoB(brotherID, _sourceOwnerID, _targetIdx, _targetOwnerID);
+        this.notifyBackendMoveAtoB(brotherID, _sourceOwner.mContainerID, _targetIdx, _targetOwner.mContainerID);
 
         return true;
     }
 
+    // Called from dropHandler
     // Swap the contents of two slots no matter where they are or what their state is
     RosterManager.prototype.swapSlots = function (_firstIdx, _tagA, _secondIdx, _tagB)
     {
@@ -415,10 +414,10 @@ RosterManager.prototype.loadFromData = function( _data )
         var targetOwner = this.get(_tagB);
         if (sourceOwner.isEmpty(_firstIdx) && targetOwner.isEmpty(_secondIdx)) return false;
 
+        var slotA = sourceOwner.mSlots[_firstIdx];
+        var slotB = targetOwner.mSlots[_secondIdx];
         if (_tagA === _tagB)
         {
-            var slotA = sourceOwner.mSlots[_firstIdx];
-            var slotB = targetOwner.mSlots[_secondIdx];
             if(slotB.data('child') === null)
             {
                 var sourceBrotherID = slotA.data('child').data('ID');
@@ -436,12 +435,15 @@ RosterManager.prototype.loadFromData = function( _data )
             return true;
         }
 
-        if (targetOwner.mCanImport === false) return false;
-        if (sourceOwner.mCanRemove === false) return false;
-
         // A brother is moved from one container into another:
-        if (sourceOwner.isEmpty(_firstIdx))    return this.transferBrother(_secondIdx, _tagB, _firstIdx, _tagA);
-        if (targetOwner.isEmpty(_secondIdx))   return this.transferBrother(_firstIdx, _tagA, _secondIdx, _tagB);
+        if (sourceOwner.isEmpty(_firstIdx))    return this.transferBrother(_secondIdx, targetOwner, _firstIdx, sourceOwner);
+        if (targetOwner.isEmpty(_secondIdx))   return this.transferBrother(_firstIdx, sourceOwner, _secondIdx, targetOwner);
+
+        if (targetOwner.canImportActor(sourceOwner.isPlayerCharacter(_firstIdx)) === false) return false;
+        if (targetOwner.canRemoveActor() === false) return false;
+
+        if (sourceOwner.canImportActor(targetOwner.isPlayerCharacter(_secondIdx)) === false) return false;
+        if (sourceOwner.canRemoveActor() === false) return false;
 
         // console.error("_firstIdx " + _firstIdx + " _secondIdx " + _secondIdx);
         var firstBrotherID = sourceOwner.mSlots[_firstIdx].data('child').data('ID');
@@ -457,25 +459,18 @@ RosterManager.prototype.loadFromData = function( _data )
         this.notifyBackendMoveAtoB(secondBrotherID, _tagB, _firstIdx, _tagA);
     }
 
-    // move brother to the other roster on right-click
-    RosterManager.prototype.quickMoveBrother = function (_clickedSlot)
+    // Is executed on right-clicking any actor
+    RosterManager.prototype.onQuickMoveActor = function (_clickedSlot)
     {
-        var _brother = _clickedSlot.data('brother');
+        var _entityData = _clickedSlot.data('brother');
 
-        var data = this.getBrotherByID(_brother[CharacterScreenIdentifier.Entity.Id]);
+        var data = this.getBrotherByID(_entityData[CharacterScreenIdentifier.Entity.Id]);
 
         if (data.Index === null || data.Tag === null) return false;
 
         var sourceOwner = this.get(data.Tag);
-        if (sourceOwner.mCanRemove === false) return false;
-
-        var targetOwner = this.getNextForInsert(sourceOwner.mContainerID);
-
-        // Source roster is at minimum
-        if (sourceOwner.mBrotherCurrent <= sourceOwner.mBrotherMin) return false;
-
-        // Targeted Roster is at maximum
-        if (targetOwner.mBrotherCurrent >= targetOwner.mBrotherMax) return false;
+        var targetOwner = this.getNextForInsert(data.Tag, sourceOwner.isPlayerCharacter(data.Index));
+        if (targetOwner === null) return false;     // No valid target for quickswitching was found
 
         // transfer brother from source roster to target roster
         var firstEmptySlot = targetOwner.getIndexOfFirstEmptySlot();
