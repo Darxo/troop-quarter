@@ -294,7 +294,7 @@ RosterContainer.prototype.update = function()
         {
             var actor = this.mBrotherList[i];
             if (actor === null) continue;
-            if (CharacterScreenIdentifier.Entity.Id in actor === false) continue;
+            if ((CharacterScreenIdentifier.Entity.Id in actor) === false) continue;
             if (actor[CharacterScreenIdentifier.Entity.Id] !== _actorID) continue;
             this.selectSlot(i);
             return true;

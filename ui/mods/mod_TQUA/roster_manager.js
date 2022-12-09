@@ -67,6 +67,7 @@ RosterManager.prototype.generateDIVs = function()
     }
 
     // When we don't know in which roster he is
+    // Returns an object with the keys 'Index', 'Tag' and 'Brother'
     RosterManager.prototype.getBrotherByID = function (_actorID)
     {
         for(var i = 0; i < this.mBrotherContainer.length; i++)
@@ -165,13 +166,16 @@ RosterManager.prototype.generateDIVs = function()
 
     RosterManager.prototype.setBrotherSelectedByID = function (_actorID)
     {
+        var target = this.getBrotherByID(_actorID);
+
+        if (this.get(target.Tag).selectSlot(target.Index) === false) return false;
+
         for(var i = 0; i < this.mBrotherContainer.length; i++)
         {
+            if (this.mBrotherContainer[i].mContainerID == target.Tag) continue;
             this.mBrotherContainer[i].deselectCurrent();
-            if (this.mBrotherContainer[i].selectBrother(_actorID) === false) continue;
-
-            this.notifyDataSourceSelection(_actorID);
         }
+        return true;
     };
 
     RosterManager.prototype.selectAnything = function()
@@ -336,6 +340,7 @@ RosterManager.prototype.generateDIVs = function()
         }, { drop: '.is-brother-slot' });
 
         // event listener when left-click the actor
+        // _actor.data('brother') consists of the following keys: id,imageOffsetX,imageOffsetY,imageScale
         result.assignListBrotherClickHandler(function (_actor, _event)
         {
             if (_event.button !== 0) return;   // We are only interested in LMB clicks

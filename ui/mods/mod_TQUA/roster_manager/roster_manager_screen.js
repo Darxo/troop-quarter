@@ -204,9 +204,9 @@ RosterManagerScreen.prototype.show = function (_data)
         this.mDataSource.mRosterManager.generateDIVs();
         this.mDataSource.mRosterManager.selectAnything();
     }
-    else
+    else    // Show the same window as before without reloading anything
     {
-        this.mDataSource.loadBrothersList();
+        // this.mDataSource.loadBrothersList();
     }
 
     this.mContainer.velocity("finish", true).velocity({ opacity: 1 },

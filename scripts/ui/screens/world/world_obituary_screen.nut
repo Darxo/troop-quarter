@@ -64,16 +64,7 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
 				return true;
 			}
 		});
-		//
-		//
-		//
-// ::World.State.getPlayer().getPos();
-// ::World.getEntityAtPos()
-// isLocation()
-// this.m.LocationType != this.Const.World.LocationType.Settlement
 
-// ::World.getEntityAtPos().isLocation() && ::World.getEntityAtPos().m.LocationType == ::Const.World.LocationType.Settlement
-		// IsOccupied = false
         this.addManagedRoster("Hire", {
 			getSettlement = function()
 			{
@@ -93,6 +84,11 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
 					mName = "Hire",
 					mType = "Town",
 					mBrotherList = _this.convertActorsToUIData(this.getAll(), false, 27),
+					mCanRemove = false,
+					mCanImport = false,
+					mMoodVisible = false,
+					mCanReposition = false,
+					mCanSelect = false
 				}},
 			getAll = function() {return ::World.getRoster(this.getSettlement().getID()).getAll();},
 			insertActor = function(_actor) {	// Maybe add Position?
@@ -238,7 +234,7 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
 				for(; resultIndex < result.len(); resultIndex++)
 				{
 					if (result[resultIndex] != null) continue;
-					_brother.setPlaceInFormation(resultIndex);
+					// _brother.setPlaceInFormation(resultIndex);
 					result[resultIndex] = ::UIDataHelper.convertEntityToUIData(_brother, null);
 					break;
 				}
