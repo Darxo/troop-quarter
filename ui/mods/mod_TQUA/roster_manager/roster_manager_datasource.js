@@ -162,17 +162,6 @@ RosterManagerDatasource.prototype.getSelectedBrotherIndex = function ()
     return selection.Index;
 };
 
-
-RosterManagerDatasource.prototype.switchToPreviousBrother = function()
-{
-    this.mRosterManager.switchToPreviousBrother();
-};
-
-RosterManagerDatasource.prototype.switchToNextBrother = function()
-{
-    this.mRosterManager.switchToNextBrother();
-};
-
 RosterManagerDatasource.prototype.selectedBrotherById = function(_brotherId, _withoutNotify)
 {
     // notify every listener

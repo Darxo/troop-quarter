@@ -234,7 +234,7 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
 				for(; resultIndex < result.len(); resultIndex++)
 				{
 					if (result[resultIndex] != null) continue;
-					// _brother.setPlaceInFormation(resultIndex);
+					_brother.setPlaceInFormation(resultIndex);		// Fixes bug when player buys recruits but opens this screen before they got assigned a formation number
 					result[resultIndex] = ::UIDataHelper.convertEntityToUIData(_brother, null);
 					break;
 				}

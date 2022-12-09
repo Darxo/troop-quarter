@@ -233,15 +233,18 @@ RosterContainer.prototype.update = function()
 
     }
 
-    RosterContainer.prototype.selectNext = function()
+    RosterContainer.prototype.selectNext = function( _indexOffset )
     {
         if (this.mSelectedBrother < 0) return false;
-        for (var i = this.mSelectedBrother + 1; i < this.mBrotherList.length; i++)
+        if (_indexOffset === undefined) _indexOffset = 1;
+        var i = this.mSelectedBrother + _indexOffset - 1;   // We need to add 1 because the first thing in the while loop is adding +1
+        while (true)
         {
-            if (this.mBrotherList[i] === null) continue;
+            i++;
+            i = i % this.mSlotLimit;
+            if (this.mBrotherList[i] === null) continue;    // Eventually we break out. 'this.mSelectedBrother' was not -1 afterall
             return this.selectSlot(i);
         }
-        return this.selectFirst();
     }
 
     RosterContainer.prototype.selectFirst = function()
@@ -254,15 +257,18 @@ RosterContainer.prototype.update = function()
         return false;
     }
 
-    RosterContainer.prototype.selectPrev = function()
+    RosterContainer.prototype.selectPrev = function( _indexOffset )
     {
         if (this.mSelectedBrother < 0) return false;
-        for (var i = this.mSelectedBrother - 1; i >= 0; i--)
+        if (_indexOffset === undefined) _indexOffset = 1;
+        var i = this.mSelectedBrother - _indexOffset + 1;
+        while (true)
         {
-            if (this.mBrotherList[i] === null) continue;
+            i--;
+            if (i < 0) i += this.mSlotLimit;
+            if (this.mBrotherList[i] === null) continue;    // Eventually we break out. 'this.mSelectedBrother' was not -1 afterall
             return this.selectSlot(i);
         }
-        return this.selectLast();
     }
 
     RosterContainer.prototype.selectLast = function()

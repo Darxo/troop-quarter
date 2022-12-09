@@ -175,6 +175,7 @@ RosterManager.prototype.generateDIVs = function()
             if (this.mBrotherContainer[i].mContainerID == target.Tag) continue;
             this.mBrotherContainer[i].deselectCurrent();
         }
+        this.notifyDataSourceSelection(_actorID);
         return true;
     };
 
@@ -363,25 +364,25 @@ RosterManager.prototype.generateDIVs = function()
 }
 
 {   // Selections
-    RosterManager.prototype.switchToPreviousBrother = function()
+    RosterManager.prototype.switchToPreviousBrother = function( _indexOffset )
     {
         var currentSelection = this.getSelected();
         if (currentSelection === null) return;
         if (currentSelection.Owner.mBrotherCurrent <= 1) return;
 
-        if (currentSelection.Owner.selectPrev() === true)
+        if (currentSelection.Owner.selectPrev( _indexOffset ) === true)
         {
             this.notifyDataSourceSelection(currentSelection.BrotherID);
         }
     }
 
-    RosterManager.prototype.switchToNextBrother = function()
+    RosterManager.prototype.switchToNextBrother = function( _indexOffset )
     {
         var currentSelection = this.getSelected();
         if (currentSelection === null) return;
         if (currentSelection.Owner.mBrotherCurrent <= 1) return;
 
-        if (currentSelection.Owner.selectNext() === true)
+        if (currentSelection.Owner.selectNext( _indexOffset ) === true)
         {
             this.notifyDataSourceSelection(currentSelection.BrotherID);
         }

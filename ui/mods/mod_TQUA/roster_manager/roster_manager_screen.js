@@ -97,12 +97,22 @@ RosterManagerScreen.prototype.createDIV = function (_parentDiv)
 
         if (MSU.Keybinds.isKeybindPressed(modTQUA.ID, "SwitchToNextSelected", _event))
         {
-            self.mDataSource.switchToNextBrother();
+            self.mDataSource.mRosterManager.switchToNextBrother();
             return true;
         }
         else if (MSU.Keybinds.isKeybindPressed(modTQUA.ID, "SwitchToPrevSelected", _event))
         {
-            self.mDataSource.switchToPreviousBrother();
+            self.mDataSource.mRosterManager.switchToPreviousBrother();
+            return true;
+        }
+        else if (MSU.Keybinds.isKeybindPressed(modTQUA.ID, "SwitchToAboveSelected", _event))
+        {
+            self.mDataSource.mRosterManager.switchToPreviousBrother(9);
+            return true;
+        }
+        else if (MSU.Keybinds.isKeybindPressed(modTQUA.ID, "SwitchToBelowSelected", _event))
+        {
+            self.mDataSource.mRosterManager.switchToNextBrother(9);
             return true;
         }
 
