@@ -512,6 +512,30 @@ RosterManager.prototype.generateDIVs = function()
         return true;
     };
 
+    RosterManager.prototype.moveSelectedRight = function( _indexOffset )
+    {
+        var currentSelection = this.getSelected();
+        if (currentSelection === null) return;
+        if (currentSelection.Owner.mBrotherCurrent === currentSelection.Owner.mSlotLimit) return;   // no empty space to move them into
+
+        if (currentSelection.Owner.moveSelectedRight( _indexOffset ) === true)
+        {
+            this.notifyDataSourceSelection(currentSelection.BrotherID);
+        }
+    }
+
+    RosterManager.prototype.moveSelectedLeft = function( _indexOffset )
+    {
+        var currentSelection = this.getSelected();
+        if (currentSelection === null) return;
+        if (currentSelection.Owner.mBrotherCurrent === currentSelection.Owner.mSlotLimit) return;   // no empty space to move them into
+
+        if (currentSelection.Owner.moveSelectedLeft( _indexOffset ) === true)
+        {
+            this.notifyDataSourceSelection(currentSelection.BrotherID);
+        }
+    }
+
 }
 
 

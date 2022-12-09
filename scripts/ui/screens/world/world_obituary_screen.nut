@@ -126,6 +126,7 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
         this.addManagedRoster("Reserve", {
 			isActive = function() {return true},
             queryData = function( _this ) {
+				::World.Assets.updateFormation();	// To make sure we don't have suprises from brothers having a position of 255
 				local convertedRoster = _this.convertActorsToUIData(::World.Assets.getFormation().slice(18));	// Only pass the last 9 slots of the player roster for vanilla
 				return {
 					mName = "Reserve",
@@ -234,7 +235,7 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
 				for(; resultIndex < result.len(); resultIndex++)
 				{
 					if (result[resultIndex] != null) continue;
-					_brother.setPlaceInFormation(resultIndex);		// Fixes bug when player buys recruits but opens this screen before they got assigned a formation number
+					// _brother.setPlaceInFormation(resultIndex);
 					result[resultIndex] = ::UIDataHelper.convertEntityToUIData(_brother, null);
 					break;
 				}

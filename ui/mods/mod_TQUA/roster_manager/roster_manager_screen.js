@@ -115,6 +115,29 @@ RosterManagerScreen.prototype.createDIV = function (_parentDiv)
             self.mDataSource.mRosterManager.switchToNextBrother(9);
             return true;
         }
+        else if (MSU.Keybinds.isKeybindPressed(modTQUA.ID, "MoveSelectedUp", _event))
+        {
+            self.mDataSource.mRosterManager.moveSelectedLeft(9);
+            return true;
+        }
+        else if (MSU.Keybinds.isKeybindPressed(modTQUA.ID, "MoveSelectedLeft", _event))
+        {
+            self.mDataSource.mRosterManager.moveSelectedLeft();
+            return true;
+        }
+        else if (MSU.Keybinds.isKeybindPressed(modTQUA.ID, "MoveSelectedDown", _event))
+        {
+            self.mDataSource.mRosterManager.moveSelectedRight(9);
+            return true;
+        }
+        else if (MSU.Keybinds.isKeybindPressed(modTQUA.ID, "MoveSelectedRight", _event))
+        {
+            self.mDataSource.mRosterManager.moveSelectedRight();
+            return true;
+        }
+
+
+
 
         return false
     });

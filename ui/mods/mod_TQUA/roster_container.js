@@ -229,8 +229,16 @@ RosterContainer.prototype.update = function()
         labelString = '<span class="label text-font-medium font-color-label">' + labelString + '</span>';
         // labelString += " (" + this.mType + ")";
         this.mRosterNameLabel.html(labelString);
+    }
 
-
+    RosterContainer.prototype.selectFirst = function()
+    {
+        for (var i = 0; i < this.mBrotherList.length; ++i)
+        {
+            if (this.mBrotherList[i] === null) continue;
+            return this.selectSlot(i);
+        }
+        return false;
     }
 
     RosterContainer.prototype.selectNext = function( _indexOffset )
@@ -247,16 +255,6 @@ RosterContainer.prototype.update = function()
         }
     }
 
-    RosterContainer.prototype.selectFirst = function()
-    {
-        for (var i = 0; i < this.mBrotherList.length; ++i)
-        {
-            if (this.mBrotherList[i] === null) continue;
-            return this.selectSlot(i);
-        }
-        return false;
-    }
-
     RosterContainer.prototype.selectPrev = function( _indexOffset )
     {
         if (this.mSelectedBrother < 0) return false;
@@ -271,14 +269,34 @@ RosterContainer.prototype.update = function()
         }
     }
 
-    RosterContainer.prototype.selectLast = function()
+    RosterContainer.prototype.moveSelectedRight = function( _indexOffset )
     {
-        for (var i = (this.mBrotherList.length - 1); i >= 0; i--)
+        if (this.mSelectedBrother < 0) return false;
+        if (this.mBrotherCurrent === this.mSlotLimit) return false;     // Can't move anyone around if all slots are occupied
+        if (_indexOffset === undefined) _indexOffset = 1;
+        var i = this.mSelectedBrother + _indexOffset - 1;   // We need to add 1 because the first thing in the while loop is adding +1
+        while (true)
         {
-            if (this.mBrotherList[i] === null) continue;
-            return this.selectSlot(i);
+            i++;
+            i = i % this.mSlotLimit;
+            if (this.mBrotherList[i] !== null) continue;    // Eventually we break out. There was one empty slot afterall
+            return this.relocateBrother(this.mSelectedBrother, i);
         }
-        return false;
+    }
+
+    RosterContainer.prototype.moveSelectedLeft = function( _indexOffset )
+    {
+        if (this.mSelectedBrother < 0) return false;
+        if (this.mBrotherCurrent === this.mSlotLimit) return false;     // Can't move anyone around if all slots are occupied
+        if (_indexOffset === undefined) _indexOffset = 1;
+        var i = this.mSelectedBrother - _indexOffset + 1;
+        while (true)
+        {
+            i--;
+            if (i < 0) i += this.mSlotLimit;
+            if (this.mBrotherList[i] !== null) continue;    // Eventually we break out. There was one empty slot afterall
+            return this.relocateBrother(this.mSelectedBrother, i);
+        }
     }
 
 }

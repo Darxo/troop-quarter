@@ -50,19 +50,11 @@
     ::modTQUA.Mod.Keybinds.addJSKeybind("SwitchToPrevSelected", "a", "Switch to previous selected", "While in the Roster Manager: select the previous actor of the roster that currently has the selection");
     ::modTQUA.Mod.Keybinds.addJSKeybind("SwitchToAboveSelected", "w", "Switch to next selected", "While in the Roster Manager: select the next actor of the roster that currently has the selection");
     ::modTQUA.Mod.Keybinds.addJSKeybind("SwitchToBelowSelected", "s", "Switch to previous selected", "While in the Roster Manager: select the previous actor of the roster that currently has the selection");
-/*
-    ::modTQUA.Mod.Keybinds.addJSKeybind("SwitchToNextSelected", "d", "Switch to next selected", "While in the Roster Manager: select the next actor of the roster that currently has the selection");
-    ::modTQUA.Mod.Keybinds.addJSKeybind("SwitchToPrevSelected", "a", "Switch to previous selected", "While in the Roster Manager: select the previous actor of the roster that currently has the selection");
-    ::modTQUA.Mod.Keybinds.addJSKeybind("SwitchToNextSelected", "d", "Switch to next selected", "While in the Roster Manager: select the next actor of the roster that currently has the selection");
-    ::modTQUA.Mod.Keybinds.addJSKeybind("SwitchToPrevSelected", "a", "Switch to previous selected", "While in the Roster Manager: select the previous actor of the roster that currently has the selection");
-*/
 
-/*		Maybe implement this with shift + wasd?
-	::modURUI.Mod.Keybinds.addJSKeybind("MoveSelectedUp", "3", "Itemfilter - Armor", "Changes the current Filter to 'Armor' when pressed in the Inventory- or Shop Screen");
-    ::modURUI.Mod.Keybinds.addJSKeybind("MoveSelectedDown", "4", "Itemfilter - Usable", "Changes the current Filter to 'Usable' when pressed in the Inventory- or Shop Screen");
-    ::modURUI.Mod.Keybinds.addJSKeybind("MoveSelectedRight", "5", "Itemfilter - Misc", "Changes the current Filter to 'Misc' when pressed in the Inventory- or Shop Screen");
-    ::modURUI.Mod.Keybinds.addJSKeybind("MoveSelectedLeft", "5", "Itemfilter - Misc", "Changes the current Filter to 'Misc' when pressed in the Inventory- or Shop Screen");
-*/
+    ::modTQUA.Mod.Keybinds.addJSKeybind("MoveSelectedUp", "shift+w", "Move Selected Up", "While in the Roster Manager: select the next actor of the roster that currently has the selection");
+    ::modTQUA.Mod.Keybinds.addJSKeybind("MoveSelectedLeft", "shift+a", "Move Selected Left", "While in the Roster Manager: select the previous actor of the roster that currently has the selection");
+    ::modTQUA.Mod.Keybinds.addJSKeybind("MoveSelectedDown", "shift+s", "Move Selected Down", "While in the Roster Manager: select the next actor of the roster that currently has the selection");
+    ::modTQUA.Mod.Keybinds.addJSKeybind("MoveSelectedRight", "shift+d", "Move Selected Right", "While in the Roster Manager: select the previous actor of the roster that currently has the selection");
 
 
 	::modTQUA.createGuests <- function()
