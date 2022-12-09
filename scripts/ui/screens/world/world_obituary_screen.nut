@@ -56,7 +56,7 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
 					mCanImport = false,
 					mMoodVisible = false
 				}},
-			getAll = function() {return this.World.getPlayerRoster().getAll();},
+			getAll = function() {return ::World.getPlayerRoster().getAll();},
 			insertActor = function(_actor) {
 				return true;
 			},
@@ -64,6 +64,45 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
 				return true;
 			}
 		});
+		//
+		//
+		//
+// ::World.State.getPlayer().getPos();
+// ::World.getEntityAtPos()
+// isLocation()
+// this.m.LocationType != this.Const.World.LocationType.Settlement
+
+// ::World.getEntityAtPos().isLocation() && ::World.getEntityAtPos().m.LocationType == ::Const.World.LocationType.Settlement
+		// IsOccupied = false
+        this.addManagedRoster("Hire", {
+			getSettlement = function()
+			{
+				local parties = this.World.getAllEntitiesAtPos(this.World.State.getPlayer().getPos(), 200.0);
+				foreach( party in parties)
+				{
+					if (party.isLocation() == false) continue;
+					if (party.m.LocationType == ::Const.World.LocationType.Settlement) return party;
+				}
+				return null;
+			}
+			isActive = function() {
+				return (this.getSettlement() != null);
+			},
+            queryData = function( _this ) {
+				return {
+					mName = "Hire",
+					mType = "Town",
+					mBrotherList = _this.convertActorsToUIData(this.getAll(), false, 27),
+				}},
+			getAll = function() {return ::World.getRoster(this.getSettlement().getID()).getAll();},
+			insertActor = function(_actor) {	// Maybe add Position?
+				::World.getRoster(this.getSettlement().getID()).add(_actor);
+				return true;
+			},
+			removeActor = function(_actor) {
+				::World.getRoster(this.getSettlement().getID()).remove(_actor);
+			}
+        });
 
         this.addManagedRoster("Formation", {
 			isActive = function() {return true},
@@ -78,7 +117,7 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
 					mAcceptsPlayerCharacters = true,
 					mPrimaryDisplayContainer = true,	// These rosters will be displayed in the bottom part of the screen
 				}},
-			getAll = function() {return this.World.getPlayerRoster().getAll();},
+			getAll = function() {return ::World.getPlayerRoster().getAll();},
 			insertActor = function(_actor) {	// Maybe add Position?
 				::World.getPlayerRoster().add(_actor);
 				return true;
@@ -166,6 +205,7 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
 		return result;
 	}
 
+	// A "Formation" has null slots indicating empty slots in the battle formation.
 	// Converts non-null actors from a passed array into UI Data and returns the newly generated Array
 	function convertActorsToUIData( _brotherArray, _isFormationAlready = true, _slotLimit = 27 )
 	{
@@ -174,12 +214,37 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
 		local result = [];
 		result.resize(arraySize, null);
 
+		local hasUnplaced = false;
 		foreach(i, _brother in _brotherArray)
 		{
 			if (_brother == null) continue;
+			if (_brother.m.PlaceInFormation == 255)
+			{
+				hasUnplaced = true;
+				continue;
+			};
 			if (_isFormationAlready == true) result[i] = ::UIDataHelper.convertEntityToUIData(_brother, null);
 			if (_isFormationAlready == false) result[_brother.getPlaceInFormation()] = ::UIDataHelper.convertEntityToUIData(_brother, null);
 		}
+
+		if (hasUnplaced)
+		{
+			local resultIndex = 0;
+			foreach(_brother in _brotherArray)
+			{
+				if (_brother == null) continue;
+				if (_brother.m.PlaceInFormation != 255) continue;
+
+				for(; resultIndex < result.len(); resultIndex++)
+				{
+					if (result[resultIndex] != null) continue;
+					_brother.setPlaceInFormation(resultIndex);
+					result[resultIndex] = ::UIDataHelper.convertEntityToUIData(_brother, null);
+					break;
+				}
+			}
+		}
+
 		return result;
 	}
 
