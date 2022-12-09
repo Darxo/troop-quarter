@@ -8,30 +8,7 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
 
 		DefaultSlotLimit = 27,
 
-        ManagedRosters = {/*
-            ID = {
-				queryData = function()
-				{
-                    return = {
-                        mBrotherList = ,
-
-                        mName = "Caravan",
-                        mType = "Escort",
-                        mBrotherMin = 0,
-                        mBrotherMax = 17,
-                        mSlotLimit = 27,
-                        mCanRemove = false,
-                        mCanImport = false,
-                        mMoodVisible = false
-                    }
-				},
-				// Inserts an Actor into this roster. Returns true if successfull
-				insertActor = function(_actor, _position),
-				// Removes an Actor from this roster. Returns true if successfull
-				removeActor = function(_actorID)
-            }*/
-        }
-
+        ManagedRosters = {}
 	},
 
 	function create()
@@ -50,7 +27,7 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
 					mBrotherList = _this.convertActorsToUIData(::World.getGuestRoster().getAll(), false, 27),
 					// mCanRemove = false,
 					// mCanImport = false,
-					// mMoodVisible = false
+					mMoodVisible = false
 				}},
 			getAll = function() {return ::World.getGuestRoster().getAll();},
 			insertActor = function(_actor) {
@@ -94,7 +71,8 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
 					mBrotherMin = 1,
 					mBrotherMax = 12,
 					mSlotLimit = 18,
-					mAcceptsPlayerCharacters = true
+					mAcceptsPlayerCharacters = true,
+					mPrimaryDisplayContainer = true,	// These rosters will be displayed in the bottom part of the screen
 				}},
 			getAll = function() {return this.World.getPlayerRoster().getAll();},
 			insertActor = function(_actor) {	// Maybe add Position?

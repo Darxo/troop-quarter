@@ -43,7 +43,6 @@ RosterManagerScreen.prototype.onDisconnection = function ()
     this.unregister();
 };
 
-
 RosterManagerScreen.prototype.onModuleOnConnectionCalled = function (_module)
 {
 };
@@ -51,7 +50,6 @@ RosterManagerScreen.prototype.onModuleOnConnectionCalled = function (_module)
 RosterManagerScreen.prototype.onModuleOnDisconnectionCalled = function (_module)
 {
 };
-
 
 RosterManagerScreen.prototype.createDIV = function (_parentDiv)
 {
@@ -202,6 +200,9 @@ RosterManagerScreen.prototype.show = function (_data)
     if (_data !== undefined && _data !== null && typeof(_data) === 'object')
     {
         this.mDataSource.loadFromData(_data);
+        this.mBrothersModule.createDelayedRosterDIVs();
+        this.mDataSource.mRosterManager.generateDIVs();
+        this.mDataSource.mRosterManager.selectAnything();
     }
     else
     {

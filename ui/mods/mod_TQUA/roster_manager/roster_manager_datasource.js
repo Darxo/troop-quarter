@@ -10,11 +10,6 @@ var RosterManagerDatasource = function()
 
 	// Caches
     this.mRosterManager = new RosterManager();
-    this.mRosterManager.addContainer(new RosterContainer(modTQUA.Owner.Formation));
-    this.mRosterManager.addContainer(new RosterContainer(modTQUA.Owner.Reserve));
-    this.mRosterManager.addContainer(new RosterContainer(modTQUA.Owner.Guests));
-    this.mRosterManager.addContainer(new RosterContainer(modTQUA.Owner.Caravan));
-
     this.mIsPopupOpen = false;
 
     // Dummy-Variable so that hooks in modules which are used in both CharacterScreen and this Screen
@@ -23,11 +18,6 @@ var RosterManagerDatasource = function()
 
 	this.init();
 };
-
-RosterManagerDatasource.prototype.getPlayerRoster = function ()
-{
-	return this.mRosterManager.get(modTQUA.Owner.Formation);
-}
 
 RosterManagerDatasource.prototype.getInventoryMode = function ()
 {
@@ -124,6 +114,7 @@ RosterManagerDatasource.prototype.isTacticalMode = function ()
     return false;
 };
 
+// Afaik this is only used for the purpose of displaying the Dismiss-Button. But since I'm not overwriting that vanilla check this function is still needed
 RosterManagerDatasource.prototype.getBrothersList = function ()
 {
     return this.mRosterManager.get(modTQUA.Owner.Formation).mBrotherList;
@@ -142,19 +133,7 @@ RosterManagerDatasource.prototype.loadFromData = function(_data)
         return;
     }
 
-/*     if ('RostersData' in _data && _data.RostersData !== null)
-    {
-        var entries = Object.keys(_data.RostersData);
-        for(var i = 0; i < entries.length; i++)
-        {
-            console.error(entries[i])
-            this.mRosterManager.addContainer(new RosterContainer(entries[i]))
-        }
- */
-        this.mRosterManager.loadFromData(_data.RostersData);
-    //}
-
-    this.mRosterManager.selectAnything();
+    this.mRosterManager.initializeFromData(_data.RostersData);
     this.loadBrothersList();
 };
 

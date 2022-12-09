@@ -36,14 +36,16 @@ var RosterContainer = function( _containerID )
     this.mCanImport = true;
     this.mCanReposition = true;
     this.mAcceptsPlayerCharacters = false;  // Are player characters allowed to be put inside this container? This is only true for Formation and Reserve usually
+    this.mPrimaryDisplayContainer = false;
 
     this.mCanSelectEmptySlots = false;
     this.mSlotClasses = '<div class="ui-control is-brother-slot is-roster-slot"/>';     // Classes that are assigned to slot DIVs of this container
 }
 
+// Initialization. Called only once every time this window is opened
 RosterContainer.prototype.loadFromData = function( _rosterData )
 {
-    console.error("loading new container from Data");
+    console.error("loading Data into the container " + this.mContainerID);
     var entries = Object.keys(_rosterData);
     for(var i = 0; i < entries.length; i++)
     {
@@ -53,9 +55,13 @@ RosterContainer.prototype.loadFromData = function( _rosterData )
             // console.error("loading variable "+ entries[i] + " to value " + _rosterData[entries[i]]);
         }
     }
+    return null;
+}
+
+RosterContainer.prototype.update = function()
+{
     this.updateNameLabel();
     this.updateCountLabel();
-    return null;
 }
 
 {   // Basic Getter and Setter
@@ -266,6 +272,7 @@ RosterContainer.prototype.loadFromData = function( _rosterData )
             if (this.mBrotherList[i] === null) continue;
             return this.selectSlot(i);
         }
+        return false;
     }
 
 }
@@ -317,6 +324,7 @@ RosterContainer.prototype.loadFromData = function( _rosterData )
         // console.error("Selected slot: " + _slotIndex);
         return true;
     };
+
     // Returns the actor objects that is currently selected. Returns null if no one was selected or if the selection was invalid
     RosterContainer.prototype.getSelected = function()
     {

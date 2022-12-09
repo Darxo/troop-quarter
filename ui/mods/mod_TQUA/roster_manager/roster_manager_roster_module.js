@@ -10,6 +10,9 @@ var RosterManagerRosterModule = function(_parent, _dataSource)
     this.mContainer = null;
 
     this.mDeadZoneElement = null;
+
+    this.PrimaryContainer = null;
+    this.SecondaryContainer = null;
 };
 
 RosterManagerRosterModule.prototype.createDIV = function (_parentDiv)
@@ -34,9 +37,9 @@ RosterManagerRosterModule.prototype.createDIV = function (_parentDiv)
             }, '', 6);
 
     // Secondary (Top) Container
-    var secondaryContainer = $('<div class="secondary-container"/>');
-    this.mContainer.append(secondaryContainer);
-    secondaryContainer.createListWithCustomOption({
+    this.SecondaryContainer = $('<div class="secondary-container"/>');
+    this.mContainer.append(this.SecondaryContainer);
+    this.SecondaryContainer.createListWithCustomOption({
         delta: 1.24,
         lineDelay: 0,
         lineTimer: 0,
@@ -49,18 +52,29 @@ RosterManagerRosterModule.prototype.createDIV = function (_parentDiv)
     });
 
     // Primary (Bottom) Container
-    var primaryContainer = $('<div class="primary-container"/>');
-    this.mContainer.append(primaryContainer);
-    this.createRosterDIV(primaryContainer, modTQUA.Owner.Formation);
-
-    this.createRosterDIV(secondaryContainer.findListScrollContainer(), modTQUA.Owner.Reserve);
-    this.createRosterDIV(secondaryContainer.findListScrollContainer(), modTQUA.Owner.Guests);
-    this.createRosterDIV(secondaryContainer.findListScrollContainer(), modTQUA.Owner.Caravan);
-
+    this.PrimaryContainer = $('<div class="primary-container"/>');
+    this.mContainer.append(this.PrimaryContainer);
 
     // DeadZones
-    this.mDataSource.mRosterManager.setDeadZoneElement(primaryContainer);
+    this.mDataSource.mRosterManager.setDeadZoneElement(this.PrimaryContainer);
 };
+
+// RosterDIVs can't be created at this point because the rosters are not yet loadedFromData
+RosterManagerRosterModule.prototype.createDelayedRosterDIVs = function()
+{
+    var containerArray = this.mDataSource.mRosterManager.mBrotherContainer;
+    for(var i = 0; i < containerArray.length; i++)
+    {
+        if (containerArray[i].mPrimaryDisplayContainer === true)
+        {
+            this.createRosterDIV(this.PrimaryContainer, containerArray[i].mContainerID)
+        }
+        else
+        {
+            this.createRosterDIV(this.SecondaryContainer.findListScrollContainer(), containerArray[i].mContainerID)
+        }
+    }
+}
 
 RosterManagerRosterModule.prototype.createRosterDIV = function (_parentDiv, _rosterID)
 {

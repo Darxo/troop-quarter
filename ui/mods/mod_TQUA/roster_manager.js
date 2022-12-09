@@ -6,6 +6,22 @@ var RosterManager = function(_dataSource)
     this.mBrotherContainer = [];        // Array of BrotherContainer
 }
 
+RosterManager.prototype.initializeFromData = function( _data )
+{
+    console.error("initializing Roster Manager");
+    var entries = Object.keys(_data);
+    for(var i = 0; i < entries.length; i++)
+    {
+        if (this.get(entries[i]) !== null)
+        {
+            console.error("Warning: trying to initialize the roster " + entries[i] + " but it already exists!");;
+            continue;
+        }
+        var newRosterContainer = this.addContainer(new RosterContainer(entries[i]));
+        newRosterContainer.loadFromData(_data[entries[i]]);
+    }
+}
+
 RosterManager.prototype.loadFromData = function( _data )
 {
     for(var i = 0; i < this.mBrotherContainer.length; i++)
@@ -17,6 +33,17 @@ RosterManager.prototype.loadFromData = function( _data )
             this.createBrotherSlots(identifier);
             this.onBrothersListLoaded(identifier);
         }
+    }
+}
+
+// Requires all RosterContainer to have a valid mListContainer variable that they can append their generated DIV to
+RosterManager.prototype.generateDIVs = function()
+{
+    for(var i = 0; i < this.mBrotherContainer.length; i++)
+    {
+        this.createBrotherSlots(this.mBrotherContainer[i].mContainerID);
+        this.onBrothersListLoaded(this.mBrotherContainer[i].mContainerID);
+        this.mBrotherContainer[i].update();
     }
 }
 
