@@ -9,8 +9,6 @@ var RosterManagerRosterModule = function(_parent, _dataSource)
     // container
     this.mContainer = null;
 
-    this.registerDatasourceListener();
-
     this.mDeadZoneElement = null;
 };
 
@@ -53,11 +51,11 @@ RosterManagerRosterModule.prototype.createDIV = function (_parentDiv)
     // Primary (Bottom) Container
     var primaryContainer = $('<div class="primary-container"/>');
     this.mContainer.append(primaryContainer);
-    this.createRosterDIV(primaryContainer, Owner.Formation);
+    this.createRosterDIV(primaryContainer, RosterOwner.Formation);
 
-    this.createRosterDIV(secondaryContainer.findListScrollContainer(), Owner.Reserve);
-    this.createRosterDIV(secondaryContainer.findListScrollContainer(), Owner.Guests);
-    this.createRosterDIV(secondaryContainer.findListScrollContainer(), Owner.Caravan);
+    this.createRosterDIV(secondaryContainer.findListScrollContainer(), RosterOwner.Reserve);
+    this.createRosterDIV(secondaryContainer.findListScrollContainer(), RosterOwner.Guests);
+    this.createRosterDIV(secondaryContainer.findListScrollContainer(), RosterOwner.Caravan);
 
 
     // DeadZones
@@ -115,9 +113,6 @@ RosterManagerRosterModule.prototype.createRosterDIV = function (_parentDiv, _ros
 
 };
 
-
-
-
 RosterManagerRosterModule.prototype.destroyDIV = function ()
 {
     this.mDataSource.mRosterManager.destroyDIV();
@@ -127,35 +122,15 @@ RosterManagerRosterModule.prototype.destroyDIV = function ()
     this.mContainer = null;
 };
 
-RosterManagerRosterModule.prototype.bindTooltips = function ()
-{
-
-};
-
-RosterManagerRosterModule.prototype.unbindTooltips = function ()
-{
-
-};
-
-
-RosterManagerRosterModule.prototype.registerDatasourceListener = function()
-{
-	this.mDataSource.addListener(CharacterScreenDatasourceIdentifier.Brother.Updated, jQuery.proxy(this.onBrotherUpdated, this));
-};
-
-
 RosterManagerRosterModule.prototype.create = function(_parentDiv)
 {
     this.createDIV(_parentDiv);
-    this.bindTooltips();
 };
 
 RosterManagerRosterModule.prototype.destroy = function()
 {
-    this.unbindTooltips();
     this.destroyDIV();
 };
-
 
 RosterManagerRosterModule.prototype.register = function (_parentDiv)
 {
@@ -211,105 +186,6 @@ RosterManagerRosterModule.prototype.isVisible = function ()
 {
 	return this.mContainer.hasClass('display-block');
 };
-
-RosterManagerRosterModule.prototype.updateBlockedSlots = function ()
-{
-    var self = this;
-
-    this.mDataSource.getPlayerRoster().mListContainer.find('.is-blocked-slot').each(function (index, element)
-    {
-        var slot = $(element);
-        slot.removeClass('is-blocked-slot');
-    });
-
-    this.mDataSource.getPlayerRoster().mListContainer.find('.is-roster-slot').each(function (index, element)
-    {
-        var slot = $(element);
-
-        if (slot.data('child') != null || self.mDataSource.getPlayerRoster().mBrotherCurrent >= self.mDataSource.getPlayerRoster().mBrotherMax)
-        {
-            slot.addClass('is-blocked-slot');
-        }
-    });
-
-    this.mDataSource.getPlayerRoster().mListContainer.find('.is-reserve-slot').each(function (index, element)
-    {
-        var slot = $(element);
-
-        if (slot.data('child') != null)
-        {
-            slot.addClass('is-blocked-slot');
-        }
-    });
-}
-
-
-RosterManagerRosterModule.prototype.clearBrothersList = function ()
-{
-    /* for(var i=0; i != this.mDataSource.getPlayerRoster().mSlots.length; ++i)
-    {
-        this.mDataSource.getPlayerRoster().mSlots[i].empty();
-        this.mDataSource.getPlayerRoster().mSlots[i].data('child', null);
-    }
-*/
-    // this.mNumActive = 0;
-};
-
-RosterManagerRosterModule.prototype.updateBrotherSlot = function (_data)
-{
-	this.mRosterManager.get(Owner.Formation).updateBrotherDIV(_data);
-	this.mRosterManager.get(Owner.Reserve).updateBrotherDIV(_data);
-};
-
-/*RosterManagerRosterModule.prototype.showBrotherSlotLock = function(_brotherId, _showLock)
-{
-	var slot = this.mDataSource.getPlayerRoster().mListContainer.find('#slot-index_' + _brotherId + ':first');
-	if (slot.length === 0)
-	{
-		return;
-	}
-
-    slot.showListBrotherLockImage(_showLock);
-};*/
-
-RosterManagerRosterModule.prototype.updateBrotherSlotLocks = function(_inventoryMode)
-{
-	/*switch(_inventoryMode)
-	{
-		case CharacterScreenDatasourceIdentifier.InventoryMode.Stash:
-		{
-			var brothersList = this.mDataSource.getBrothersList();
-			if (brothersList === null || !jQuery.isArray(brothersList))
-			{
-				return;
-			}
-
-			for (var i = 0; i < brothersList.length; ++i)
-			{
-				var brother = brothersList[i];
-				if (brother !== null && CharacterScreenIdentifier.Entity.Id in brother)
-				{
-					this.showBrotherSlotLock(brother[CharacterScreenIdentifier.Entity.Id], false);
-				}
-			}
-
-		}
-	}*/
-};
-
-RosterManagerRosterModule.prototype.onBrotherUpdated = function (_dataSource, _brother)
-{
-	if (_brother !== null &&
-		CharacterScreenIdentifier.Entity.Id in _brother &&
-		CharacterScreenIdentifier.Entity.Character.Key in _brother &&
-		CharacterScreenIdentifier.Entity.Character.Name in _brother[CharacterScreenIdentifier.Entity.Character.Key] &&
-		CharacterScreenIdentifier.Entity.Character.ImagePath in _brother[CharacterScreenIdentifier.Entity.Character.Key])
-	{
-		this.updateBrotherSlot(_brother);
-	}
-};
-
-
 
 // List with custom options to be able to remove the horizontal scroll bar
 $.fn.createListWithCustomOption = function(_options, _classes,_withoutFrame)

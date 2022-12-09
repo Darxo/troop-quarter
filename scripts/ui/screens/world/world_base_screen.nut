@@ -53,7 +53,7 @@ this.world_base_screen <- {
 	{
 		if (this.m.Animating != null)
 		{
-			return this.m.Animating == true;
+			return (this.m.Animating == true);
 		}
 		else
 		{

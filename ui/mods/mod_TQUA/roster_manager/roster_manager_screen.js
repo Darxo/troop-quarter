@@ -10,8 +10,6 @@ var RosterManagerScreen = function()
 
     // generic containers
     this.mContainer = null;
-    this.mBackgroundImage = null;
-    this.mRosterManagerScreenStatuetes = null;
     this.mRosterManagerScreen = null;
     this.mLeftContentContainer = null;
     this.mRightContentContainer = null;
@@ -21,7 +19,6 @@ var RosterManagerScreen = function()
     this.mBrothersModule = null;
 
     this.createModules();
-    this.registerDatasourceListener();
 };
 
 
@@ -63,29 +60,20 @@ RosterManagerScreen.prototype.createDIV = function (_parentDiv)
     this.mContainer = $('<div class="character-screen ui-control dialog-modal-background display-none opacity-none"/>');
     _parentDiv.append(this.mContainer);
 
-    this.mBackgroundImage = this.mContainer.createImage(null, function (_image)
-    {
-        _image.removeClass('display-none').addClass('display-block');
-        _image.fitImageToParent();
-    }, function (_image)
-    {
-        _image.fitImageToParent();
-    }, 'display-none');
-
-    this.mRosterManagerScreenStatuetes = $('<div class="character-screen-statuetes"/>');
-    this.mContainer.append(this.mRosterManagerScreenStatuetes);
+    var rosterManagerScreenStatuetes = $('<div class="character-screen-statuetes"/>');
+    this.mContainer.append(rosterManagerScreenStatuetes);
 
     var parentWidth = this.mContainer.width();
     var parentHeight = this.mContainer.height();
-    var width = this.mRosterManagerScreenStatuetes.width();
-    var height = this.mRosterManagerScreenStatuetes.height();
+    var width = rosterManagerScreenStatuetes.width();
+    var height = rosterManagerScreenStatuetes.height();
 
     if (width > parentWidth)
     {
         width = width + 32;
         var marginLeft = (parentWidth - width) / 2;
 
-        this.mRosterManagerScreenStatuetes.css({ 'left': marginLeft, 'margin-left': 0, 'margin-right': 0 });
+        rosterManagerScreenStatuetes.css({ 'left': marginLeft, 'margin-left': 0, 'margin-right': 0 });
     }
 
     if (height > parentHeight)
@@ -93,11 +81,11 @@ RosterManagerScreen.prototype.createDIV = function (_parentDiv)
         height = height + 122;
         var marginTop = (parentHeight - height) / 2;
 
-        this.mRosterManagerScreenStatuetes.css({ 'top': marginTop, 'margin-top': 0, 'margin_bottom': 0 });
+        rosterManagerScreenStatuetes.css({ 'top': marginTop, 'margin-top': 0, 'margin_bottom': 0 });
     }
 
     this.mRosterManagerScreen = $('<div class="character-screen-container"/>');
-    this.mRosterManagerScreenStatuetes.append(this.mRosterManagerScreen);
+    rosterManagerScreenStatuetes.append(this.mRosterManagerScreen);
 
     this.mLeftContentContainer = $('<div class="l-left-content-container"/>');
     this.mRosterManagerScreen.append(this.mLeftContentContainer);
@@ -115,14 +103,10 @@ RosterManagerScreen.prototype.destroyDIV = function ()
     this.mRosterManagerScreen.empty();
     this.mRosterManagerScreen = null;
 
-    this.mBackgroundImage.empty();
-    this.mBackgroundImage = null;
-
     this.mContainer.empty();
     this.mContainer.remove();
     this.mContainer = null;
 };
-
 
 RosterManagerScreen.prototype.createModules = function()
 {
@@ -142,13 +126,6 @@ RosterManagerScreen.prototype.unregisterModules = function ()
     this.mBrothersModule.unregister();
 };
 
-
-RosterManagerScreen.prototype.registerDatasourceListener = function()
-{
-    this.mDataSource.addListener(CharacterScreenDatasourceIdentifier.Inventory.ModeUpdated, jQuery.proxy(this.onInventoryModeUpdated, this));
-};
-
-
 RosterManagerScreen.prototype.create = function(_parentDiv)
 {
     this.createDIV(_parentDiv);
@@ -160,7 +137,6 @@ RosterManagerScreen.prototype.destroy = function()
     this.unregisterModules();
     this.destroyDIV();
 };
-
 
 RosterManagerScreen.prototype.register = function (_parentDiv)
 {
@@ -195,22 +171,6 @@ RosterManagerScreen.prototype.unregister = function ()
     this.destroy();
 };
 
-
-RosterManagerScreen.prototype.showBackgroundImage = function ()
-{
-    // show background image - Only in Battle Preparation mode
-    if (this.mDataSource.getInventoryMode() === CharacterScreenDatasourceIdentifier.InventoryMode.BattlePreparation)
-    {
-        //this.mBackgroundImage.attr('src', ''); // NOTE: Reset img src otherwise Chrome will use the cached one..
-        this.mBackgroundImage.attr('src', Path.GFX + Asset.BACKGROUND_INVENTORY);
-    }
-    else
-    {
-        this.mBackgroundImage.attr('src', ''); // NOTE: Reset img src otherwise Chrome will use the cached one..
-        this.mBackgroundImage.removeClass('display-block').addClass('display-none');
-    }
-};
-
 RosterManagerScreen.prototype.show = function (_data)
 {
     var self = this;
@@ -234,7 +194,6 @@ RosterManagerScreen.prototype.show = function (_data)
         {
             $(this).removeClass('display-none').addClass('display-block');
             self.notifyBackendOnAnimating();
-            self.showBackgroundImage();
         },
         complete: function()
         {
@@ -262,24 +221,6 @@ RosterManagerScreen.prototype.hide = function ()
         }
     });
 };
-
-
-RosterManagerScreen.prototype.onInventoryModeUpdated = function (_dataSource, _inventoryMode)
-{
-    switch(_inventoryMode)
-    {
-        case CharacterScreenDatasourceIdentifier.InventoryMode.BattlePreparation:
-        {
-            this.mRosterManagerScreen.addClass('is-battle-preparation');
-        } break;
-        case CharacterScreenDatasourceIdentifier.InventoryMode.Stash:
-        case CharacterScreenDatasourceIdentifier.InventoryMode.Ground:
-        {
-            this.mRosterManagerScreen.removeClass('is-battle-preparation');
-        } break;
-    }
-};
-
 
 RosterManagerScreen.prototype.getModule = function (_name)
 {

@@ -1,20 +1,11 @@
 this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_screen", {
 	m = {
 		JSDataSourceHandle = null,
-		Visible = null,
-		PopupDialogVisible = null,
-		Animating = null,
-
 		OnCloseButtonClickedListener = null,
-
-		PlayerID = "Player",
-		QuarterID = "Quarter",
 
         Formation = "Formation",
         Reserve = "Reserve",
-        Guests = "Guests",
 
-		MinPlayerRoster = 1,
 		DefaultSlotLimit = 27,
 
         ManagedRosters = {/*
@@ -48,7 +39,6 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
 		::logWarning("Create()");
 		this.world_base_screen.create();
 
-		this.m.PopupDialogVisible = false;
 		this.m.JSHandle = this.UI.connect("RosterManagerScreen", this);
 		this.m.JSDataSourceHandle = this.m.JSHandle.connectToModule("DataSource", this);
 
@@ -166,11 +156,6 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
         }
     }
 
-	function isAnimating()
-	{
-		return this.m.Animating != null && this.m.Animating == true || this.m.PopupDialogVisible != null && this.m.PopupDialogVisible == true;
-	}
-
 	function setOnClosePressedListener( _listener )
 	{
 		this.m.OnCloseButtonClickedListener = _listener;
@@ -192,6 +177,7 @@ this.world_obituary_screen <- this.inherit("scripts/ui/screens/world/world_base_
 		}
 		local result = {};
 		result.RostersData <- rosterData;
+		result.PlayerBrotherCap <- ::World.Assets.m.BrothersMax = 12;
 		return result;
 	}
 

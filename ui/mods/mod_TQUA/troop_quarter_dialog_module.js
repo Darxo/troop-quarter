@@ -5,11 +5,6 @@ var Owner =
 {
     Quarter: 'Quarter',
     Player: 'Player',
-
-    Formation:  'Formation',
-    Reserve:    'Reserve',
-    Guests:     'Guests',
-    Caravan:    'Caravan'
 };
 
 var TroopQuarterDialogModule = function(_parent)

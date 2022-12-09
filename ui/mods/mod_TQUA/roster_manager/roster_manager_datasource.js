@@ -10,10 +10,10 @@ var RosterManagerDatasource = function()
 
 	// Caches
     this.mRosterManager = new RosterManager();
-    this.mRosterManager.addContainer(new RosterContainer(Owner.Formation));
-    this.mRosterManager.addContainer(new RosterContainer(Owner.Reserve));
-    this.mRosterManager.addContainer(new RosterContainer(Owner.Guests));
-    this.mRosterManager.addContainer(new RosterContainer(Owner.Caravan));
+    this.mRosterManager.addContainer(new RosterContainer(RosterOwner.Formation));
+    this.mRosterManager.addContainer(new RosterContainer(RosterOwner.Reserve));
+    this.mRosterManager.addContainer(new RosterContainer(RosterOwner.Guests));
+    this.mRosterManager.addContainer(new RosterContainer(RosterOwner.Caravan));
 
     this.mIsPopupOpen = false;
 
@@ -26,7 +26,7 @@ var RosterManagerDatasource = function()
 
 RosterManagerDatasource.prototype.getPlayerRoster = function ()
 {
-	return this.mRosterManager.get(Owner.Formation);
+	return this.mRosterManager.get(RosterOwner.Formation);
 }
 
 RosterManagerDatasource.prototype.getInventoryMode = function ()
@@ -126,7 +126,7 @@ RosterManagerDatasource.prototype.isTacticalMode = function ()
 
 RosterManagerDatasource.prototype.getBrothersList = function ()
 {
-    return this.mRosterManager.get(Owner.Formation).mBrotherList;
+    return this.mRosterManager.get(RosterOwner.Formation).mBrotherList;
 };
 
 RosterManagerDatasource.prototype.getTooltipItemOwner = function()

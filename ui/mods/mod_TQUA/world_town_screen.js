@@ -1,4 +1,4 @@
-
+/*
 // HOOK TIME
 var TQUA_onDisconnection = WorldTownScreen.prototype.onDisconnection;
 WorldTownScreen.prototype.onDisconnection = function ()
@@ -103,3 +103,4 @@ WorldTownScreen.prototype.showTroopQuarterDialog = function (_data)
 
     this.mTroopQuarterDialogModule.show(_withSlideAnimation);
 };
+*/

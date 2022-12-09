@@ -28,6 +28,7 @@
     // ::mods_registerJS("mod_TQUA/original/mod_stronghold_pokebro_pc_dialog_module.js");
     // ::mods_registerCSS("mod_TQUA/original/mod_stronghold_pokebro_pc_dialog_module.css");
 
+    ::mods_registerJS("mod_TQUA/mod_Assets.js");
 
     ::mods_registerJS("mod_TQUA/roster_container.js");
     ::mods_registerJS("mod_TQUA/roster_manager.js");
