@@ -17,6 +17,10 @@ var RosterManagerDatasource = function()
 
     this.mIsPopupOpen = false;
 
+    // Dummy-Variable so that hooks in modules which are used in both CharacterScreen and this Screen
+    // That way they can have different behavior
+    this.mIsRosterManager = true;
+
 	this.init();
 };
 
