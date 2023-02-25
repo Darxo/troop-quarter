@@ -48,6 +48,7 @@ var TroopQuarterDialogModule = function(_parent)
 
 TroopQuarterDialogModule.prototype.createDIV = function (_parentDiv)
 {
+    console.error("TroopQuarterDialogModule.prototype.createDIV");
     var self = this;
 
     // create: containers (init hidden!)

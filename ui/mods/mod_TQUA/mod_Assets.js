@@ -8,5 +8,15 @@ var modTQUA =
         Reserve:    'Reserve',
         Guests:     'Guests',
         Caravan:    'Caravan'
+    },
+
+    TooltipIdentifier:
+    {
+        Character: 'modTQUA.CharacterTooltip',
+
+        Stash:
+        {
+            ActiveRoster: 'modTQUA.RosterSizeLabel'
+        }
     }
 }

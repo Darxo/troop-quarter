@@ -121,7 +121,8 @@ RosterManagerRosterModule.prototype.createRosterDIV = function (_parentDiv, _ros
 
                 var reserveCountLabel = $('<div class="label text-font-small font-bold font-color-value"/>');
                 countContainer.append(reserveCountLabel);
-                countContainer.bindTooltip({ contentType: 'ui-element', elementId: TooltipIdentifier.Stash.ActiveRoster });
+
+                countContainer.bindTooltip({ contentType: 'msu-generic', modId: modTQUA.ID, elementId: 'RosterModule.RosterSizeLabel' });
                 this.mDataSource.mRosterManager.get(_rosterID).attachCountLabel(reserveCountLabel);
 
         var listContainerLayout = $('<div class="l-list-container"/>');

@@ -56,7 +56,6 @@
     ::modTQUA.Mod.Keybinds.addJSKeybind("MoveSelectedDown", "shift+s", "Move Selected Down", "While in the Roster Manager: select the next actor of the roster that currently has the selection");
     ::modTQUA.Mod.Keybinds.addJSKeybind("MoveSelectedRight", "shift+d", "Move Selected Right", "While in the Roster Manager: select the previous actor of the roster that currently has the selection");
 
-
 	::modTQUA.createGuests <- function()
 	{
 		if (::World.getGuestRoster().getSize() != 0) return;
@@ -86,5 +85,16 @@
 		militia.assignRandomEquipment();
 	}
 
+	::modTQUA.RosterScreen <- ::new("scripts/ui/screens/world/troop_manager_screen");
+	::MSU.UI.registerConnection(::modTQUA.RosterScreen);
+	// ::MSU.UI.addOnConnectCallback(::modTQUA.RosterScreen.show.bindenv(::modTQUA.RosterScreen));
+	::modTQUA.Mod.Keybinds.addSQKeybind("toggleScriptFightScreen", "ctrl+p", ::MSU.Key.State.All, ::modTQUA.RosterScreen.toggle.bindenv(::modTQUA.RosterScreen));
+
+
+	::modTQUA.Mod.Tooltips.setTooltips({
+		RosterModule = {
+			RosterSizeLabel = ::MSU.Class.BasicTooltip("Roster Size", "Shows the current and maximum amount of characters for this roster.")
+		}
+	});
 
 });

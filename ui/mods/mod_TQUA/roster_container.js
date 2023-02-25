@@ -375,7 +375,8 @@ RosterContainer.prototype.update = function()
         result.data('idx', _index);
         result.data('tag', this.mContainerID);
         result.unbindTooltip();
-        result.bindTooltip({ contentType: 'ui-element', entityId: actorID, elementId: 'pokebro.roster' });
+        result.bindTooltip({ contentType: 'ui-element', entityId: actorID, elementId: modTQUA.TooltipIdentifier.Character });
+
         parentDiv.data('child', result);
         this.mBrotherCurrent++;
         this.updateCountLabel();
