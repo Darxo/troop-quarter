@@ -472,11 +472,12 @@ RosterManager.prototype.generateDIVs = function()
         if (sourceOwner.isEmpty(_firstIdx))    return this.transferBrother(_secondIdx, targetOwner, _firstIdx, sourceOwner);
         if (targetOwner.isEmpty(_secondIdx))   return this.transferBrother(_firstIdx, sourceOwner, _secondIdx, targetOwner);
 
-        if (targetOwner.canImportActor(sourceOwner.isPlayerCharacter(_firstIdx)) === false) return false;
-        if (targetOwner.canRemoveActor() === false) return false;
+        // Two actor are switched with each other
+        if (targetOwner.canSwitchInActor(sourceOwner.isPlayerCharacter(_firstIdx)) === false) return false;
+        if (targetOwner.canSwitchOutActor() === false) return false;
 
-        if (sourceOwner.canImportActor(targetOwner.isPlayerCharacter(_secondIdx)) === false) return false;
-        if (sourceOwner.canRemoveActor() === false) return false;
+        if (sourceOwner.canSwitchInActor(targetOwner.isPlayerCharacter(_secondIdx)) === false) return false;
+        if (sourceOwner.canSwitchOutActor() === false) return false;
 
         // console.error("_firstIdx " + _firstIdx + " _secondIdx " + _secondIdx);
         var firstBrotherID = sourceOwner.mSlots[_firstIdx].data('child').data('ID');

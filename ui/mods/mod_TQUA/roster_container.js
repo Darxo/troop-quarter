@@ -129,11 +129,25 @@ RosterContainer.prototype.update = function()
         return true;
     }
 
+    RosterContainer.prototype.canSwitchOutActor = function()
+    {
+        if (this.mCanRemove === false) return false;
+        return true;
+    }
+
     // _isPlayerCharacter is optional parameter with default value of false
     RosterContainer.prototype.canImportActor = function( _isPlayerCharacter )
     {
         if (this.mCanImport === false) return false;
         if (this.mBrotherCurrent >= this.mBrotherMax) return false;
+        if (_isPlayerCharacter !== undefined && this.mAcceptsPlayerCharacters === false && _isPlayerCharacter === true) return false;
+        return true;
+    }
+
+    // _isPlayerCharacter is optional parameter with default value of false
+    RosterContainer.prototype.canSwitchInActor = function( _isPlayerCharacter )
+    {
+        if (this.mCanImport === false) return false;
         if (_isPlayerCharacter !== undefined && this.mAcceptsPlayerCharacters === false && _isPlayerCharacter === true) return false;
         return true;
     }
