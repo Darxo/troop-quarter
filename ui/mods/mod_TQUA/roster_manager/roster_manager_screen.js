@@ -194,7 +194,7 @@ RosterManagerScreen.prototype.register = function (_parentDiv)
 
     if (this.mContainer !== null)
     {
-        console.error('ERROR: Failed to register Character Screen. Reason: Screen is already initialized.');
+        console.error('ERROR: Failed to register Roster Manager Screen. Reason: Screen is already initialized.');
         return;
     }
 
@@ -212,7 +212,7 @@ RosterManagerScreen.prototype.unregister = function ()
 
     if (this.mContainer === null)
     {
-        console.error('ERROR: Failed to unregister Character Screen. Reason: Screen is not initialized.');
+        console.error('ERROR: Failed to unregister Roster Manager Screen. Reason: Screen is not initialized.');
         return;
     }
 

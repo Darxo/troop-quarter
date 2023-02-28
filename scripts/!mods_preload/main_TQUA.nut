@@ -33,8 +33,6 @@
     ::mods_registerJS("mod_TQUA/roster_container.js");
     ::mods_registerJS("mod_TQUA/roster_manager.js");
 
-    ::mods_registerJS("mod_TQUA/world_town_screen.js");
-
 	::mods_registerJS("mod_TQUA/roster_manager/roster_manager_roster_module.js");
 	::mods_registerCSS("mod_TQUA/roster_manager/roster_manager_roster_module.css");
 
@@ -88,8 +86,9 @@
 	::modTQUA.RosterScreen <- ::new("scripts/ui/screens/world/troop_manager_screen");
 	::MSU.UI.registerConnection(::modTQUA.RosterScreen);
 	// ::MSU.UI.addOnConnectCallback(::modTQUA.RosterScreen.show.bindenv(::modTQUA.RosterScreen));
-	::modTQUA.Mod.Keybinds.addSQKeybind("toggleScriptFightScreen", "ctrl+p", ::MSU.Key.State.All, ::modTQUA.RosterScreen.toggle.bindenv(::modTQUA.RosterScreen));
+	::modTQUA.Mod.Keybinds.addSQKeybind("toggleScriptFightScreen", "m", ::MSU.Key.State.All, ::modTQUA.RosterScreen.toggle.bindenv(::modTQUA.RosterScreen));
 
+	// ::modTQUA.RosterScreen.setOnClosePressedListener(this.town_screen_main_dialog_module_onLeaveButtonClicked.bindenv(this));
 
 	::modTQUA.Mod.Tooltips.setTooltips({
 		RosterModule = {
