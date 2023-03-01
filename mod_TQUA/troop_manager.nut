@@ -184,10 +184,11 @@ this.troop_manager <- {
 					mType = "Player",
 					mBrotherList = _this.convertActorsToUIData(::World.Assets.getFormation().slice(0, 18)),		// Only pass the first 18 slots of the player roster
 					mBrotherMin = 1,
-					mBrotherMax = 12,
+					mBrotherMax = ::World.Assets.getBrothersMaxInCombat(),
 					mSlotLimit = 18,
 					mAcceptsPlayerCharacters = true,
-					mPrimaryDisplayContainer = true,	// These rosters will be displayed in the bottom part of the screen
+					mPrimaryDisplayContainer = true,	// These rosters will be displayed in the bottom part of the screen,
+					mSharedMaximumBrothers = ::World.Assets.getBrothersMax()	// We want both Formation & Reserve to respect this shared maximum
 				}},
 			getAll = function() {return ::World.getPlayerRoster().getAll();},
 			insertActor = function(_actor) {	// Maybe add Position?
@@ -211,7 +212,8 @@ this.troop_manager <- {
 					mBrotherMax = 9,
 					mSlotLimit = 9,
 					mSlotClasses = "<div class=\"ui-control is-brother-slot is-reserve-slot\"/>",
-					mAcceptsPlayerCharacters = true
+					mAcceptsPlayerCharacters = true,
+					mSharedMaximumBrothers = ::World.Assets.getBrothersMax()	// We want both Formation & Reserve to respect this shared maximum
 				}
 			},
 			getAll = function() {return ::World.getPlayerRoster().getAll();},

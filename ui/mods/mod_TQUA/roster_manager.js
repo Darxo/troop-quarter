@@ -4,11 +4,31 @@ var RosterManager = function(_dataSource)
     this.mSQHandle        = null;
     this.mEventListener     = null;
     this.mBrotherContainer = [];        // Array of BrotherContainer
+
+    this.mSharedMaximumInformation = null;
 }
 
 RosterManager.prototype.initializeFromData = function( _data )
 {
     this.mBrotherContainer = [];    // Makes sure all previous data is wiped
+    this.mSharedMaximumInformation =
+    {
+        MaximumTotalBrothers: 27,
+        CurrentBrothers: {},    // Has an entry for each ID that shares maximum total brothers
+        isAtCapacity: function()
+        {
+            if (this.getCurrentBrothers() === this.MaximumTotalBrothers);
+        },
+        getCurrentBrothers: function()
+        {
+            var currentBrothers = 0;
+            for (var containerEntry in CurrentBrothers)
+            {
+                currentBrothers += CurrentBrothers[containerEntry];
+            }
+            return currentBrothers;
+        }
+    }
 
     // console.error("initializing Roster Manager");
     var entries = Object.keys(_data);
@@ -20,7 +40,7 @@ RosterManager.prototype.initializeFromData = function( _data )
             continue;
         }
         var newRosterContainer = this.addContainer(new RosterContainer(entries[i]));
-        newRosterContainer.loadFromData(_data[entries[i]]);
+        newRosterContainer.loadFromData(_data[entries[i]], this.mSharedMaximumInformation);
     }
 }
 
@@ -136,7 +156,7 @@ RosterManager.prototype.generateDIVs = function()
     // Returns the next container in line that comes after this one. Useful for quickMove features
     // Only returns a container that is able to be inserted into (not full, mCanInsert etc)
     // Returns null is this ID doesn't exists or no applicable container was found
-    RosterManager.prototype.getNextForInsert = function( _containerID, _isPlayerCharacter )
+    RosterManager.prototype.getNextForInsert = function( _containerID, _isPlayerCharacter, _sharedMaximumBrothers )
     {
         if (this.mBrotherContainer.length === 1) return null;
 
@@ -150,7 +170,7 @@ RosterManager.prototype.generateDIVs = function()
                 sourceFound = true;
                 continue;
             }
-            if (this.mBrotherContainer[i].canImportActor(_isPlayerCharacter) === false) continue;   // skip all container that cant be imported
+            if (this.mBrotherContainer[i].canImportActor(_isPlayerCharacter, _sharedMaximumBrothers) === false) continue;   // skip all container that cant be imported
             if (sourceFound === false)
             {
                 if (beforeIndex === null) beforeIndex = i;
@@ -418,7 +438,7 @@ RosterManager.prototype.generateDIVs = function()
     RosterManager.prototype.transferBrother = function ( _sourceIdx, _sourceOwner, _targetIdx, _targetOwner )
     {
         if (_sourceOwner.canRemoveActor() === false) return false;
-        if (_targetOwner.canImportActor(_sourceOwner.isPlayerCharacter(_sourceIdx)) === false) return false;
+        if (_targetOwner.canImportActor(_sourceOwner.isPlayerCharacter(_sourceIdx), _sourceOwner.mSharedMaximumInformation) === false) return false;
 
         // console.error("transferBrother _targetIdx: " + _targetIdx);
 
@@ -472,10 +492,10 @@ RosterManager.prototype.generateDIVs = function()
         if (targetOwner.isEmpty(_secondIdx))   return this.transferBrother(_firstIdx, sourceOwner, _secondIdx, targetOwner);
 
         // Two actor are switched with each other
-        if (targetOwner.canSwitchInActor(sourceOwner.isPlayerCharacter(_firstIdx)) === false) return false;
+        if (targetOwner.canSwitchInActor(sourceOwner.isPlayerCharacter(_firstIdx), sourceOwner.mSharedMaximumInformation) === false) return false;
         if (targetOwner.canSwitchOutActor() === false) return false;
 
-        if (sourceOwner.canSwitchInActor(targetOwner.isPlayerCharacter(_secondIdx)) === false) return false;
+        if (sourceOwner.canSwitchInActor(targetOwner.isPlayerCharacter(_secondIdx), targetOwner.mSharedMaximumInformation) === false) return false;
         if (sourceOwner.canSwitchOutActor() === false) return false;
 
         // console.error("_firstIdx " + _firstIdx + " _secondIdx " + _secondIdx);
@@ -502,7 +522,7 @@ RosterManager.prototype.generateDIVs = function()
         if (data.Index === null || data.Tag === null) return false;
 
         var sourceOwner = this.get(data.Tag);
-        var targetOwner = this.getNextForInsert(data.Tag, sourceOwner.isPlayerCharacter(data.Index));
+        var targetOwner = this.getNextForInsert(data.Tag, sourceOwner.isPlayerCharacter(data.Index), sourceOwner.mSharedMaximumInformation);
         if (targetOwner === null) return false;     // No valid target for quickswitching was found
 
         // transfer brother from source roster to target roster

@@ -40,10 +40,13 @@ var RosterContainer = function( _containerID )
 
     this.mCanSelectEmptySlots = false;
     this.mSlotClasses = '<div class="ui-control is-brother-slot is-roster-slot"/>';     // Classes that are assigned to slot DIVs of this container
+
+    // Shared Variables
+    this.mSharedMaximumBrothers = false;  // Only used to enforce a shared maximum between roster and reserve within the roster manager
 }
 
 // Initialization. Called only once every time this window is opened
-RosterContainer.prototype.loadFromData = function( _rosterData )
+RosterContainer.prototype.loadFromData = function( _rosterData, _sharedMaximumInformation )
 {
     // console.error("loading Data into the container " + this.mContainerID);
     var entries = Object.keys(_rosterData);
@@ -54,6 +57,11 @@ RosterContainer.prototype.loadFromData = function( _rosterData )
             this[entries[i]] = _rosterData[entries[i]];
             // console.error("loading variable "+ entries[i] + " to value " + _rosterData[entries[i]]);
         }
+    }
+    if (typeof this.mSharedMaximumBrothers === "number")
+    {
+        _sharedMaximumInformation.MaximumTotalBrothers = this.mSharedMaximumBrothers;
+        this.mSharedMaximumBrothers = _sharedMaximumInformation;
     }
     return null;
 }
@@ -136,19 +144,21 @@ RosterContainer.prototype.update = function()
     }
 
     // _isPlayerCharacter is optional parameter with default value of false
-    RosterContainer.prototype.canImportActor = function( _isPlayerCharacter )
+    RosterContainer.prototype.canImportActor = function( _isPlayerCharacter, _comingFromSharedMaximum )
     {
         if (this.mCanImport === false) return false;
         if (this.mBrotherCurrent >= this.mBrotherMax) return false;
         if (_isPlayerCharacter !== undefined && this.mAcceptsPlayerCharacters === false && _isPlayerCharacter === true) return false;
+        if (_comingFromSharedMaximum === false && this.mSharedMaximumBrothers !== false && this.mSharedMaximumBrothers.isAtCapacity()) return false;
         return true;
     }
 
     // _isPlayerCharacter is optional parameter with default value of false
-    RosterContainer.prototype.canSwitchInActor = function( _isPlayerCharacter )
+    RosterContainer.prototype.canSwitchInActor = function( _isPlayerCharacter, _comingFromSharedMaximum )
     {
         if (this.mCanImport === false) return false;
         if (_isPlayerCharacter !== undefined && this.mAcceptsPlayerCharacters === false && _isPlayerCharacter === true) return false;
+        if (_comingFromSharedMaximum === false && this.mSharedMaximumBrothers !== false && this.mSharedMaximumBrothers.isAtCapacity()) return false;
         return true;
     }
 
@@ -394,6 +404,7 @@ RosterContainer.prototype.update = function()
 
         parentDiv.data('child', result);
         this.mBrotherCurrent++;
+        if (this.mSharedMaximumBrothers !== false) this.mSharedMaximumBrothers.CurrentBrothers[this.mContainerID]++;
         this.updateCountLabel();
 
         // Temporary
@@ -511,6 +522,7 @@ RosterContainer.prototype.update = function()
         this.mBrotherList[_slotIdx] = _data.BrotherData;     // Insert the Brother Data
 
         this.mBrotherCurrent++;
+        if (this.mSharedMaximumBrothers !== false) this.mSharedMaximumBrothers.CurrentBrothers[this.mContainerID]++;
         this.updateCountLabel();
         if (_data.IsSelected === true) this.selectSlot(_slotIdx);
 
@@ -536,6 +548,7 @@ RosterContainer.prototype.update = function()
         this.mBrotherList[_slotIdx] = null;         // Make the list entry null
 
         this.mBrotherCurrent--;
+        if (this.mSharedMaximumBrothers !== false) this.mSharedMaximumBrothers.CurrentBrothers[this.mContainerID]--;
         this.updateCountLabel();
         if (data.IsSelected) this.deselectCurrent();
 
