@@ -82,10 +82,9 @@
 		militia.assignRandomEquipment();
 	}
 
-	::modTQUA.RosterScreen <- ::new("scripts/ui/screens/world/troop_manager_screen");
-	::MSU.UI.registerConnection(::modTQUA.RosterScreen);
-	// ::MSU.UI.addOnConnectCallback(::modTQUA.RosterScreen.show.bindenv(::modTQUA.RosterScreen));
-	::modTQUA.Mod.Keybinds.addSQKeybind("toggleScriptFightScreen", "m", ::MSU.Key.State.All, ::modTQUA.RosterScreen.toggle.bindenv(::modTQUA.RosterScreen));
+	// ::modTQUA.RosterScreen <- ::new("scripts/ui/screens/world/troop_manager_screen");
+	// ::MSU.UI.registerConnection(::modTQUA.RosterScreen);
+	// ::modTQUA.Mod.Keybinds.addSQKeybind("toggleScriptFightScreen", "m", ::MSU.Key.State.All, ::modTQUA.RosterScreen.toggle.bindenv(::modTQUA.RosterScreen));
 
 	// ::modTQUA.RosterScreen.setOnClosePressedListener(this.town_screen_main_dialog_module_onLeaveButtonClicked.bindenv(this));
 
