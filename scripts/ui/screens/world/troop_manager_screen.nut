@@ -14,7 +14,6 @@ this.troop_manager_screen <- this.inherit("scripts/mods/msu/ui_screen", {
 
 	function create()
 	{
-		::logWarning("Create()");
 		this.ui_screen.create();
 		this.m.ID = "RosterManagerScreen";
 		this.m.TroopManager = ::new("mod_TQUA/troop_manager");
@@ -31,7 +30,6 @@ this.troop_manager_screen <- this.inherit("scripts/mods/msu/ui_screen", {
 		this.ui_screen.clearEventListener();
 	}
 
-	// Overwrites
 	function show()
 	{
 		local data = this.m.TroopManager.queryData();

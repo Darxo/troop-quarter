@@ -43,7 +43,6 @@
     ::mods_registerJS("mod_TQUA/screens/character/modules/character_screen_left_panel/character_screen_paperdoll_module.js");
 
 // MSU Keybinds
-    // Useful Item Filter
     ::modTQUA.Mod.Keybinds.addJSKeybind("SwitchToNextSelected", "d", "Switch to next selected", "While in the Roster Manager: select the next actor of the roster that currently has the selection");
     ::modTQUA.Mod.Keybinds.addJSKeybind("SwitchToPrevSelected", "a", "Switch to previous selected", "While in the Roster Manager: select the previous actor of the roster that currently has the selection");
     ::modTQUA.Mod.Keybinds.addJSKeybind("SwitchToAboveSelected", "w", "Switch to next selected", "While in the Roster Manager: select the next actor of the roster that currently has the selection");

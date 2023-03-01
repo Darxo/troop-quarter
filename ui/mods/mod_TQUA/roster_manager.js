@@ -10,7 +10,7 @@ RosterManager.prototype.initializeFromData = function( _data )
 {
     this.mBrotherContainer = [];    // Makes sure all previous data is wiped
 
-    console.error("initializing Roster Manager");
+    // console.error("initializing Roster Manager");
     var entries = Object.keys(_data);
     for(var i = 0; i < entries.length; i++)
     {
@@ -52,7 +52,7 @@ RosterManager.prototype.generateDIVs = function()
 {   // Basic Getter and Setter
     RosterManager.prototype.addContainer = function( _container )
     {
-        console.error("Registered RosterContainer: " + _container.mContainerID);
+        // console.error("Registered RosterContainer: " + _container.mContainerID);
         this.mBrotherContainer.push(_container);
         return _container;
     }
@@ -95,7 +95,7 @@ RosterManager.prototype.generateDIVs = function()
                 };
             }
         }
-        console.error("getSelected returned null");
+        // console.error("getSelected returned null");
         return null;
     }
 
@@ -252,7 +252,7 @@ RosterManager.prototype.generateDIVs = function()
                 return false;
             }
 
-            console.error("dropHandler fired for " + drop.data('tag'));
+            // console.error("dropHandler fired for " + drop.data('tag'));
 
             drag.removeClass('is-dragged');
 
@@ -293,8 +293,7 @@ RosterManager.prototype.generateDIVs = function()
         // some event listener for actor slot to drag and drop
         result.drag("start", function (ev, dd)
         {
-
-            console.error("drag start fired for " + _index);
+            // console.error("drag start fired for " + _index);
 
             // build proxy
             var proxy = $('<div class="ui-control brother is-proxy"/>');

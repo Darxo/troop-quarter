@@ -135,10 +135,6 @@ RosterManagerScreen.prototype.createDIV = function (_parentDiv)
             self.mDataSource.mRosterManager.moveSelectedRight();
             return true;
         }
-
-
-
-
         return false
     });
 };

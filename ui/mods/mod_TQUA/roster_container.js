@@ -45,7 +45,7 @@ var RosterContainer = function( _containerID )
 // Initialization. Called only once every time this window is opened
 RosterContainer.prototype.loadFromData = function( _rosterData )
 {
-    console.error("loading Data into the container " + this.mContainerID);
+    // console.error("loading Data into the container " + this.mContainerID);
     var entries = Object.keys(_rosterData);
     for(var i = 0; i < entries.length; i++)
     {
@@ -95,7 +95,7 @@ RosterContainer.prototype.update = function()
         // console.error("isEmpty of mBrotherList[" + _slotIndex + "] is " + this.mBrotherList[_slotIndex]);
         if (this.mBrotherList[_slotIndex] === undefined)
         {
-            console.error("mBrotherList[" + _slotIndex + "] is undefined! The arraysize is " + this.mBrotherList.length);
+            // console.error("mBrotherList[" + _slotIndex + "] is undefined! The arraysize is " + this.mBrotherList.length);
         }
         return (this.mBrotherList[_slotIndex] === null);
     };
@@ -193,6 +193,7 @@ RosterContainer.prototype.update = function()
         return null
     }
 
+    // This was a fruitless attempt to prevent slots that overlap with player roster to accept drop events
     RosterContainer.prototype.isInDeadZone = function( _offsetX, _offsetY)
     {
         return false;
@@ -559,7 +560,7 @@ RosterContainer.prototype.update = function()
     // _targetIdx is an unsigned integer
     RosterContainer.prototype.swapBrothers = function ( _firstIdx, _secondIdx )
     {
-        console.error("swapBrothers");
+        // console.error("swapBrothers");
         var sourceSlot = this.mSlots[_firstIdx];
         var targetSlot = this.mSlots[_secondIdx];
 
@@ -602,7 +603,7 @@ RosterContainer.prototype.update = function()
     // _targetIdx is an unsigned integer
     RosterContainer.prototype.relocateBrother = function ( _sourceIdx, _targetIdx )
     {
-        console.error("relocateBrother");
+        // console.error("relocateBrother");
         var sourceSlot = this.mSlots[_sourceIdx];
         var targetSlot = this.mSlots[_targetIdx];
 

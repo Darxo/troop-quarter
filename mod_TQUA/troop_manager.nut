@@ -98,7 +98,7 @@ this.troop_manager <- {
 	// Changes the place in formation of a single brother only within their own roster
     function relocateActor( _rosterID, _actorID, _newPosition )
     {
-		::logWarning("Relocate the brother '" + _actorID + "' from roster '" + _rosterID + "' into position '" + _newPosition + "'");
+		// ::logWarning("Relocate the brother '" + _actorID + "' from roster '" + _rosterID + "' into position '" + _newPosition + "'");
 		local sourceRoster = this.getManagedRoster(_rosterID);
 
 		local foundActor = null;
@@ -119,7 +119,7 @@ this.troop_manager <- {
 	// Moves a brother out of a roster and into another roster
     function transferBrother( _actorID, _sourceID, _newPosition, _targetID )
     {
-		::logWarning("Transfer the brother '" + _actorID + "' from sourceRoster '" + _sourceID + "' into targetRoster '" + _targetID + "' into position '" + _newPosition + "'");
+		// ::logWarning("Transfer the brother '" + _actorID + "' from sourceRoster '" + _sourceID + "' into targetRoster '" + _targetID + "' into position '" + _newPosition + "'");
 
 		local sourceRoster = this.getManagedRoster(_sourceID);
 		local targetRoster = this.getManagedRoster(_targetID);
@@ -225,7 +225,8 @@ this.troop_manager <- {
 		});
 	}
 
-	function registerTownRosters()
+    // This will scan nearby towns automatically and display their roster. It's only debug and proof of concept at this point
+	function registerAutomaticTownRosters()
 	{
 		this.addManagedRoster("Hire", {
 			getSettlement = function()
@@ -263,9 +264,9 @@ this.troop_manager <- {
 		});
 	}
 
-	function registerRoster( _name, _rosterID, _slotLimit )
+	function registerTownRoster( _id, _name, _rosterID, _slotLimit )
 	{
-		this.addManagedRoster(_name, {
+		this.addManagedRoster(_id, {
 			isActive = function() {
 				return true;
 			},

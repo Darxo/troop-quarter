@@ -11,8 +11,8 @@ var RosterManagerRosterModule = function(_parent, _dataSource)
 
     this.mDeadZoneElement = null;
 
-    this.PrimaryContainer = null;
-    this.SecondaryContainer = null;
+    this.mPrimaryContainer = null;
+    this.mSecondaryContainer = null;
 };
 
 RosterManagerRosterModule.prototype.createDIV = function (_parentDiv)
@@ -37,9 +37,9 @@ RosterManagerRosterModule.prototype.createDIV = function (_parentDiv)
             }, '', 6);
 
     // Secondary (Top) Container
-    this.SecondaryContainer = $('<div class="secondary-container"/>');
-    this.mContainer.append(this.SecondaryContainer);
-    this.SecondaryContainer.createListWithCustomOption({
+    this.mSecondaryContainer = $('<div class="secondary-container"/>');
+    this.mContainer.append(this.mSecondaryContainer);
+    this.mSecondaryContainer.createListWithCustomOption({
         delta: 1.24,
         lineDelay: 0,
         lineTimer: 0,
@@ -52,30 +52,30 @@ RosterManagerRosterModule.prototype.createDIV = function (_parentDiv)
     });
 
     // Primary (Bottom) Container
-    this.PrimaryContainer = $('<div class="primary-container"/>');
-    this.mContainer.append(this.PrimaryContainer);
+    this.mPrimaryContainer = $('<div class="primary-container"/>');
+    this.mContainer.append(this.mPrimaryContainer);
 
     // DeadZones
-    this.mDataSource.mRosterManager.setDeadZoneElement(this.PrimaryContainer);
+    this.mDataSource.mRosterManager.setDeadZoneElement(this.mPrimaryContainer);
 };
 
 // RosterDIVs can't be created at this point because the rosters are not yet loadedFromData
 RosterManagerRosterModule.prototype.createDelayedRosterDIVs = function()
 {
     // Remove all previous slots for all the cases where we re-open the Roster-Screen with different rosters
-    this.PrimaryContainer.empty();
-    this.SecondaryContainer.findListScrollContainer().empty();
+    this.mPrimaryContainer.empty();
+    this.mSecondaryContainer.findListScrollContainer().empty();
 
     var containerArray = this.mDataSource.mRosterManager.mBrotherContainer;
     for(var i = 0; i < containerArray.length; i++)
     {
         if (containerArray[i].mPrimaryDisplayContainer === true)
         {
-            this.createRosterDIV(this.PrimaryContainer, containerArray[i].mContainerID)
+            this.createRosterDIV(this.mPrimaryContainer, containerArray[i].mContainerID)
         }
         else
         {
-            this.createRosterDIV(this.SecondaryContainer.findListScrollContainer(), containerArray[i].mContainerID)
+            this.createRosterDIV(this.mSecondaryContainer.findListScrollContainer(), containerArray[i].mContainerID)
         }
     }
 }
