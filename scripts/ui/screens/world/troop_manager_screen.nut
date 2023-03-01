@@ -16,7 +16,11 @@ this.troop_manager_screen <- this.inherit("scripts/mods/msu/ui_screen", {
 	{
 		this.ui_screen.create();
 		this.m.ID = "RosterManagerScreen";
-		this.m.TroopManager = ::new("mod_TQUA/troop_manager");
+	}
+
+	function init( _troopManager )
+	{
+		this.m.TroopManager = _troopManager.weakref();
 	}
 
 	function setOnClosePressedListener( _listener )
@@ -32,6 +36,11 @@ this.troop_manager_screen <- this.inherit("scripts/mods/msu/ui_screen", {
 
 	function show()
 	{
+		if (this.m.TroopManager == null)
+		{
+			::logError("TroopManagerScreen was not initialized yet. It has TroopManager attached yet.")
+			return;
+		}
 		local data = this.m.TroopManager.queryData();
 		this.ui_screen.show(data);
 	}

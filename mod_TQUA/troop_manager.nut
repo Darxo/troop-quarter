@@ -169,11 +169,6 @@ this.troop_manager <- {
 		this.transferBrother(_data[0], _data[1], newPosition, _data[3]);
 	}
 
-	function addRoster( _roster )
-	{
-
-	}
-
 	function registerPlayerRosters()
 	{
 		this.addManagedRoster("Formation", {

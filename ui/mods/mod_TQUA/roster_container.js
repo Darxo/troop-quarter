@@ -24,6 +24,7 @@ var RosterContainer = function( _containerID )
     this.mRosterCountLabel = null;  // Will be updated with current/max actors
     this.mRosterNameLabel = null;   // Will be updated with name (type)
 
+
     // Config
     this.mDeadZoneElement = null;      // Anything above this element is considered a deadZone for DropHandle
 
