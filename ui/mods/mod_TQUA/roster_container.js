@@ -400,7 +400,7 @@ RosterContainer.prototype.update = function()
         result.data('ID', actorID);
         result.data('idx', _index);
         result.data('tag', this.mContainerID);
-        result.unbindTooltip();
+        // result.unbindTooltip();  // Idk why I had this line here in the first place
         result.bindTooltip({ contentType: 'ui-element', entityId: actorID, elementId: modTQUA.TooltipIdentifier.Character });
 
         parentDiv.data('child', result);

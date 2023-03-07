@@ -50,8 +50,3 @@ CharacterScreenLeftPanelHeaderModule.prototype.bindTooltips = function ()
     // All this tooltip does is advertising the Change-Name-Title feature. But that is not supported in the RosterManager
     this.mNameContainer.unbindTooltip();
 };
-
-
-
-
-
