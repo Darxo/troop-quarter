@@ -48,7 +48,7 @@ this.troop_manager <- {
 		}
 		local result = {};
 		result.RostersData <- rosterData;
-		result.PlayerBrotherCap <- ::World.Assets.m.BrothersMax = 12;
+		result.PlayerBrotherCap <- ::World.Assets.m.BrothersMax;
 		return result;
 	}
 
