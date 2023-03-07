@@ -224,6 +224,11 @@ RosterManagerScreen.prototype.isVisible = function ()
 
 RosterManagerScreen.prototype.show = function (_data)
 {
+    // Clean up all popup dialogs caused by the original vanilla CharacterScreen.
+    // We use the same id as that screen (for .css style reasons) which is why all popupdialogs it creates are also appended on our screen.
+    $(this.mContainer).find('.popup-dialog-dialog-modal-background').remove();
+    $(this.mContainer).find('.popup-dialog-dialog-modal-background-transparent').remove();
+
     var self = this;
 
     if (_data !== undefined && _data !== null && typeof(_data) === 'object')
