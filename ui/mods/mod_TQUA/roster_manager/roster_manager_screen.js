@@ -1,3 +1,6 @@
+/*
+Base Screen Class that contains all other elements needed for the Roster Manager
+*/
 
 "use strict";
 

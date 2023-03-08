@@ -1,3 +1,6 @@
+/*
+Right half of the Roster Manager that displays all brothers managed in this screen and offers functionality to highlight and move them around
+*/
 
 "use strict";
 
@@ -9,7 +12,7 @@ var RosterManagerRosterModule = function(_parent, _dataSource)
     // container
     this.mContainer = null;
 
-    this.mDeadZoneElement = null;
+    this.mDeadZoneElement = null;   // experimental
 
     this.mPrimaryContainer = null;
     this.mSecondaryContainer = null;

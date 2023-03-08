@@ -150,7 +150,7 @@ this.troop_manager <- {
 		// Todo: more input validation
 
         local newPosition = _data[2];
-        if (_data[0] == "Reserve") newPosition += 18;	// Hack because Reserve and Formation are the same roster
+        if (_data[0] == "Reserve") newPosition += 18;	// Hack because Reserve and Formation are the same roster in vanilla
 
         this.relocateActor( _data[0], _data[1], newPosition );
 	}
@@ -162,6 +162,8 @@ this.troop_manager <- {
 		// Todo do some input validation
 
 		local newPosition = _data[2];
+
+		// Hard-Coded intercept to deal with the way the vanilla roster works
 		if (_data[3] == this.m.Reserve) newPosition += 18;
         if (_data[1] == this.m.Formation && _data[3] == this.m.Reserve) return this.relocateActor(_data[1], _data[0], newPosition);
         if (_data[1] == this.m.Reserve && _data[3] == this.m.Formation) return this.relocateActor(_data[1], _data[0], newPosition);
@@ -169,18 +171,20 @@ this.troop_manager <- {
 		this.transferBrother(_data[0], _data[1], newPosition, _data[3]);
 	}
 
+// Initializer functions:
 	function registerPlayerRosters()
 	{
+		// Add an entry for the Formation part of the player roster
 		this.addManagedRoster("Formation", {
 			isActive = function() {return true},
 			queryData = function( _this ) {
 				return {
 					mName = "Formation",
 					mType = "Player",
-					mBrotherList = _this.convertActorsToUIData(::World.Assets.getFormation().slice(0, 18)),		// Only pass the first 18 slots of the player roster
+					mBrotherList = _this.convertActorsToUIData(::World.Assets.getFormation().slice(0, ::modTQUA.Const.PlayerFormationSize)),		// Only pass the first 18 slots of the player roster
 					mBrotherMin = 1,
-					mBrotherMax = ::World.Assets.getBrothersMaxInCombat(),
-					mSlotLimit = 18,
+					mBrotherMax = ::Math.min(::modTQUA.Const.PlayerFormationSize, ::World.Assets.getBrothersMaxInCombat()),
+					mSlotLimit = ::modTQUA.Const.PlayerFormationSize,
 					mAcceptsPlayerCharacters = true,
 					mPrimaryDisplayContainer = true,	// These rosters will be displayed in the bottom part of the screen,
 					mSharedMaximumBrothers = ::World.Assets.getBrothersMax()	// We want both Formation & Reserve to respect this shared maximum
@@ -195,17 +199,18 @@ this.troop_manager <- {
 			}
 		});
 
+		// Add an entry for the Reserve part of the player roster
 		this.addManagedRoster("Reserve", {
 			isActive = function() {return true},
 			queryData = function( _this ) {
 				::World.Assets.updateFormation();	// To make sure we don't have suprises from brothers having a position of 255
-				local convertedRoster = _this.convertActorsToUIData(::World.Assets.getFormation().slice(18));	// Only pass the last 9 slots of the player roster for vanilla
+				local convertedRoster = _this.convertActorsToUIData(::World.Assets.getFormation().slice(::modTQUA.Const.PlayerFormationSize));	// Only pass the last 9 slots of the player roster for vanilla
 				return {
 					mName = "Reserve",
 					mType = "Player",
 					mBrotherList = convertedRoster,
-					mBrotherMax = 9,
-					mSlotLimit = 9,
+					mBrotherMax = ::modTQUA.Const.PlayerReserveSize,
+					mSlotLimit = ::modTQUA.Const.PlayerReserveSize,
 					mSlotClasses = "<div class=\"ui-control is-brother-slot is-reserve-slot\"/>",
 					mAcceptsPlayerCharacters = true,
 					mSharedMaximumBrothers = ::World.Assets.getBrothersMax()	// We want both Formation & Reserve to respect this shared maximum
@@ -244,8 +249,8 @@ this.troop_manager <- {
 					mName = "Hire",
 					mType = "Town",
 					mBrotherList = _this.convertActorsToUIData(this.getAll(), false, 27),
-					mCanRemove = true,
-					mCanImport = true,
+					mCanRemove = false,
+					mCanImport = false,
 					mMoodVisible = true,
 					mCanReposition = true,
 					mCanSelect = true
@@ -261,8 +266,17 @@ this.troop_manager <- {
 		});
 	}
 
-	function registerTownRoster( _id, _name, _rosterID, _slotLimit )
+	// Connect a world roster to this screen.
+	// _id = unique string within this instance of this manager
+	// _name = display name of this roster in the roster screen
+	// _rosterID = ID of the world party that this roster is from
+	// _slotLimit = amount of slots that will be generated for the player to drop brothers into
+	// _brothersMax = amount of brothers that are allowed to be put in here
+	function registerRoster( _id, _name, _rosterID, _slotLimit, _brotherMax = null )
 	{
+		if (_brotherMax == null) _brotherMax = _slotLimit;
+		if (_brotherMax > _slotLimit) _brotherMax = _slotLimit;
+
 		this.addManagedRoster(_id, {
 			isActive = function() {
 				return true;
@@ -270,20 +284,22 @@ this.troop_manager <- {
 			queryData = function( _this ) {
 				return {
 					mName = _name,
-					mType = "Town",
+					mType = "",		// Maybe this is never needed
+					mBrotherMax = _brotherMax,
 					mBrotherList = _this.convertActorsToUIData(this.getAll(), false, _slotLimit),
-					mCanRemove = true,
-					mCanImport = true,
-					mMoodVisible = true,
-					mCanReposition = true,
-					mCanSelect = true
+					mSlotLimit = _slotLimit,
+					mCanRemove = true,		// Are you take brothers out of this roster?
+					mCanImport = true,		// Are you allowed to drop brothers into this roster?
+					mMoodVisible = true,	// Is the mood visible?
+					mCanReposition = true,	// Can you move brother around within the roster?
+					mCanSelect = true		// Can you select and therefore look at the stats of the brothers in this roster?
 				}},
 			getAll = function() {return ::World.getRoster(_rosterID).getAll();},
-			insertActor = function(_actor) {	// Maybe add Position?
+			insertActor = function( _actor ) {	// Maybe add Position?
 				::World.getRoster(_rosterID).add(_actor);
 				return true;
 			},
-			removeActor = function(_actor) {
+			removeActor = function( _actor ) {
 				::World.getRoster(_rosterID).remove(_actor);
 			}
 		});

@@ -18,6 +18,7 @@ var RosterContainer = function( _containerID )
     // Dynamic Variables
     this.mBrotherCurrent = 0;     // Current amount of actors in this container
     this.mSelectedBrother = -1;   // Index of the currently selected actor; negative = none
+    this.mIsCollapsed = false;
 
     // Optional DIVs
     this.mListContainer = null;     // Contains all Slots created by this class. Is only used externally from RosterManager
@@ -28,7 +29,6 @@ var RosterContainer = function( _containerID )
     // Config
     this.mDeadZoneElement = null;      // Anything above this element is considered a deadZone for DropHandle
 
-    this.mIsCollapsed = false;
     this.mMoodVisible = true;      // Show the Mood Symbol on the character?
     this.mInjuriesVisible = true;   // List all injuries on top of the character?
     this.mLostHPVisible = true;     // Draw Icon that indicates character is not at full HP?
