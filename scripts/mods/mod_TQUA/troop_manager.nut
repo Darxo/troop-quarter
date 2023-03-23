@@ -10,7 +10,7 @@ this.troop_manager <- {
 
 	function create()
 	{
-		this.registerPlayerRosters();
+		this.registerPlayerRostersVanilla();
 	}
 
     function addManagedRoster(_rosterID, _getDataFunction)
@@ -172,22 +172,24 @@ this.troop_manager <- {
 	}
 
 // Initializer functions:
-	function registerPlayerRosters()
+	// This function tries to mimic the vanilla setup as seen in the character screen as much as possible
+	function registerPlayerRostersVanilla()
 	{
 		// Add an entry for the Formation part of the player roster
 		this.addManagedRoster("Formation", {
 			isActive = function() {return true},
 			queryData = function( _this ) {
 				return {
-					mName = "Formation",
-					mType = "Player",
+					// mName = "Formation",	// We don't display the name so this is not shown
+					// mType = "Player",	// this is currently not supported and never displayed anywhere
 					mBrotherList = _this.convertActorsToUIData(::World.Assets.getFormation().slice(0, ::modTQUA.Const.PlayerFormationSize)),		// Only pass the first 18 slots of the player roster
 					mBrotherMin = 1,
 					mBrotherMax = ::Math.min(::modTQUA.Const.PlayerFormationSize, ::World.Assets.getBrothersMaxInCombat()),
 					mSlotLimit = ::modTQUA.Const.PlayerFormationSize,
 					mAcceptsPlayerCharacters = true,
 					mPrimaryDisplayContainer = true,	// These rosters will be displayed in the bottom part of the screen,
-					mSharedMaximumBrothers = ::World.Assets.getBrothersMax()	// We want both Formation & Reserve to respect this shared maximum
+					mSharedMaximumBrothers = ::World.Assets.getBrothersMax(),	// We want both Formation & Reserve to respect this shared maximum
+					mHideHeaderName = true
 				}},
 			getAll = function() {return ::World.getPlayerRoster().getAll();},
 			insertActor = function(_actor) {	// Maybe add Position?
@@ -206,14 +208,16 @@ this.troop_manager <- {
 				::World.Assets.updateFormation();	// To make sure we don't have suprises from brothers having a position of 255
 				local convertedRoster = _this.convertActorsToUIData(::World.Assets.getFormation().slice(::modTQUA.Const.PlayerFormationSize));	// Only pass the last 9 slots of the player roster for vanilla
 				return {
-					mName = "Reserve",
-					mType = "Player",
+					// mName = "Reserve",	// We don't display the header so this is not shown
+					// mType = "Player",	// this is currently not supported and never displayed anywhere
 					mBrotherList = convertedRoster,
 					mBrotherMax = ::modTQUA.Const.PlayerReserveSize,
 					mSlotLimit = ::modTQUA.Const.PlayerReserveSize,
 					mSlotClasses = "<div class=\"ui-control is-brother-slot is-reserve-slot\"/>",
 					mAcceptsPlayerCharacters = true,
-					mSharedMaximumBrothers = ::World.Assets.getBrothersMax()	// We want both Formation & Reserve to respect this shared maximum
+					mSharedMaximumBrothers = ::World.Assets.getBrothersMax(),	// We want both Formation & Reserve to respect this shared maximum
+					mDisplayHeader = false,
+					mPrimaryDisplayContainer = true	// These rosters will be displayed in the bottom part of the screen
 				}
 			},
 			getAll = function() {return ::World.getPlayerRoster().getAll();},

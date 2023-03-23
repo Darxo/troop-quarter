@@ -38,6 +38,8 @@ var RosterContainer = function( _containerID )
     this.mCanReposition = true;
     this.mAcceptsPlayerCharacters = false;  // Are player characters allowed to be put inside this container? This is only true for Formation and Reserve usually
     this.mPrimaryDisplayContainer = false;
+    this.mDisplayHeader = true;     // Display a Title Name + Brother Amount for this container? This option is mainly useful for displaying Playerreserve similar to how vanilla does it
+	this.mHideHeaderName = false;	// Hide the header name and therefore disabled the ability to collapse this container?
 
     this.mCanSelectEmptySlots = false;
     this.mSlotClasses = '<div class="ui-control is-brother-slot is-roster-slot"/>';     // Classes that are assigned to slot DIVs of this container

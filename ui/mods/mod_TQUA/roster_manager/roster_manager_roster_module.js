@@ -85,12 +85,17 @@ RosterManagerRosterModule.prototype.createDelayedRosterDIVs = function()
 
 RosterManagerRosterModule.prototype.createRosterDIV = function (_parentDiv, _rosterID)
 {
+    var rosterContainerObject = this.mDataSource.mRosterManager.get(_rosterID);
+
     var rosterContainer = $('<div class="roster-container"/>');
     _parentDiv.append(rosterContainer);
 
+    if (rosterContainerObject.mDisplayHeader)
+    {
         var headerBar = $('<div class="header-bar"/>');
         rosterContainer.append(headerBar);
-
+        if (rosterContainerObject.mHideHeaderName === false)
+        {
             var mNameContainer = $('<div class="name-container"/>');
             headerBar.append(mNameContainer);
                 var entry = $('<div class="ui-control list-entry list-entry-small"/>');
@@ -98,10 +103,11 @@ RosterManagerRosterModule.prototype.createRosterDIV = function (_parentDiv, _ros
                 entry.click(this, function (_event)
                 {
                     var self = _event.data;
-                    self.mDataSource.mRosterManager.get(_rosterID).toggleCollapse();
+                    rosterContainerObject.toggleCollapse();
                 });
                 mNameContainer.append(entry);
-                this.mDataSource.mRosterManager.get(_rosterID).attachNameLabel(entry);
+                rosterContainerObject.attachNameLabel(entry);
+        }
 /*
                 var nameLabel = $('<div class="label title-font-big font-bold font-color-brother-name"/>');
                 mNameContainer.append(nameLabel);
@@ -126,11 +132,12 @@ RosterManagerRosterModule.prototype.createRosterDIV = function (_parentDiv, _ros
                 countContainer.append(reserveCountLabel);
 
                 countContainer.bindTooltip({ contentType: 'msu-generic', modId: modTQUA.ID, elementId: 'RosterModule.RosterSizeLabel' });
-                this.mDataSource.mRosterManager.get(_rosterID).attachCountLabel(reserveCountLabel);
+                rosterContainerObject.attachCountLabel(reserveCountLabel);
+    }
 
         var listContainerLayout = $('<div class="l-list-container"/>');
         rosterContainer.append(listContainerLayout);
-        this.mDataSource.mRosterManager.get(_rosterID).mListContainer = listContainerLayout;
+        rosterContainerObject.mListContainer = listContainerLayout;
 
 
 };

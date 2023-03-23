@@ -42,6 +42,7 @@ RosterManager.prototype.initializeFromData = function( _data )
         var newRosterContainer = this.addContainer(new RosterContainer(entries[i]));
         newRosterContainer.loadFromData(_data[entries[i]], this.mSharedMaximumInformation);
     }
+    this.mBrotherContainer.sort(function compareFn(a, b) { return a.mContainerID.localeCompare(b.mContainerID)} );
 }
 
 RosterManager.prototype.loadFromData = function( _data )
