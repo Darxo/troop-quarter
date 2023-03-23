@@ -13,10 +13,5 @@ var modTQUA =
     TooltipIdentifier:
     {
         Character: 'modTQUA.CharacterTooltip',
-
-        Stash:
-        {
-            ActiveRoster: 'modTQUA.RosterSizeLabel'
-        }
     }
 }

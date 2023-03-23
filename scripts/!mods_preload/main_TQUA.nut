@@ -3,6 +3,7 @@
 	Name = "Troop Quarter",
 	Version = "0.1.0",
 	Const = {
+		// Vanilla
 		MinPlayerRoster = 1,
 		PlayerFormationSize = 18,
 		PlayerReserveSize = 9,
@@ -18,17 +19,19 @@
 
     ::mods_registerJS("mod_TQUA/mod_Assets.js");
 
-    ::mods_registerJS("mod_TQUA/roster_container.js");
-    ::mods_registerJS("mod_TQUA/roster_manager.js");
+    ::mods_registerJS("mod_TQUA/roster_manager_screen/roster_container.js");
+    ::mods_registerJS("mod_TQUA/roster_manager_screen/roster_manager.js");
+	::mods_registerJS("mod_TQUA/roster_manager_screen/roster_manager_roster_module.js");
+    ::mods_registerJS("mod_TQUA/roster_manager_screen/roster_manager_datasource.js");
+    ::mods_registerJS("mod_TQUA/roster_manager_screen/roster_manager_screen.js");
 
-	::mods_registerJS("mod_TQUA/roster_manager/roster_manager_roster_module.js");
-	::mods_registerCSS("mod_TQUA/roster_manager/roster_manager_roster_module.css");
+	::mods_registerCSS("mod_TQUA/roster_manager_screen/roster_manager_roster_module.css");
 
-    ::mods_registerJS("mod_TQUA/roster_manager/roster_manager_datasource.js");
-    ::mods_registerJS("mod_TQUA/roster_manager/roster_manager_screen.js");
-
-    ::mods_registerJS("mod_TQUA/screens/character/modules/character_screen_left_panel/character_screen_left_panel_header_module.js");
-    ::mods_registerJS("mod_TQUA/screens/character/modules/character_screen_left_panel/character_screen_paperdoll_module.js");
+	local prefixLen = "ui/mods/".len();
+	foreach(file in ::IO.enumerateFiles("ui/mods/mod_TQUA/js_hooks"))
+	{
+		::mods_registerJS(file.slice(prefixLen) + ".js");
+	}
 
 // MSU Keybinds
     ::modTQUA.Mod.Keybinds.addJSKeybind("SwitchToNextSelected", "d", "Switch to next selected", "While in the Roster Manager: select the next actor of the roster that currently has the selection");

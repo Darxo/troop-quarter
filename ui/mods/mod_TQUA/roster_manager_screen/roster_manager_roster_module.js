@@ -99,7 +99,7 @@ RosterManagerRosterModule.prototype.createRosterDIV = function (_parentDiv, _ros
             var mNameContainer = $('<div class="name-container"/>');
             headerBar.append(mNameContainer);
                 var entry = $('<div class="ui-control list-entry list-entry-small"/>');
-                // entry.data('resolution', _index);
+
                 entry.click(this, function (_event)
                 {
                     var self = _event.data;

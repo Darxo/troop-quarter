@@ -1,49 +1,18 @@
 ### Description ###
 
-Write a short summary about what your mod does without going into specific. This text can then be copy&pasted and used whenever you publish the mod
+This Framework provides the functions and logic to create a Troop Manager screen for swapping brothers between different rosters
 
 ### Main Changes ###
 
-- Write all- or your most important specific changes here
-- What new content/functionality does your mod introduce?
-- What existent content/functionality is reworked/fixed?
-- This is a great place to go into specific numbers and lay it all out for people who really want to know what they are getting into
-
 ### Requirements ###
 
-- This mod is required to run this mod
-- This other mod is required with atleast the version X to run this mod
-Examples:
 - Modding Script Hooks
 - Modding Standards and Utilities (MSU)
 
 ### Known Issues: ###
 
-- If two BrotherSlots are on top of each other then only one of them receives the click event (e.g. when scroll list is so big that lower part clips out of the window)
-
 ### Compatibility ###
 
-
-Examples:
 - Should be safe to remove from- and add to running games and should not corrupt anything upon removal
 - Should be safe to remove from- and add to any existing savegames
 
-### Future Plans: ###
-
-- Combine with Troop Quarter Building
-- Combine with Caravans from missions and other types of escorts
-- Better UI
-- Better implementation of Guests and Allies concept
-- System for converting not-yet-player-like entities inti player-like for the purpose of displaying them/their stats That means generating equipment for them
-
-### Changes: ###
-
-0.2.0
-    - adds some_feature
-    - adds some_content
-
-0.1.1
-    - fixes some_bug
-
-0.1.0
-    - released on some_platform

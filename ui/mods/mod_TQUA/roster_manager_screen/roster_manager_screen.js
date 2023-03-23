@@ -1,5 +1,7 @@
 /*
-Base Screen Class that contains all other elements needed for the Roster Manager
+Base Screen Class that contains all other elements needed for the Roster Manager.
+This includes Vanilla elements like the Attributes, Effect section and Paperdoll.
+But the heart of it is the Roster-Manager-Roster-Module
 */
 
 "use strict";
