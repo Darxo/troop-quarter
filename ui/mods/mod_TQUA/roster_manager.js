@@ -172,6 +172,7 @@ RosterManager.prototype.generateDIVs = function()
                 continue;
             }
             if (this.mBrotherContainer[i].canImportActor(_isPlayerCharacter, _sharedMaximumBrothers) === false) continue;   // skip all container that cant be imported
+            if (this.mBrotherContainer[i].mIsCollapsed === true && this.mBrotherContainer.length !== 2) continue;      // Collapsing will prevent a container from being targeted for auto insert. Unless we only have 2 container
             if (sourceFound === false)
             {
                 if (beforeIndex === null) beforeIndex = i;
