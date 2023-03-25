@@ -1,7 +1,7 @@
 ::modTQUA <- {
 	ID = "mod_TQUA",
 	Name = "Troop Quarter",
-	Version = "0.1.0",
+	Version = "0.1.1",
 	Const = {
 		// Vanilla
 		MinPlayerRoster = 1,
