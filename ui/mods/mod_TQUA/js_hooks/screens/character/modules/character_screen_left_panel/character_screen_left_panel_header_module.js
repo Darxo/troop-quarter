@@ -16,13 +16,17 @@ CharacterScreenLeftPanelHeaderModule.prototype.setXP = function(_xpValue, _xpVal
 
 // Permanently hides the Dismiss Button
 var modTQUA_CharacterScreenLeftPanelHeaderModule_updateControls = CharacterScreenLeftPanelHeaderModule.prototype.updateControls;
-CharacterScreenLeftPanelHeaderModule.prototype.updateControls = function(_data)
+CharacterScreenLeftPanelHeaderModule.prototype.updateControls = function(_data, _secondLegendsParameter)    // _secondLegendsParameter is a legends specific tweak
 {
-    modTQUA_CharacterScreenLeftPanelHeaderModule_updateControls.call(this, _data);
+
+    modTQUA_CharacterScreenLeftPanelHeaderModule_updateControls.call(this, _data, _secondLegendsParameter);
     if (this.mDataSource.mIsRosterManager === undefined) return;
 
     // We want the DismissButton to never be shown in the RosterManager.
     this.mDismissButton.addClass('display-none').removeClass('display-block');
+
+    // Legends Specific Addition - We also want the Reserve Button to never show in this screen
+    if ('mReserveButton' in this) this.mReserveButton.addClass('display-none').removeClass('display-block');
 };
 
 

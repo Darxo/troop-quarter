@@ -7,7 +7,9 @@
 		MinPlayerRoster = 1,
 		PlayerFormationSize = 18,
 		PlayerReserveSize = 9,
-		PlayerRosterLimit = 27
+		PlayerRosterLimit = 27,
+
+		LegendsPlayerRosterLimit = 27
 	}
 }
 

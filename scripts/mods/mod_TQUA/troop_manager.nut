@@ -1,16 +1,24 @@
 this.troop_manager <- {
 	m = {
+		// Const
         Formation = "Formation",    // Name of the Formation of the Player Roster
         Reserve = "Reserve",        // Name of the Reserve of the Player Roster
-
 		DefaultSlotLimit = 27,
 
+		// Variables
         ManagedRosters = {}
 	},
 
 	function create()
 	{
-		this.registerPlayerRostersVanilla();
+		if (::mods_getRegisteredMod("mod_legends"))
+		{
+			this.registerPlayerRostersLegends();
+		}
+		else
+		{
+			this.registerPlayerRostersVanilla();
+		}
 	}
 
     function addManagedRoster(_rosterID, _getDataFunction)
@@ -222,6 +230,44 @@ this.troop_manager <- {
 			},
 			getAll = function() {return ::World.getPlayerRoster().getAll();},
 			insertActor = function(_actor) {
+				::World.getPlayerRoster().add(_actor);
+				return true;
+			},
+			removeActor = function(_actor) {
+				::World.getPlayerRoster().remove(_actor);
+			}
+		});
+	}
+
+	// Legends-Mod: This function tries to mimic the vanilla setup as seen in the character screen as much as possible
+	function registerPlayerRostersLegends()
+	{
+		// Add an entry for the Formation part of the player roster
+		this.addManagedRoster("Formation", {
+			isActive = function() {return true},
+			queryData = function( _this ) {
+				return {
+					// mName = "Formation",	// We don't display the name so this is not shown
+					// mType = "Player",	// this is currently not supported and never displayed anywhere
+					mBrotherList = _this.convertActorsToUIData(::World.Assets.getFormation().slice(0, ::modTQUA.Const.LegendsPlayerRosterLimit)),		// Only pass the first 27 slots of the player roster (because this is the current maximum)
+					mBrotherMin = 1,
+					mBrotherMax = ::Math.min(::modTQUA.Const.LegendsPlayerRosterLimit, ::World.Assets.getBrothersMax()),
+					mSlotLimit = ::modTQUA.Const.LegendsPlayerRosterLimit,
+					mAcceptsPlayerCharacters = true,
+					mPrimaryDisplayContainer = true,	// These rosters will be displayed in the bottom part of the screen
+					mHideHeaderName = true
+				}},
+			getAll = function() {return ::World.getPlayerRoster().getAll();},
+			insertActor = function(_actor) {	// Maybe add Position?
+				// Legends specific adjustment. Otherwise we could cheese more people into Frontline than allowed
+				if (::World.State.getBrothersInFrontline() >= ::World.Assets.getBrothersMaxInCombat())
+				{
+					_actor.setInReserves(true);
+				}
+				else
+				{
+					_actor.setInReserves(false);
+				}
 				::World.getPlayerRoster().add(_actor);
 				return true;
 			},
