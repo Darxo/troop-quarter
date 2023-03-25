@@ -113,12 +113,9 @@ this.troop_manager <- {
 		foreach (actor in sourceRoster.getAll())
 		{
             if (actor == null) continue;
-			if (actor.getID() == _actorID) foundActor = actor;
-		 	if (actor.getPlaceInFormation() == _newPosition)
-            {
-                ::logError("Tried relocating a actor into position " + _newPosition + " but an actor already is already here");
-                return;
-            }
+			if (actor.getID() != _actorID) continue;
+			foundActor = actor;
+			break;
 		}
 		if (foundActor == null) return;
 		foundActor.setPlaceInFormation(_newPosition);
