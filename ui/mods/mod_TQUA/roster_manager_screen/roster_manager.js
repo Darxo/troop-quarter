@@ -10,7 +10,7 @@ var RosterManager = function(_dataSource)
 
 RosterManager.prototype.initializeFromData = function( _data )
 {
-	this.mBrotherContainer = [];    // Makes sure all previous data is wiped
+	this.mBrotherContainer.length = 0;    // Makes sure all previous data is wiped
 	this.mSharedMaximumInformation =
 	{
 		MaximumTotalBrothers: 27,

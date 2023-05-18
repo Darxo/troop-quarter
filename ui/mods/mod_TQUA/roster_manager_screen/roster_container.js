@@ -491,7 +491,7 @@ RosterContainer.prototype.update = function()
 
 	RosterContainer.prototype.createBrotherSlots = function()
 	{
-		this.mSlots = [];
+		this.mSlots.length = 0;
 		for (var i = 0 ; i < this.mSlotLimit; i++)
 		{
 			this.mSlots.push(null);
