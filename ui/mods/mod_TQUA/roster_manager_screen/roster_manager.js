@@ -17,7 +17,7 @@ RosterManager.prototype.initializeFromData = function( _data )
 		CurrentBrothers: {},    // Has an entry for each ID that shares maximum total brothers
 		isAtCapacity: function()
 		{
-			if (this.getCurrentBrothers() === this.MaximumTotalBrothers);
+			return (this.getCurrentBrothers() >= this.MaximumTotalBrothers);
 		},
 		getCurrentBrothers: function()
 		{
