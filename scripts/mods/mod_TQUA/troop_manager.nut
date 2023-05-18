@@ -1,12 +1,12 @@
 this.troop_manager <- {
 	m = {
 		// Const
-        Formation = "Formation",    // Name of the Formation of the Player Roster
-        Reserve = "Reserve",        // Name of the Reserve of the Player Roster
+		Formation = "Formation",    // Name of the Formation of the Player Roster
+		Reserve = "Reserve",        // Name of the Reserve of the Player Roster
 		DefaultSlotLimit = 27,
 
 		// Variables
-        ManagedRosters = {}
+		ManagedRosters = {}
 	},
 
 	function create()
@@ -21,29 +21,29 @@ this.troop_manager <- {
 		}
 	}
 
-    function addManagedRoster(_rosterID, _getDataFunction)
-    {
-        this.m.ManagedRosters[_rosterID] <- _getDataFunction;
-    }
+	function addManagedRoster(_rosterID, _getDataFunction)
+	{
+		this.m.ManagedRosters[_rosterID] <- _getDataFunction;
+	}
 
-    // Returns a table that's generated from the 'getData()' function for a given ID
-    function getManagedRoster( _rosterID )
-    {
-        if (_rosterID in this.m.ManagedRosters) return this.m.ManagedRosters[_rosterID];
-        return null;
-    }
+	// Returns a table that's generated from the 'getData()' function for a given ID
+	function getManagedRoster( _rosterID )
+	{
+		if (_rosterID in this.m.ManagedRosters) return this.m.ManagedRosters[_rosterID];
+		return null;
+	}
 
-    function queryRosterData( _rosterID )
-    {
-        local rosterData = this.getManagedRoster(_rosterID);
-        local slotLimit = ("mSlotLimit" in rosterData) ? rosterData.mSlotLimit : this.m.DefaultSlotLimit;
-        local positionedList = [];
-        positionedList.resize(slotLimit, null);
-        foreach( _entity in rosterData.mBrotherList )
-        {
-            positionedList[_entity.getPlaceInFormation()] = _entity
-        }
-    }
+	function queryRosterData( _rosterID )
+	{
+		local rosterData = this.getManagedRoster(_rosterID);
+		local slotLimit = ("mSlotLimit" in rosterData) ? rosterData.mSlotLimit : this.m.DefaultSlotLimit;
+		local positionedList = [];
+		positionedList.resize(slotLimit, null);
+		foreach( _entity in rosterData.mBrotherList )
+		{
+			positionedList[_entity.getPlaceInFormation()] = _entity
+		}
+	}
 
 	// Returns a Table with one entry for each managed roster in this class. Key = RosterID and Value is a table of all its data
 	function queryData()
@@ -104,26 +104,26 @@ this.troop_manager <- {
 	}
 
 	// Changes the place in formation of a single brother only within their own roster
-    function relocateActor( _rosterID, _actorID, _newPosition )
-    {
+	function relocateActor( _rosterID, _actorID, _newPosition )
+	{
 		// ::logWarning("Relocate the brother '" + _actorID + "' from roster '" + _rosterID + "' into position '" + _newPosition + "'");
 		local sourceRoster = this.getManagedRoster(_rosterID);
 
 		local foundActor = null;
 		foreach (actor in sourceRoster.getAll())
 		{
-            if (actor == null) continue;
+			if (actor == null) continue;
 			if (actor.getID() != _actorID) continue;
 			foundActor = actor;
 			break;
 		}
 		if (foundActor == null) return;
 		foundActor.setPlaceInFormation(_newPosition);
-    }
+	}
 
 	// Moves a brother out of a roster and into another roster
-    function transferBrother( _actorID, _sourceID, _newPosition, _targetID )
-    {
+	function transferBrother( _actorID, _sourceID, _newPosition, _targetID )
+	{
 		// ::logWarning("Transfer the brother '" + _actorID + "' from sourceRoster '" + _sourceID + "' into targetRoster '" + _targetID + "' into position '" + _newPosition + "'");
 
 		local sourceRoster = this.getManagedRoster(_sourceID);
@@ -139,29 +139,29 @@ this.troop_manager <- {
 		targetRoster.insertActor(actorToRemove);	// Insert needs to happen first or there may be critical exception
 		sourceRoster.removeActor(actorToRemove);
 		actorToRemove.setPlaceInFormation(_newPosition);
-    }
+	}
 
-    // Called from JavaScript
-    // [0] = rosterID,		[1] = brotherID,		[2] = place in formation
+	// Called from JavaScript
+	// [0] = rosterID,		[1] = brotherID,		[2] = place in formation
 	function onRelocateBrother( _data )
 	{
 		local rosterData = this.getManagedRoster(_data[0]);
-        if (rosterData == null)
-        {
-            ::logError("Can't find the roster with the ID: " + _data[0]);
-            return;
-        }
+		if (rosterData == null)
+		{
+			::logError("Can't find the roster with the ID: " + _data[0]);
+			return;
+		}
 
 		// Todo: more input validation
 
-        local newPosition = _data[2];
-        if (_data[0] == "Reserve") newPosition += 18;	// Hack because Reserve and Formation are the same roster in vanilla
+		local newPosition = _data[2];
+		if (_data[0] == "Reserve") newPosition += 18;	// Hack because Reserve and Formation are the same roster in vanilla
 
-        this.relocateActor( _data[0], _data[1], newPosition );
+		this.relocateActor( _data[0], _data[1], newPosition );
 	}
 
-    // Called from JavaScript
-    // _data[0] = brotherID		_data[1] = tagA			_data[2] = targetIndex		_data[3] = tagB
+	// Called from JavaScript
+	// _data[0] = brotherID		_data[1] = tagA			_data[2] = targetIndex		_data[3] = tagB
 	function onTransferBrother( _data )
 	{
 		// Todo do some input validation
@@ -170,8 +170,8 @@ this.troop_manager <- {
 
 		// Hard-Coded intercept to deal with the way the vanilla roster works
 		if (_data[3] == this.m.Reserve) newPosition += 18;
-        if (_data[1] == this.m.Formation && _data[3] == this.m.Reserve) return this.relocateActor(_data[1], _data[0], newPosition);
-        if (_data[1] == this.m.Reserve && _data[3] == this.m.Formation) return this.relocateActor(_data[1], _data[0], newPosition);
+		if (_data[1] == this.m.Formation && _data[3] == this.m.Reserve) return this.relocateActor(_data[1], _data[0], newPosition);
+		if (_data[1] == this.m.Reserve && _data[3] == this.m.Formation) return this.relocateActor(_data[1], _data[0], newPosition);
 
 		this.transferBrother(_data[0], _data[1], newPosition, _data[3]);
 	}
@@ -274,7 +274,7 @@ this.troop_manager <- {
 		});
 	}
 
-    // This will scan nearby towns automatically and display their roster. It's only debug and proof of concept at this point
+	// This will scan nearby towns automatically and display their roster. It's only debug and proof of concept at this point
 	function registerAutomaticTownRosters()
 	{
 		this.addManagedRoster("Hire", {

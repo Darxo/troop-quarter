@@ -9,11 +9,11 @@ var RosterManagerDatasource = function()
 	this.mEventListener = { };
 
 	// Caches
-    this.mRosterManager = new RosterManager();
-    this.mIsPopupOpen = false;
+	this.mRosterManager = new RosterManager();
+	this.mIsPopupOpen = false;
 
-    // Dummy-Variable so that hooks in modules which are used in both CharacterScreen and this Screen know whether they should be active or ignored
-    this.mIsRosterManager = true;
+	// Dummy-Variable so that hooks in modules which are used in both CharacterScreen and this Screen know whether they should be active or ignored
+	this.mIsRosterManager = true;
 
 	this.init();
 };
@@ -26,13 +26,13 @@ RosterManagerDatasource.prototype.getInventoryMode = function ()
 RosterManagerDatasource.prototype.onConnection = function (_handle)
 {
 	this.mSQHandle = _handle;
-    this.mRosterManager.onConnection(_handle);
+	this.mRosterManager.onConnection(_handle);
 };
 
 RosterManagerDatasource.prototype.onDisconnection = function ()
 {
 	this.mSQHandle = null;
-    this.mRosterManager.onDisconnection();
+	this.mRosterManager.onDisconnection();
 	this.reset();
 };
 
@@ -78,14 +78,14 @@ RosterManagerDatasource.prototype.notifyEventListener = function(_channel, _payl
 
 RosterManagerDatasource.prototype.createEventChannels = function()
 {
-    this.mEventListener[ErrorCode.Key] = [ ];
+	this.mEventListener[ErrorCode.Key] = [ ];
 
-    this.mEventListener[CharacterScreenDatasourceIdentifier.Brother.ListLoaded] = [];
-    this.mEventListener[CharacterScreenDatasourceIdentifier.Brother.SettingsChanged] = [];
+	this.mEventListener[CharacterScreenDatasourceIdentifier.Brother.ListLoaded] = [];
+	this.mEventListener[CharacterScreenDatasourceIdentifier.Brother.SettingsChanged] = [];
 	this.mEventListener[CharacterScreenDatasourceIdentifier.Brother.Updated] = [ ];
 	this.mEventListener[CharacterScreenDatasourceIdentifier.Brother.Selected] = [ ];
 
-    this.mEventListener[CharacterScreenDatasourceIdentifier.Perks.TreesLoaded] = [ ];
+	this.mEventListener[CharacterScreenDatasourceIdentifier.Perks.TreesLoaded] = [ ];
 };
 
 
@@ -110,13 +110,13 @@ RosterManagerDatasource.prototype.isInGroundMode = function()
 
 RosterManagerDatasource.prototype.isTacticalMode = function ()
 {
-    return false;
+	return false;
 };
 
 // Afaik this is only used for the purpose of displaying the Dismiss-Button. But since I'm not overwriting that vanilla check this function is still needed
 RosterManagerDatasource.prototype.getBrothersList = function ()
 {
-    return this.mRosterManager.get(modTQUA.Owner.Formation).mBrotherList;
+	return this.mRosterManager.get(modTQUA.Owner.Formation).mBrotherList;
 };
 
 RosterManagerDatasource.prototype.getTooltipItemOwner = function()
@@ -126,14 +126,14 @@ RosterManagerDatasource.prototype.getTooltipItemOwner = function()
 
 RosterManagerDatasource.prototype.loadFromData = function(_data)
 {
-    if (_data === undefined || _data == null || typeof(_data) !== 'object')
-    {
-        console.error('ERROR: Failed to query character screen result data. Reason: Invalid result.');
-        return;
-    }
+	if (_data === undefined || _data == null || typeof(_data) !== 'object')
+	{
+		console.error('ERROR: Failed to query character screen result data. Reason: Invalid result.');
+		return;
+	}
 
-    this.mRosterManager.initializeFromData(_data.RostersData);
-    this.loadBrothersList();
+	this.mRosterManager.initializeFromData(_data.RostersData);
+	this.loadBrothersList();
 };
 
 RosterManagerDatasource.prototype.loadBrothersList = function(_withoutNotify)
@@ -149,25 +149,25 @@ RosterManagerDatasource.prototype.loadBrothersList = function(_withoutNotify)
 
 RosterManagerDatasource.prototype.getSelectedBrother = function()
 {
-    var selection = this.mRosterManager.getSelected();
-    if (selection === null) return null;
-    return selection.Brother;
+	var selection = this.mRosterManager.getSelected();
+	if (selection === null) return null;
+	return selection.Brother;
 };
 
 RosterManagerDatasource.prototype.getSelectedBrotherIndex = function ()
 {
-    var selection = this.mRosterManager.getSelected();
-    if (selection === null) return null;
-    return selection.Index;
+	var selection = this.mRosterManager.getSelected();
+	if (selection === null) return null;
+	return selection.Index;
 };
 
 RosterManagerDatasource.prototype.selectedBrotherById = function(_brotherId, _withoutNotify)
 {
-    // notify every listener
-    if ((_withoutNotify === undefined || _withoutNotify !== true))
-    {
-        this.notifyEventListener(CharacterScreenDatasourceIdentifier.Brother.Selected, this.getSelectedBrother());
-    }
+	// notify every listener
+	if ((_withoutNotify === undefined || _withoutNotify !== true))
+	{
+		this.notifyEventListener(CharacterScreenDatasourceIdentifier.Brother.Selected, this.getSelectedBrother());
+	}
 };
 
 RosterManagerDatasource.prototype.updateBrother = function (_data)
@@ -180,7 +180,7 @@ RosterManagerDatasource.prototype.updateBrother = function (_data)
 
 	for (var i = 0; i < this.getBrothersList().length; ++i)
 	{
-	    if (this.getBrothersList()[i] != null && this.getBrothersList()[i][CharacterScreenIdentifier.Entity.Id] === _data[CharacterScreenIdentifier.Entity.Id])
+		if (this.getBrothersList()[i] != null && this.getBrothersList()[i][CharacterScreenIdentifier.Entity.Id] === _data[CharacterScreenIdentifier.Entity.Id])
 		{
 			this.getBrothersList()[i] = _data;
 			this.notifyEventListener(CharacterScreenDatasourceIdentifier.Brother.Updated, this.getBrothersList()[i]);
@@ -191,7 +191,7 @@ RosterManagerDatasource.prototype.updateBrother = function (_data)
 
 RosterManagerDatasource.prototype.getNumBrothers = function()
 {
-    return this.getBrothersList().length;
+	return this.getBrothersList().length;
 };
 
 // These functions remain unchanged compared to their original in CharacterScreenDatasource
@@ -208,5 +208,5 @@ RosterManagerDatasource.prototype.notifyBackendCloseButtonClicked = function ()
 
 RosterManagerDatasource.prototype.notifyBackendUpdateRosterPosition = function (_id, _pos)
 {
-    SQ.call(this.mSQHandle, 'onUpdateRosterPosition', [ _id, _pos ]);
+	SQ.call(this.mSQHandle, 'onUpdateRosterPosition', [ _id, _pos ]);
 };

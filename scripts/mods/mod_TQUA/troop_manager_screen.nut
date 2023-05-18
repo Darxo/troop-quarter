@@ -3,7 +3,7 @@ this.troop_manager_screen <- this.inherit("scripts/mods/msu/ui_screen", {
 		JSDataSourceHandle = null,
 		OnCloseButtonClickedListener = null,
 
-        TroopManager = null
+		TroopManager = null
 	},
 
 	function connect()
@@ -61,24 +61,24 @@ this.troop_manager_screen <- this.inherit("scripts/mods/msu/ui_screen", {
 		this.m.JSDataSourceHandle.asyncCall("loadFromData", this.queryData());
 	}
 
-    // Functions called from JavaScript:
+	// Functions called from JavaScript:
 	function onCloseButtonClicked()
 	{
 		// ::World.State.m.MenuStack.pop();
 		this.hide();
 	}
 
-    // [0] = rosterID,		[1] = brotherID,		[2] = place in formation
+	// [0] = rosterID,		[1] = brotherID,		[2] = place in formation
 	function onRelocateBrother( _data )
 	{
-        this.m.TroopManager.onRelocateBrother( _data );
+		this.m.TroopManager.onRelocateBrother( _data );
 	}
 
-    // Called from JavaScript
-    // _data[0] = brotherID		_data[1] = tagA			_data[2] = targetIndex		_data[3] = tagB
+	// Called from JavaScript
+	// _data[0] = brotherID		_data[1] = tagA			_data[2] = targetIndex		_data[3] = tagB
 	function onTransferBrother( _data )
 	{
-        this.m.TroopManager.onTransferBrother( _data );
+		this.m.TroopManager.onTransferBrother( _data );
 	}
 });
 

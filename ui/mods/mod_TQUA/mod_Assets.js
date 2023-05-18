@@ -1,17 +1,17 @@
 
 var modTQUA =
 {
-    ID: 'mod_TQUA',
-    Owner:
-    {
-        Formation:  'Formation',
-        Reserve:    'Reserve',
-        Guests:     'Guests',
-        Caravan:    'Caravan'
-    },
+	ID: 'mod_TQUA',
+	Owner:
+	{
+		Formation:  'Formation',
+		Reserve:    'Reserve',
+		Guests:     'Guests',
+		Caravan:    'Caravan'
+	},
 
-    TooltipIdentifier:
-    {
-        Character: 'modTQUA.CharacterTooltip',
-    }
+	TooltipIdentifier:
+	{
+		Character: 'modTQUA.CharacterTooltip',
+	}
 }
