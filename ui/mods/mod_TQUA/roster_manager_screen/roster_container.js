@@ -10,7 +10,7 @@ var RosterContainer = function( _containerID )
 	this.mName = null;
 	this.mType = null;      // Secondary name-like string
 	this.mSlots = [];            // Array of DIVs that an actor can fit in
-	this.mBrotherList = [];      // Array of BrotherObject objects
+	this.mBrotherList = [];      // Array of BrotherObject objects that are structured according to vanilla CharacterSreenIdentifier: CharacterScreenIdentifier.Entity
 	this.mBrotherMin = 0;       // minimum allowed actors in a contaner (player roster can never have less than 1)
 	this.mBrotherMax = 27;      // Maximum allows actors in this list
 	this.mSlotLimit = 27;       // Maximum slots on this list
@@ -402,7 +402,7 @@ RosterContainer.prototype.update = function()
 		result.data('ID', actorID);
 		result.data('idx', _index);
 		result.data('tag', this.mContainerID);
-		result.bindTooltip({ contentType: 'ui-element', entityId: actorID, elementId: "" });    // An element ID is apparently not needed here
+		result.bindTooltip({ contentType: 'msu-generic', modId: modTQUA.ID, elementId: "Player.RosterTooltip", EntityId: actorID, RosterId: this.mContainerID});	// tooltip via msu
 
 		parentDiv.data('child', result);
 		this.mBrotherCurrent++;

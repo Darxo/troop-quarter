@@ -1,4 +1,5 @@
 ::include("mod_TQUA/msu_systems/keybinds");
+::include("mod_TQUA/msu_systems/tooltips");
 
 if (::mods_getRegisteredMod("mod_legends"))
 {
