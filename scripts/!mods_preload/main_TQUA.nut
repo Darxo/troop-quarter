@@ -2,6 +2,7 @@
 	ID = "mod_TQUA",
 	Name = "Troop Quarter",
 	Version = "0.1.1",
+	DefaultLoadOrder = [">mod_msu", ">mod_legends", ">mod_URUI"],
 	Const = {
 		// Vanilla
 		MinPlayerRoster = 1,
@@ -14,7 +15,7 @@
 ::modTQUA.HooksMod <- ::Hooks.register(::modTQUA.ID, ::modTQUA.Version, ::modTQUA.Name);
 ::modTQUA.HooksMod.require(["mod_msu"]);
 
-::modTQUA.HooksMod.queue(">mod_msu, >mod_legends, >mod_URUI", function()
+::modTQUA.HooksMod.queue(::modTQUA.DefaultLoadOrder, function()
 {
 	::modTQUA.Mod <- ::MSU.Class.Mod(::modTQUA.ID, ::modTQUA.Version, ::modTQUA.Name);
 
