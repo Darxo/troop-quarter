@@ -1,14 +1,13 @@
 ::modTQUA <- {
 	ID = "mod_TQUA",
 	Name = "Troop Quarter",
-	Version = "0.1.1",
+	Version = "0.2.0",
 	DefaultLoadOrder = [">mod_msu", ">mod_legends", ">mod_URUI"],
 	Const = {
 		// Vanilla
 		MinPlayerRoster = 1,
 		PlayerFormationSize = 18,
 		PlayerReserveSize = 9,
-		PlayerRosterLimit = 27,
 	}
 	Global = {
 		// Vanilla and Modded (non-legends)

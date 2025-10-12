@@ -16,3 +16,14 @@ This Framework provides the functions and logic to create a Troop Manager screen
 - Should be safe to remove from- and add to running games and should not corrupt anything upon removal
 - Should be safe to remove from- and add to any existing savegames
 
+### Changes: ###
+
+0.2.0
+	- Rewrite mod using modern hooks
+	- Fix roster tooltips not working for brothers while in the troop quarter
+
+0.1.1
+	- released as part of PlayerHideout mod
+
+0.1.0
+	- released on discord
