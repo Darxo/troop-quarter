@@ -209,8 +209,8 @@ this.troop_manager <- {
 					// mName = "Reserve",	// We don't display the header so this is not shown
 					// mType = "Player",	// this is currently not supported and never displayed anywhere
 					mBrotherList = convertedRoster,
-					mBrotherMax = ::modTQUA.Const.PlayerReserveSize,
-					mSlotLimit = ::modTQUA.Const.PlayerReserveSize,
+					mBrotherMax = ::modTQUA.Global.getPlayerReserveSize(),
+					mSlotLimit = ::modTQUA.Global.getPlayerReserveSize(),
 					mSlotClasses = "<div class=\"ui-control is-brother-slot is-reserve-slot\"/>",
 					mAcceptsPlayerCharacters = true,
 					mSharedMaximumBrothers = ::World.Assets.getBrothersMax(),	// We want both Formation & Reserve to respect this shared maximum

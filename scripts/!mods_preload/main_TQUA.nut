@@ -10,6 +10,15 @@
 		PlayerReserveSize = 9,
 		PlayerRosterLimit = 27,
 	}
+	Global = {
+		// Vanilla and Modded (non-legends)
+		getPlayerReserveSize = function()
+		{
+			// The vanilla getFormation is one of the rare places, where the amount of slots, representing the player party, is [hard] coded into
+			// We assume that if ever a mod changes the amount of reserve slots, they would adjust that vanilla function accordingly
+			return ::World.Assets.getFormation().len() - ::modTQUA.Const.PlayerFormationSize;
+		}
+	}
 }
 
 ::modTQUA.HooksMod <- ::Hooks.register(::modTQUA.ID, ::modTQUA.Version, ::modTQUA.Name);
